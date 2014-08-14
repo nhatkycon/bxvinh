@@ -1,0 +1,119 @@
+﻿@import url(facebox.css);
+@import url(bootstrap-datetimepicker.min.css);
+body{
+    padding-top: 70px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+ul,li, ol {
+    padding: 0;
+    margin: 0;
+}
+.logo {
+    font-family: 'Marck Script', cursive;
+    font-size: 18pt;
+    font-weight: bold;
+    /*visibility: hidden;*/
+}
+.imgfinder-box {
+    display: inline-block; 
+    width: 200px;
+    min-height: 100px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-attachment: fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+.imgfinder-cover {
+    position: relative; 
+    z-index: 1;
+}
+.imgfinder-overlay {
+    bottom: -80px;
+    left: 210px;
+    position: absolute;
+    width: 140px;
+}
+.imgfinder-changeBtn {
+    cursor: pointer;
+}
+.imgfinder-removeBtn {
+    cursor: pointer;
+}
+.imgfinder-img {
+    width: 200px;
+    min-height: 100px;
+    position: relative; 
+    z-index: 0;
+}
+
+.home-panel .table{
+    margin-bottom: 0px;
+}
+.home-panel .panel-body {
+    padding: 0px;
+}
+.home-panel .panel {
+}
+.home-panel .panel-heading {
+    border: 0px;
+}
+.home-panel .panel-footer {
+    border: 0px;
+}
+.ui-ChamCong-Co .ui-state-default{
+	background: red !important;
+	border-color: red !important;
+	color: white !important;
+}
+.Phoi-ThuPhi-Pnl input, .TruyThuModal-Pnl input {
+    text-align: right;
+}
+.Phoi-ChamCongCalendar-Pnl .ui-datepicker-next, .Phoi-ChamCongCalendar-Pnl .ui-datepicker-prev {
+    display: none;      
+}
+.ChamCongCalendarPnl .ui-widget-content{
+    border: 0px;
+}
+.ChamCongCalendarPnl .ui-widget-header{
+    border: 0px;
+    background: none;
+}
+.TruyThuModal-Calendar .ui-state-highlight {
+    background: red !important;
+	border-color: red !important;
+	color: white !important;
+}
+.Phoi-NghiepVu-Pnl {
+    display: none;
+}
+.Phoi-NghiepVuActive-Pnl {
+    display: block;
+}
+.modal-content {
+}
+.DeNghi-Pnl {
+    display: none;
+}
+.DeNghiActive-Pnl {
+    display: block;
+}
+.Phoi-TruyThuPnl-ChamCongPnl table {
+    font-size: 80%;
+}
+.ui-autocomplete-loading {
+    background-image: url(i/loading.gif) !important;
+    background-repeat: no-repeat  !important;
+    background-position: right center  !important;
+    background-color: #F8F8F8  !important;
+}
+.ChamCongTd-Item-Clickable {
+    cursor: pointer;
+}
+.ChamCongTd-Item-Clickable.ChamCongTd-Item-Clickable-Active {
+    border: solid 1px red;
+    background-color: orange !important;    
+}

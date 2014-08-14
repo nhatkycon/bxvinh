@@ -1,0 +1,47 @@
+﻿body {
+    padding-top: 65px;
+}
+.BanHang-ItemSanPham {
+    display: block;
+    padding: 10px 20px;
+    cursor: pointer;
+    background-color: red;
+    margin-bottom: 10px;
+    text-decoration: none;
+    color: #FFF;
+    background-image: linear-gradient(to bottom, #FF0000 0px, #D90000 100%);
+    outline-style: none;
+}
+.BanHang-ItemSanPham-Ten {
+    font-weight: bold;
+}
+.BanHang-ItemSanPham:hover {
+    text-decoration: none;
+    background-color: red;
+}
+.BanHang-ItemSanPham-Price {
+    color: #FFF;
+    font-weight: bold;
+}
+.BanHang-ItemSanPham:hover .BanHang-ItemSanPham-Price{
+    color: #FFF;
+}
+.BanHang-ItemSanPham-MoTa {
+}
+.BanHang-Total {
+    font-size: 12pt;
+    font-weight: bold;
+}
+
+@media (max-width: 780px) {
+    .navbar-rightPnl {
+        float: right !important;
+        border: 0px !important;
+        margin-top: 0px !important;
+        margin-right: 5px !important;
+        margin-bottom: 0px !important;
+    }   
+    .BanHang-ItemSanPham {
+        min-height: 90px;
+    }
+}
