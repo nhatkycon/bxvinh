@@ -1,7 +1,6 @@
 ﻿@import url(facebox.css);
 @import url(bootstrap-datetimepicker.min.css);
 body{
-    padding-top: 70px;
     padding-left: 5px;
     padding-right: 5px;
 }
@@ -116,4 +115,20 @@ ul,li, ol {
 .ChamCongTd-Item-Clickable.ChamCongTd-Item-Clickable-Active {
     border: solid 1px red;
     background-color: orange !important;    
+}
+.XeVaoBen-HangDoi-Box {
+    padding-bottom: 10px;
+    padding-top: 10px;
+}
+.Phoi-HangDoi-XeYeuCauXuLy-Pnl {
+    /*position: fixed;
+    bottom: 10px;
+    right: 10px;
+    width: 140px;*/    
+}
+.Phoi-NghiepVu-HanPnl {
+    padding: 0px 9px;
+}
+.Phoi-NghiepVu-HanPnl .form-group {
+    margin-bottom: 0px;
 }

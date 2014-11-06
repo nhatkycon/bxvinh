@@ -57,8 +57,8 @@
                         <input type="text" style="display: none;" class="form-control DONVI_ID" name="DONVI_ID" id="DONVI_ID" value="<%=Item.DONVI_ID %>"/>
                     </div>
                 </div>
-                <label for="XE_BienSo" class="col-sm-2 control-label">Xe:</label>
-                <div class="col-sm-4">
+                <label for="XE_BienSo" class="col-sm-1 control-label">Xe:</label>
+                <div class="col-sm-2">
                     <div class="input-group">
                         <input type="text" data-src="/lib/ajax/Xe/Default.aspx" data-refId="XE_ID" class="form-control form-autocomplete-input XE_BienSo" name="XE_BienSo" id="XE_BienSo" value="<%=Item.XE_BienSo %>"/>
                         <span class="input-group-btn">
@@ -69,11 +69,7 @@
                         <input type="text" style="display: none;" class="form-control XE_ID" name="XE_ID" id="XE_ID" value="<%=Item.XE_ID %>"/>
                     </div>
                 </div>
-               
-            </div>
-            
-            <div class="form-group">
-                <label for="NgaySinh" class="col-sm-2 control-label">Ngày sinh:</label>
+               <label for="NgaySinh" class="col-sm-1 control-label">Ngày sinh:</label>
                 <div class="col-sm-2">
                     <div id="NgaySinhPicker" class="input-append datepicker-input date input-group">
                         <input 
@@ -89,6 +85,11 @@
                         </span>
                     </div>
                 </div>
+
+            </div>
+            
+            <div class="form-group">
+                
                 <label for="NgayHetHanBangLai" class="col-sm-2 control-label">Hạn bằng lái:</label>
                 <div class="col-sm-2">
                     <div id="NgayHetHanBangLaiPicker" class="input-append datepicker-input date input-group">
@@ -124,10 +125,6 @@
                     </div>
                 </div>
 
-            </div>
-            
-            
-            <div class="form-group">
                 <label for="Khoa" class="col-sm-2 control-label">Khóa:</label>
                 <div class="col-sm-2">
                     <%if (Item.Khoa)
@@ -136,7 +133,7 @@
                     <%}
                     else
                     {%>
-                        <input class="Khoa input-sm" id="Khoa" name="Khoa" type="checkbox"/>
+                        <input class="Khoa input-sm" id="Checkbox1" name="Khoa" type="checkbox"/>
                     <% } %>
                 </div>
             </div>

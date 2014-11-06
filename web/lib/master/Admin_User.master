@@ -5,6 +5,11 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
     <asp:ContentPlaceHolder id="head3" runat="server"></asp:ContentPlaceHolder>
+    <style type="text/css">
+        body{
+            padding-top: 70px;
+        }
+    </style>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" Runat="Server">
     <uc1:Menu runat="server" ID="Menu" />

@@ -30,7 +30,7 @@ namespace appStore.authorityStore.userMgr
         public override void KhoiTao(SqlConnection con)
         {
 
-            bool login = SecurityCangTin.IsAuthenticated();
+            bool login = Security.IsAuthenticated();
             Page _Page = new Page();
             ClientScriptManager cs = _Page.ClientScript;
             StringBuilder sb = new StringBuilder();
@@ -46,7 +46,7 @@ namespace appStore.authorityStore.userMgr
             {
                 case "Login":
                     #region Login
-                    sb.Append(SecurityCangTin.Login(_Usr, _Pwd, _Rem).ToString());
+                    sb.Append(Security.Login(_Usr, _Pwd, _Rem).ToString());
                     break;
                     #endregion
                 case "LogOut":
@@ -92,7 +92,7 @@ namespace appStore.authorityStore.userMgr
                         bool ok = UserDal.ValidActiveCode(_ActiveCode, Security.Username);
                         if (!ok)
                         {
-                            SecurityCangTin.Login(Security.Username, "True");
+                            Security.Login(Security.Username, "True");
                             c.Session["c-user"] = null;
 
                         }

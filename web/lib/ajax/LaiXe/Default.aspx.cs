@@ -35,7 +35,7 @@ public partial class lib_ajax_LaiXe_Default : basePage
 
                 #region save
 
-                if (!loggedIn || !string.IsNullOrEmpty(Ten) || !string.IsNullOrEmpty(BangLai))
+                if (loggedIn || !string.IsNullOrEmpty(Ten) || !string.IsNullOrEmpty(BangLai))
                 {
                     var Item = Inserted ? new LaiXe() : LaiXeDal.SelectById(Convert.ToInt32(Id));
 

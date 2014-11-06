@@ -47,6 +47,10 @@ namespace docsoft.entities
         public String LDM_Ten { get; set; }
         public Int32 Level { get; set; }
         public string PID_Ten { get; set; }
+        public string Hint
+        {
+            get { return string.Format("{0} {1}", Ten, Ma); }
+        }
         #endregion
         public override BaseEntity getFromReader(IDataReader rd)
         {

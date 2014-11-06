@@ -20,6 +20,48 @@ namespace linh.common
 {
     public class Lib
     {
+
+        private const string MaFull = "000000000";
+        public static string FormatMa(int Ma, string maFull)
+        {
+            if (Ma == 0) return string.Empty;
+            if (string.IsNullOrEmpty(maFull)) return string.Empty;
+            var maLen = Ma.ToString().Length;
+            return maFull.PadRight(maLen) + Ma.ToString();
+        }
+        public static string FormatMa(Int64 Ma, string maFull)
+        {
+            if (Ma == 0) return string.Empty;
+            if (string.IsNullOrEmpty(maFull)) return string.Empty;
+            var maLen = Ma.ToString().Length;
+            return maFull.PadRight(maLen) + Ma.ToString();
+        }
+        public static string FormatMa(string Ma, string maFull)
+        {
+            if (string.IsNullOrEmpty(Ma)) return string.Empty;
+            if (string.IsNullOrEmpty(maFull)) return string.Empty;
+            var maLen = Ma.ToString().Length;
+            return maFull.PadRight(maLen) + Ma.ToString();
+        }
+
+        public static string FormatMa(Int64 Ma)
+        {
+            if (Ma == 0) return string.Empty;
+            var maLen = Ma.ToString().Length;
+            return MaFull.PadRight(maLen) + Ma.ToString();
+        }
+        public static string FormatMa(int Ma)
+        {
+            if (Ma == 0) return string.Empty;
+            var maLen = Ma.ToString().Length;
+            return MaFull.PadRight(maLen) + Ma.ToString();
+        }
+        public static string FormatMa(string Ma)
+        {
+            if (string.IsNullOrEmpty(Ma)) return string.Empty;
+            var maLen = Ma.ToString().Length;
+            return MaFull.PadRight(maLen) + Ma.ToString();
+        }
         public static string NoHtml(string input)
         {
             return Regex.Replace(input, "<.*?>", String.Empty);

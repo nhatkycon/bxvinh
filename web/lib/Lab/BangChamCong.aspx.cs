@@ -4,48 +4,28 @@ using docsoft.entities;
 
 public partial class lib_Lab_BangChamCong : System.Web.UI.Page
 {
+    public LoaiBieuDo BieuDo { get; set; }
     protected void Page_Load(object sender, EventArgs e)
     {
-        var chamCongList = new List<ChamCong>();
-        var month = DateTime.Now.Month;
-        var year = DateTime.Now.Year;
-        var prevMonth = month == 1 ? 12 : month - 1;
-        var rnd = new Random();
-
-        for (var i = 0; i < 20; i++ )
+        var XE_ID = Request["XE_ID"];
+        var PHOI_ID = Request["PHOI_ID"];
+        if (!string.IsNullOrEmpty(XE_ID))
         {
-            var cday = new DateTime(year, month, rnd.Next(1, 30));
-            if(cday < DateTime.Now)
-            {
-                chamCongList.Add(new ChamCong()
-            {
-                Duyet = true
-                ,
-                Loai = Convert.ToInt16(rnd.Next(1, 4))
-                ,
-                Ngay = cday
-            });
-            }
-            
-        }
+            var month = DateTime.Now.Month;
+            var year = DateTime.Now.Year;
+            var prevMonth = month == 1 ? 12 : month - 1;
+            var tuNgay = new DateTime(year, prevMonth, 1).AddDays(-1);
+            var Xe = XeDal.SelectById(Convert.ToInt64(XE_ID));
+            var LoaiBieuDo = LoaiBieuDoDal.SelectById(Xe.BIEUDO_ID);
+            var chamCongList = ChamCongDal.SelectByXeTuNgay(PHOI_ID, tuNgay.ToString("dd/MM/yyyy"), Xe.ID);
+            var chamCongListCurrent = new List<ChamCong>();
 
-        for (var i = 0; i < 12; i++)
-        {
-            chamCongList.Add(new ChamCong()
-            {
-                Duyet = true
-                ,
-                Loai = Convert.ToInt16(rnd.Next(1, 4))
-                ,
-                Ngay = new DateTime(year, prevMonth, rnd.Next(1, 30))
-            });
-        }
+            ChamCongCalendar_View.ListChamCong = chamCongList;
+            ChamCongCalendar_View.ListChamCongCurrent = chamCongListCurrent;
+            ChamCongCalendar_View.LoaiBieuDo = LoaiBieuDo;
+            ChamCongCalendar_View.Visible = true;
 
-        ChamCongCalendar_View.ListChamCong = chamCongList;
-        ChamCongCalendar_View.LoaiBieuDo=new LoaiBieuDo()
-                                             {
-                                                 KhoanTuyen = false
-                                                 , SoTuyenKhoan = 2
-                                             };
+            BieuDo = LoaiBieuDo;
+        }
     }
 }

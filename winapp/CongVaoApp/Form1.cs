@@ -1,0 +1,253 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Data;
+using System.Diagnostics;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+using CongVaoApp.BxVinh.WebSrv;
+using Emgu.CV;
+using Emgu.CV.Structure;
+using Emgu.Util;
+
+namespace CongVaoApp
+{
+    public partial class Form1 : Form
+    {
+
+        private List<Xe> XeList { get; set; }
+        private List<LoaiXe> LoaiXeList { get; set; }
+        private BxVinh.WebSrv.WebService Wsrv { get; set; }
+        private long XeVaoBenInsertRs { get; set; }
+        private string BienSoStr { get; set; }
+        private int LoaiXeInt { get; set; }
+        private int XeId { get; set; }
+        private string NgayStr { get; set; }
+        private bool XeVangLai { get; set; }
+        public string Username { get; set; }
+        public string Ten { get; set; }
+        public int DonVi_Id { get; set; }
+        public GiaoCa GiaoCa { get; set; }
+        //declaring global variables
+        private Capture capture;        //takes images from camera as image frames
+        private bool captureInProgress; // checks if capture is executing
+
+        public Form1(string username, string ten, int donVi_Id)
+        {
+            InitializeComponent();
+            Username = username;
+            Ten = ten;
+            DonVi_Id = donVi_Id;
+            this.Text = string.Format("{0} - {1} - {2}", username, ten, donVi_Id);
+            Wsrv = new WebService();
+        }
+        public Form1(string username, string ten, int donVi_Id, GiaoCa giaoCa)
+        {
+            InitializeComponent();
+            Username = username;
+            Ten = ten;
+            DonVi_Id = donVi_Id;
+            GiaoCa = giaoCa;
+            lblTongSo.Text = GiaoCa.TongSoPhoi.ToString();
+            this.Text = string.Format("{0} - {1} - {2}", username, ten, donVi_Id);
+            Wsrv = new WebService();
+        }
+        public Form1()
+        {
+            InitializeComponent();
+            Wsrv = new WebService();
+        }
+        private void ProcessFrame(object sender, EventArgs arg)
+        {
+            var imageFrame = capture.QueryFrame();  //line 1
+            imageBox1.Image = imageFrame;        //line 2
+            imageBox3.Image = imageFrame;        //line 2
+            imageBox4.Image = imageFrame;        //line 2
+        }
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            backgroundWorker1.RunWorkerAsync();
+            drlBienSo.Enabled = cbxLoaiXe.Enabled = false;
+            KeyPreview = true;
+
+            
+
+
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            txtThoiGian.Text = DateTime.Now.ToString("HH:mm:ss dd/MM/yyyy");
+        }
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            bool bHandled = false;
+            // switch case is the easy way, a hash or map would be better, 
+            // but more work to get set up.
+            switch (keyData)
+            {
+                case Keys.Alt | Keys.F:
+                    #region View Camera
+                    #region if capture is not created, create it now
+                    if (capture == null)
+                    {
+                        try
+                        {
+                            capture = new Capture();
+                        }
+                        catch (NullReferenceException excpt)
+                        {
+                            MessageBox.Show(excpt.Message);
+                        }
+                    }
+                    #endregion
+
+                    if (capture != null)
+                    {
+                        Application.Idle += ProcessFrame;
+                        captureInProgress = !captureInProgress;
+                    }
+                    #endregion
+                    break;
+                case Keys.F8:
+                    BienSoStr = drlBienSo.Text;
+                    LoaiXeInt = Convert.ToInt32(cbxLoaiXe.SelectedValue);
+                    NgayStr = txtThoiGian.Text;
+                    XeId = Convert.ToInt32(drlBienSo.SelectedValue);
+                    XeVangLai = false;
+                    Debug.WriteLine(string.Format("Bien so: {0}", BienSoStr));
+                    Debug.WriteLine(string.Format("Xe id: {0}", XeId));
+                    Debug.WriteLine(string.Format("Loai xe: {0}", LoaiXeInt));
+                    if (!string.IsNullOrEmpty(BienSoStr) && LoaiXeInt != 0)
+                    {
+                        if (!backgroundWorker2.IsBusy)
+                        {
+                            backgroundWorker2.RunWorkerAsync();
+                        }
+                    }
+                    break;
+                case Keys.F9:
+                    BienSoStr = drlBienSo.Text;
+                    LoaiXeInt = Convert.ToInt32(cbxLoaiXe.SelectedValue);
+                    NgayStr = txtThoiGian.Text;
+                    XeId = Convert.ToInt32(drlBienSo.SelectedValue);
+                    XeVangLai = true;
+                    Debug.WriteLine(string.Format("Bien so: {0}", BienSoStr));
+                    Debug.WriteLine(string.Format("Xe id: {0}", XeId));
+                    Debug.WriteLine(string.Format("Loai xe: {0}", LoaiXeInt));
+                    if (!string.IsNullOrEmpty(BienSoStr) && LoaiXeInt != 0)
+                    {
+                        if (!backgroundWorker2.IsBusy)
+                        {
+                            backgroundWorker2.RunWorkerAsync();
+                        }
+                    }
+                    break;
+            }
+            return bHandled;
+        }
+
+
+        #region binding combobox
+        private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
+        {
+            XeList = Wsrv.XeGetAll(string.Empty,1000).ToList();
+            LoaiXeList = Wsrv.LoaiXeGetAll().ToList();
+        }
+
+        private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            BindingCombobox();
+        }
+        private void BindingCombobox()
+        {
+            #region bien So
+
+            var xe = new Xe { ID = 0, BienSo_Chu = "", BienSo_So = "", LOAIXE_ID = 0 };
+            XeList.Insert(0, xe);
+
+            drlBienSo.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            drlBienSo.AutoCompleteSource = AutoCompleteSource.ListItems;
+
+            drlBienSo.DataSource = XeList;
+            drlBienSo.DroppedDown = false;
+            drlBienSo.DisplayMember = "BienSo";
+            drlBienSo.ValueMember = "ID";
+            drlBienSo.Enabled = true;
+            #endregion
+
+            #region Loai xe
+
+            var loaiXe = new LoaiXe { ID = 0, Ten = "" };
+            LoaiXeList.Insert(0, loaiXe);
+
+            cbxLoaiXe.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            cbxLoaiXe.AutoCompleteSource = AutoCompleteSource.ListItems;
+
+            cbxLoaiXe.DataSource = LoaiXeList;
+            cbxLoaiXe.DroppedDown = false;
+            cbxLoaiXe.DisplayMember = "Ten";
+            cbxLoaiXe.ValueMember = "ID";
+            cbxLoaiXe.Enabled = true;
+
+            #endregion
+            backgroundWorker1.Dispose();
+            drlBienSo.Focus();
+        }
+
+        #endregion
+
+        private void drlBienSo_SelectionChangeCommitted(object sender, EventArgs e)
+        {
+            var item = (Xe)drlBienSo.SelectedItem;
+            cbxLoaiXe.SelectedValue = item.LOAIXE_ID;
+        }
+
+        private void backgroundWorker2_DoWork(object sender, DoWorkEventArgs e)
+        {
+            Debug.WriteLine("--background thread");
+            Debug.WriteLine(string.Format("Bien so: {0}", BienSoStr));
+            Debug.WriteLine(string.Format("Loai xe: {0}", LoaiXeInt));
+            XeVaoBenInsertRs = Wsrv.XeVaoBenInsert(BienSoStr, LoaiXeInt, NgayStr, Username, DonVi_Id, XeVangLai, GiaoCa.ID);
+
+        }
+
+        private void backgroundWorker2_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            drlBienSo.SelectedValue = 0;
+            cbxLoaiXe.SelectedValue = 0;
+            drlBienSo.Focus();
+
+            Debug.WriteLine(XeVaoBenInsertRs == 0 ? string.Format("Lỗi: {0}", XeVaoBenInsertRs) : string.Format("ID: {0}", XeVaoBenInsertRs));
+            backgroundWorker2.Dispose();
+
+            // Lấy dữ liệu mới khi phát hiện thêm xe vào hệ thống
+            if (XeId == 0 && !backgroundWorker1.IsBusy)
+            {
+                backgroundWorker1.RunWorkerAsync();
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            var frm = new Login();
+            frm.Show();
+        }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            backgroundWorker1.Dispose();
+            backgroundWorker2.Dispose();
+            backgroundWorker3.Dispose();
+            Application.Exit();
+            Process.GetCurrentProcess().Kill();
+        }
+
+    }
+}
+

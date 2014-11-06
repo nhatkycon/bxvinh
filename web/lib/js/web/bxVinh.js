@@ -1,6 +1,9 @@
 ﻿var pmLatestLoadedTimer;
-var pmLatestLoadedTimeOut = 10000;
+var pmLatestLoadedTimeOut = 2000;
 var _lastXhr;
+var dangCapPhoi = false;
+var globalTimeout = 10000;
+
 jQuery(function () {
     $('#__VIEWSTATE').remove();
     bxVinhFn.init();
@@ -51,6 +54,7 @@ var bxVinhFn = {
             }, "");
         }
         , getNumberFormMoney: function (tien) {
+            if (tien == '') return 0;
             function escapeRegExp(string) {
                 return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
             }
@@ -146,11 +150,58 @@ var bxVinhFn = {
         , donVi: '/lib/ajax/DonVi/default.aspx'
     }
     , normalFormFn: {
-        init:function () {
+        init: function () {
+            var logout = $('.logoutbtn');
+            logout.click(function () {
+                var data = { act: 'Logout' };
+                $.ajax({
+                    url: '/lib/ajax/Default.aspx'
+                    , data: data
+                    , success: function () {
+                        document.location.reload();
+                    }
+                });
+            });
+
+
             bxVinhFn.normalFormFn.add();
             bxVinhFn.normalFormFn.addPhoi();
+            bxVinhFn.normalFormFn.XeVaoBenTodayList();
+            bxVinhFn.normalFormFn.XeChoThanhToanList();
+            bxVinhFn.normalFormFn.ThuCapPhoiFn();
+            bxVinhFn.normalFormFn.XeDaThanhToanList();
         }
-        ,add:function () {
+        , add: function () {
+            /// Format các thành phần cơ bản
+            var moneyInputs = $('.money-input');
+            $.each(moneyInputs, function (i, j) {
+                var itemEl = $(j);
+                bxVinhFn.utils.formatTien(itemEl);
+            });
+
+            var datePickerElements = $('.datepicker-input');
+            $.each(datePickerElements, function (i, j) {
+                var itemEl = $(j);
+                itemEl.datetimepicker({
+                    language: 'vi-Vn'
+                });
+                var input = itemEl.find('input');
+                input.focus(function () {
+                    input.next().click();
+                });
+            });
+            
+            var timePickerElements = $('.timePicker-input');
+            $.each(timePickerElements, function (i, j) {
+                var itemEl = $(j);
+                itemEl.timepicker({
+                    minuteStep: 15,
+                    showMeridian: false,
+                    defaultTime: false
+                });
+            });
+
+
             var pnl = $('.Normal-Pnl-Add');
             if ($(pnl).length < 1) return;
             var url = pnl.attr('data-url');
@@ -241,46 +292,20 @@ var bxVinhFn = {
                         refEl.val(ui.item.id);
                     }
                     , function (matcher, item) {
-                        if (matcher.test(item.Ten.toLowerCase()) || matcher.test(adm.normalizeStr(item.Ten.toLowerCase())) || matcher.test(item.Ma.toLowerCase()) || matcher.test(item.Mobile.toLowerCase())) {
+                        if (matcher.test(item.Hint.toLowerCase()) || matcher.test(bxVinhFn.utils.normalizeStr(item.Hint.toLowerCase()))) {
                             return {
                                 label: item.Ten,
                                 value: item.Ten,
-                                id: item.ID
+                                id: item.ID,
+                                hint: item.Hint
                             };
                         }
                     }
                 );
             });
-
-
-            var datePickerElements = pnl.find('.datepicker-input');
-            $.each(datePickerElements, function(i, j) {
-                var itemEl = $(j);
-                itemEl.datetimepicker({
-                    language: 'vi-Vn'
-                });
-            });
-            
-            var timePickerElements = pnl.find('.timePicker-input');
-            $.each(timePickerElements, function (i, j) {
-                var itemEl = $(j);
-                itemEl.timepicker({
-                    minuteStep: 15,
-                    showMeridian: false,
-                    defaultTime: false
-                });
-            });
-            
-
             
             
             
-            
-            var moneyInputs = pnl.find('.money-input');
-            $.each(moneyInputs, function (i, j) {
-                var itemEl = $(j);
-                bxVinhFn.utils.formatTien(itemEl);
-            });
 
         }
         , phepTinh:function (pnl) {
@@ -380,19 +405,46 @@ var bxVinhFn = {
         , addPhoi:function () {
             var pnl = $('.Phoi-ThongTinXe-Pnl');
             if ($(pnl).length < 1) return;
+
+            bxVinhFn.normalFormFn.clearPhoiForm();
+
             var url = pnl.attr('data-url');
             var urlSuccess = pnl.attr('data-success');
             var urlList = pnl.attr('data-list');
             
             var btn = pnl.find('.saveBtn');
+            var restoreBtn = pnl.find('.restoreBtn');
+            
             var alertErr = pnl.find('.alert-danger');
             var alertOk = pnl.find('.alert-success');
-            var TruyThuModal = $('#TruyThuModal');
-            var TruyThuChamCongPnl = pnl.find('.Phoi-TruyThuPnl-ChamCongPnl');
-            var PhoiNghiepVuHanPnl = pnl.find('.Phoi-NghiepVu-HanPnl');
-            var PhoiThuPhiPnl = pnl.find('.Phoi-ThuPhi-Pnl');
+            var truyThuChamCongPnl = pnl.find('.Phoi-TruyThuPnl-ChamCongPnl');
+            var phoiNghiepVuHanPnl = pnl.find('.Phoi-NghiepVu-HanPnl');
+            var phoiThuPhiPnl = pnl.find('.Phoi-ThuPhi-Pnl');
             
-            btn.click(function () {
+            // Phục hồi trạng thái yêu cầu xử lý
+            restoreBtn.unbind('click').click(function() {
+                var xvbId = pnl.find('.XVB_ID');
+                var id = xvbId.val();
+                if(id=='0' || id=='') {
+                    return;
+                }
+                var urlXeVaoBen = '/lib/ajax/XeVaoBen/Default.aspx';
+                $.ajax({
+                    url: urlXeVaoBen,
+                    data: {
+                        subAct: 'RestoreXeChuaXuLy'
+                        , Id : id
+                    },
+                    success: function (rs) {
+                        $('.Phoi-NghiepVu-Pnl').removeClass('Phoi-NghiepVuActive-Pnl');
+                        bxVinhFn.normalFormFn.clearPhoiForm();
+                        restoreBtn.hide();
+                    }
+                });
+            });
+
+            // Lưu dữ liệu phơi
+            btn.unbind('click').click(function () {
                 
                 var LAIXE_Ten = pnl.find('.LAIXE_Ten');
                 var XE_BienSo = pnl.find('.XE_BienSo');
@@ -432,8 +484,10 @@ var bxVinhFn = {
                            alertErr.fadeIn();
                            alertErr.html('Đăng nhập và nhập dữ liệu cho chuẩn nhé');
                        } else {
+                           bxVinhFn.normalFormFn.clearPhoiForm();
                            alertOk.fadeIn();
                            alertOk.html('Lưu thành công');
+                           dangCapPhoi = false;
                            //setTimeout(function () {
                            //    document.location.href = urlSuccess + rs;
                            //}, 1000);
@@ -459,8 +513,8 @@ var bxVinhFn = {
                 bxVinhFn.utils.autoCompleteSearch(itemEl, src, refId
                     , function (event, ui) {
                         refEl.val(ui.item.id);
-                        var NgayHetHanBangLaiStr = PhoiNghiepVuHanPnl.find('.NgayHetHanBangLaiStr');
-                        var NgayHetHanGiayKhamSucKhoeStr = PhoiNghiepVuHanPnl.find('.NgayHetHanGiayKhamSucKhoeStr');
+                        var NgayHetHanBangLaiStr = phoiNghiepVuHanPnl.find('.NgayHetHanBangLaiStr');
+                        var NgayHetHanGiayKhamSucKhoeStr = phoiNghiepVuHanPnl.find('.NgayHetHanGiayKhamSucKhoeStr');
                         NgayHetHanBangLaiStr.html(ui.item.NgayHetHanBangLaiStr);
                         NgayHetHanGiayKhamSucKhoeStr.html(ui.item.NgayHetHanGiayKhamSucKhoeStr);
 
@@ -509,171 +563,17 @@ var bxVinhFn = {
                 bxVinhFn.utils.autoCompleteSearch(itemEl, src, refId
                     , function (event, ui) {
                         refEl.val(ui.item.id);
-                        var data = [];
-                        data.push({ name: 'subAct', value: 'GetById' });
-                        data.push({ name: 'Id', value: ui.item.id });
-                        $.ajax({
-                            url: '/lib/ajax/Xe/Default.aspx'
-                            , type: 'POST'
-                            , data: data
-                           , success: function (rs) {
-                               $('.Phoi-NghiepVu-Pnl').addClass('Phoi-NghiepVuActive-Pnl');
-
-                               var dt = eval(rs);
-                               var thongTinXePnl = $('.Phoi-ThongTinXe-Pnl');
-
-                               var LAIXE_Ten = thongTinXePnl.find('.LAIXE_Ten');
-                               var LAIXE_ID = thongTinXePnl.find('.LAIXE_ID');
-                               var DONVI_Ten = thongTinXePnl.find('.DONVI_Ten');
-                               var DI_Ten = thongTinXePnl.find('.DI_Ten');
-                               var DEN_Ten = thongTinXePnl.find('.DEN_Ten');
-                               var GioXuatBen = thongTinXePnl.find('.GioXuatBen');
-                               var BIEUDO_Ten = thongTinXePnl.find('.BIEUDO_Ten');
-                               
-                               // Hạn
-                               var TuyenCoDinhStr = PhoiNghiepVuHanPnl.find('.TuyenCoDinhStr');
-                               var LuuHanhStr = PhoiNghiepVuHanPnl.find('.LuuHanhStr');
-                               var BaoHiemStr = PhoiNghiepVuHanPnl.find('.BaoHiemStr');
-                               var NgayHetHanBangLaiStr = PhoiNghiepVuHanPnl.find('.NgayHetHanBangLaiStr');
-                               var NgayHetHanGiayKhamSucKhoeStr = PhoiNghiepVuHanPnl.find('.NgayHetHanGiayKhamSucKhoeStr');
-                               var XE_Khoa = PhoiNghiepVuHanPnl.find('.XE_Khoa');
-                               
-                               ////////////////////////////////////////////////////////////////////////////////////////////////////////
-                               // FORM THU
-                               ////////////////////////////////////////////////////////////////////////////////////////////////////////
-                               
-                               // Giá vé
-                               var PhoiThuPhiPnl = pnl.find('.Phoi-ThuPhi-Pnl');
-                               var GiaVe = PhoiThuPhiPnl.find('.GiaVe');
-                               var HoaHongBanVe = PhoiThuPhiPnl.find('.HoaHongBanVe');
-                               var PhiTrenMotVe = PhoiThuPhiPnl.find('.PhiTrenMotVe');
-                               var PHI_BenBai = PhoiThuPhiPnl.find('.PHI_BenBai');
-                               var Ve = PhoiThuPhiPnl.find('.Ve');
-                               var PHI_HoaHongBanVe = PhoiThuPhiPnl.find('.PHI_HoaHongBanVe');
-                               // Truy thu khách
-                               var KhachTruyThu = PhoiThuPhiPnl.find('.KhachTruyThu');
-                               var PHI_KhachTruyThu = PhoiThuPhiPnl.find('.PHI_KhachTruyThu');
-                               var PHI_TruyThuGiam = PhoiThuPhiPnl.find('.PHI_TruyThuGiam');
-                               // Tổng
-                               var PHI_Tong = PhoiThuPhiPnl.find('.PHI_Tong');
-                               var PHI_Nop = PhoiThuPhiPnl.find('.PHI_Nop');
-                               var PHI_ConNo = PhoiThuPhiPnl.find('.PHI_ConNo');
-                               
-                               ////////////////////////////////////////////////////////////////////////////////////////////////////////
-                               // FORM MODAL
-                               ////////////////////////////////////////////////////////////////////////////////////////////////////////
-                               
-                               var TruyThuModal = pnl.find('#TruyThuModal');
-                               var GiaTienDichVuTrongHopDong = TruyThuModal.find('.GiaTienDichVuTrongHopDong');
-                               var SoChuyenBieuDo = TruyThuModal.find('#SoChuyenBieuDo');
-                               var TongTruyThu = TruyThuModal.find('#TongTruyThu');
-                               var GiamTru = TruyThuModal.find('#GiamTru');
-                               var ConLai = TruyThuModal.find('#ConLai');
-
-
-                               ////////////////////////////////////////////////////////////////////////////////////////////////////////
-                               // BIND DỮ LIỆU TỪ AJAX
-                               ////////////////////////////////////////////////////////////////////////////////////////////////////////
-                               
-                               LAIXE_Ten.val(dt.LaiXe.Ten);
-                               LAIXE_ID.val(dt.LaiXe.ID);
-                               TuyenCoDinhStr.html(dt.TuyenCoDinhStr);
-                               LuuHanhStr.html(dt.LuuHanhStr);
-                               BaoHiemStr.html(dt.BaoHiemStr);
-                               NgayHetHanBangLaiStr.html(dt.LaiXe.NgayHetHanBangLaiStr);
-                               NgayHetHanGiayKhamSucKhoeStr.html(dt.LaiXe.NgayHetHanGiayKhamSucKhoeStr);
-
-                               if(dt.Khoa) {
-                                   XE_Khoa.attr('checked', 'checked');
-                               } else {
-                                   XE_Khoa.removeAttr('checked');
-                               }
-                               HoaHongBanVe.val(dt.Tuyen.HoaHongBanVe);
-                               GiaTienDichVuTrongHopDong.val(dt.MucPhi);
-                               PHI_BenBai.val(dt.MucPhi);
-                               Ve.val(dt.SoKhach);
-                               GiaVe.val(dt.GiaVe);
-                               PhiTrenMotVe.val(dt.GiaVe * dt.Tuyen.HoaHongBanVe / 100);
-
-                               PHI_HoaHongBanVe.val(dt.GiaVe * dt.Tuyen.HoaHongBanVe / 100 * dt.SoKhach);
-
-
-                               PHI_BenBai.val();
-                               DONVI_Ten.val(dt.DONVI_Ten);
-                               DONVI_Ten.val(dt.DONVI_Ten);
-                               DI_Ten.val(dt.Tuyen.DI_Ten);
-                               DEN_Ten.val(dt.Tuyen.DEN_Ten);
-                               GioXuatBen.val(dt.GioXuatBen);
-                               BIEUDO_Ten.html(dt.LoaiBieuDo.Ten);
-                               
-                               ////////////////////////////////////////////////////////////////////////////////////////////////////////
-                               // HÀM TÍNH TOÁN TRÊN MODAL FORM
-                               ////////////////////////////////////////////////////////////////////////////////////////////////////////
-                               $(TongTruyThu).unbind('keyup').keyup(function () {
-                                   var tongModal = parseInt(bxVinhFn.utils.getNumberFormMoney(TongTruyThu.val()));
-                                   var giamModal = parseInt(bxVinhFn.utils.getNumberFormMoney(GiamTru.val()));
-                                   var conModal = tongModal - giamModal;
-                                   ConLai.val(bxVinhFn.utils.convertNumberToMoney(conModal));
-                               });
-                               $(GiamTru).unbind('keyup').keyup(function () {
-                                   var tongModal = parseInt(bxVinhFn.utils.getNumberFormMoney(TongTruyThu.val()));
-                                   var giamModal = parseInt(bxVinhFn.utils.getNumberFormMoney(GiamTru.val()));
-                                   var conModal = tongModal - giamModal;
-                                   ConLai.val(bxVinhFn.utils.convertNumberToMoney(conModal));
-                               });
-
-                               $(GiaTienDichVuTrongHopDong).unbind('keyup').keyup(function () {
-                                   var soChuyen = parseInt(bxVinhFn.utils.getNumberFormMoney(SoChuyenBieuDo.val()));
-                                   var giaChuyen = parseInt(bxVinhFn.utils.getNumberFormMoney(GiaTienDichVuTrongHopDong.val()));
-                                   var tongModal = (soChuyen * giaChuyen);
-                                   TongTruyThu.val(bxVinhFn.utils.convertNumberToMoney(tongModal));
-                                   var giamModal = parseInt(GiamTru.val());
-                                   var conModal = tongModal - giamModal;
-                                   ConLai.val(bxVinhFn.utils.convertNumberToMoney(conModal));
-                               });
-
-
-                               
-                               ////////////////////////////////////////////////////////////////////////////////////////////////////////
-                               // HÀM TÍNH TOÁN FORM THU
-                               ////////////////////////////////////////////////////////////////////////////////////////////////////////
-                               bxVinhFn.utils.formatTien(pnl.find('.money-input'));
-
-                               // HÀM TÍNH TOÁN TRÊN CLIENT
-                               bxVinhFn.normalFormFn.phepTinh(pnl);
-                               
-                           }
-                        });
-
-                        data = [];
-                        data.push({ name: 'subAct', value: 'BangChamCongTheoXe' });
-                        data.push({ name: 'XE_ID', value: ui.item.id });
-                        $.ajax({
-                            url: '/lib/ajax/ChamCong/Default.aspx'
-                           , type: 'POST'
-                           , data: data
-                          , success: function (rs) {
-                              TruyThuChamCongPnl.html(rs);
-                          }
-                        });
+                        bxVinhFn.normalFormFn.chonXeHandler(ui.item.id, ui.item.label, '');
 
                         //Phoi-TruyThuPnl-ChamCongPnl
                     }
                     , function (matcher, item) {
-                        if (matcher.test(item.BienSo_So.toLowerCase()) || matcher.test(adm.normalizeStr(item.BienSo_So.toLowerCase()))) {
+                        if (matcher.test(item.Hint.toLowerCase()) || matcher.test(adm.normalizeStr(item.Hint.toLowerCase()))) {
                             return {
-                                label: item.Ten,
-                                value: item.Ten,
+                                label: item.Bien,
+                                value: item.Bien,
                                 id: item.ID,
-                                bh: item.BaoHiem,
-                                luuHanh: item.LuuHanh,
-                                tcd: item.TuyenCoDinh,
-                                khoa: item.Khoa,
-                                mucPhi: item.MucPhi,
-                                hopLe: item.HopLe,
-                                donVi_Ten: item.DONVI_Ten,
-                                hopLeThongBao: item.HopLeThongBao,
-                                gioXuatBen: item.GioXuatBen
+                                hint: item.Hint
                             };
                         }
                     }
@@ -682,7 +582,7 @@ var bxVinhFn = {
                 itemEl.data('ui-autocomplete')._renderItem = function (ul, item) {
                     return $("<li></li>")
                         .data("item.autocomplete", item)
-                        .append("<a href=\"javascript:;\"><strong class=\"" + (item.hopLe ? "" : "ui-state-error-text") + "\">" + item.label + "</strong> " + (item.hopLe ? "" : item.hopLeThongBao) + "</a>")
+                        .append("<a href=\"javascript:;\">" + item.label + "</a>")
                         .appendTo(ul);
                 };
 
@@ -691,7 +591,7 @@ var bxVinhFn = {
 
             bxVinhFn.normalFormFn.phepTinh(pnl);
 
-            var ChuyenTruyThu = PhoiThuPhiPnl.find('.ChuyenTruyThu');
+            var chuyenTruyThu = phoiThuPhiPnl.find('.ChuyenTruyThu');
             $('.Phoi-TruyThuPnl-ChamCongPnl').on('click', '.ChamCongTd-Item-Clickable', function () {
                 var item = $(this);
                 var txt = item.find('input');
@@ -703,13 +603,458 @@ var bxVinhFn = {
                     item.addClass('ChamCongTd-Item-Clickable-Active');
                     txt.attr('name', 'NgayChamCong');
                 }
-                var totalChuyenTruyThu = TruyThuChamCongPnl.find('.ChamCongTd-Item-Clickable-Active').length;
-                ChuyenTruyThu.val(totalChuyenTruyThu);
+                var totalChuyenTruyThu = truyThuChamCongPnl.find('.ChamCongTd-Item-Clickable-Active').length;
+                chuyenTruyThu.val(totalChuyenTruyThu);
                 bxVinhFn.normalFormFn.phepTinh(pnl);
             });
-        }
-        , chonXeHandler:function () {
             
+            $(document).on('keydown', null, 'f8', function () {
+                btn.click();
+            });
+        }
+        , clearPhoiForm:function () {
+            var pnl = $('.Phoi-ThongTinXe-Pnl');
+            if($(pnl).length > 0) {
+                pnl.find('input:not([form-control-hasDefalltValue])').val('');
+                pnl.find('.restoreBtn').hide();
+            }
+        }
+        , chonXeHandler: function (id, bx, xvbId) {
+            dangCapPhoi = true;
+            
+            var pnl = $('.Phoi-ThongTinXe-Pnl');
+            var itemEl = pnl.find('.form-autocomplete-input-Phoi-ChonXe');
+            var xeId = pnl.find('.XE_ID');
+            
+            var TruyThuChamCongPnl = pnl.find('.Phoi-TruyThuPnl-ChamCongPnl');
+            var PhoiNghiepVuHanPnl = pnl.find('.Phoi-NghiepVu-HanPnl');
+            var NgayXuatBen = pnl.find('.NgayXuatBen');
+            itemEl.val(bx);
+            xeId.val(id);
+
+                var data = [];
+                 data.push({ name: 'subAct', value: 'GetById' });
+                 data.push({ name: 'Id', value: id });
+                 data.push({ name: 'XVB_ID', value: xvbId });
+                $.ajax({
+                    url: '/lib/ajax/Xe/Default.aspx'
+                    , type: 'POST'
+                    , data: data
+                    , success: function (rs) {
+                        $('.Phoi-NghiepVu-Pnl').addClass('Phoi-NghiepVuActive-Pnl');
+
+                        var dt = eval(rs);
+                        var thongTinXePnl = $('.Phoi-ThongTinXe-Pnl');
+
+                        var LAIXE_Ten = thongTinXePnl.find('.LAIXE_Ten');
+                        var LAIXE_ID = thongTinXePnl.find('.LAIXE_ID');
+                        var DONVI_Ten = thongTinXePnl.find('.DONVI_Ten');
+                        var DI_Ten = thongTinXePnl.find('.DI_Ten');
+                        var DEN_Ten = thongTinXePnl.find('.DEN_Ten');
+                        var GioXuatBen = thongTinXePnl.find('.GioXuatBen');
+                        var BIEUDO_Ten = thongTinXePnl.find('.BIEUDO_Ten');
+                               
+                        // Hạn
+                        var TuyenCoDinhStr = PhoiNghiepVuHanPnl.find('.TuyenCoDinhStr');
+                        var LuuHanhStr = PhoiNghiepVuHanPnl.find('.LuuHanhStr');
+                        var BaoHiemStr = PhoiNghiepVuHanPnl.find('.BaoHiemStr');
+                        var NgayHetHanBangLaiStr = PhoiNghiepVuHanPnl.find('.NgayHetHanBangLaiStr');
+                        var NgayHetHanGiayKhamSucKhoeStr = PhoiNghiepVuHanPnl.find('.NgayHetHanGiayKhamSucKhoeStr');
+                        var XE_Khoa = PhoiNghiepVuHanPnl.find('.XE_Khoa');
+                               
+                        ////////////////////////////////////////////////////////////////////////////////////////////////////////
+                        // FORM THU
+                        ////////////////////////////////////////////////////////////////////////////////////////////////////////
+                               
+                        // Giá vé
+                        var PhoiThuPhiPnl = pnl.find('.Phoi-ThuPhi-Pnl');
+                        var GiaVe = PhoiThuPhiPnl.find('.GiaVe');
+                        var HoaHongBanVe = PhoiThuPhiPnl.find('.HoaHongBanVe');
+                        var PhiTrenMotVe = PhoiThuPhiPnl.find('.PhiTrenMotVe');
+                        var PHI_BenBai = PhoiThuPhiPnl.find('.PHI_BenBai');
+                        var Ve = PhoiThuPhiPnl.find('.Ve');
+                        var PHI_HoaHongBanVe = PhoiThuPhiPnl.find('.PHI_HoaHongBanVe');
+                        // Truy thu khách
+                        var KhachTruyThu = PhoiThuPhiPnl.find('.KhachTruyThu');
+                        var PHI_KhachTruyThu = PhoiThuPhiPnl.find('.PHI_KhachTruyThu');
+                        var PHI_TruyThuGiam = PhoiThuPhiPnl.find('.PHI_TruyThuGiam');
+                        // Tổng
+                        var PHI_Tong = PhoiThuPhiPnl.find('.PHI_Tong');
+                        var PHI_Nop = PhoiThuPhiPnl.find('.PHI_Nop');
+                        var PHI_ConNo = PhoiThuPhiPnl.find('.PHI_ConNo');
+                               
+                        ////////////////////////////////////////////////////////////////////////////////////////////////////////
+                        // FORM MODAL
+                        ////////////////////////////////////////////////////////////////////////////////////////////////////////
+                               
+                        var TruyThuModal = pnl.find('#TruyThuModal');
+                        var GiaTienDichVuTrongHopDong = TruyThuModal.find('.GiaTienDichVuTrongHopDong');
+                        var SoChuyenBieuDo = TruyThuModal.find('#SoChuyenBieuDo');
+                        var TongTruyThu = TruyThuModal.find('#TongTruyThu');
+                        var GiamTru = TruyThuModal.find('#GiamTru');
+                        var ConLai = TruyThuModal.find('#ConLai');
+
+
+                        ////////////////////////////////////////////////////////////////////////////////////////////////////////
+                        // BIND DỮ LIỆU TỪ AJAX
+                        ////////////////////////////////////////////////////////////////////////////////////////////////////////
+                               
+                        LAIXE_Ten.val(dt.LaiXe.Ten);
+                        LAIXE_ID.val(dt.LaiXe.ID);
+                        TuyenCoDinhStr.html(dt.TuyenCoDinhStr);
+                        LuuHanhStr.html(dt.LuuHanhStr);
+                        BaoHiemStr.html(dt.BaoHiemStr);
+                        NgayHetHanBangLaiStr.html(dt.LaiXe.NgayHetHanBangLaiStr);
+                        NgayHetHanGiayKhamSucKhoeStr.html(dt.LaiXe.NgayHetHanGiayKhamSucKhoeStr);
+
+                        if(dt.Khoa) {
+                            XE_Khoa.attr('checked', 'checked');
+                        } else {
+                            XE_Khoa.removeAttr('checked');
+                        }
+                        HoaHongBanVe.val(dt.Tuyen.HoaHongBanVe);
+                        GiaTienDichVuTrongHopDong.val(dt.MucPhi);
+                        PHI_BenBai.val(dt.MucPhi);
+                        Ve.val(dt.SoKhach);
+                        GiaVe.val(dt.GiaVe);
+                        PhiTrenMotVe.val(dt.GiaVe * dt.Tuyen.HoaHongBanVe / 100);
+
+                        PHI_HoaHongBanVe.val(dt.GiaVe * dt.Tuyen.HoaHongBanVe / 100 * dt.SoKhach);
+
+
+                        PHI_BenBai.val();
+                        DONVI_Ten.val(dt.DONVI_Ten);
+                        DONVI_Ten.val(dt.DONVI_Ten);
+                        DI_Ten.val(dt.Tuyen.DI_Ten);
+                        DEN_Ten.val(dt.Tuyen.DEN_Ten);
+                        GioXuatBen.val(dt.GioXuatBen);
+                        BIEUDO_Ten.html(dt.LoaiBieuDo.Ten);
+                               
+                        ////////////////////////////////////////////////////////////////////////////////////////////////////////
+                        // HÀM TÍNH TOÁN TRÊN MODAL FORM
+                        ////////////////////////////////////////////////////////////////////////////////////////////////////////
+                        $(TongTruyThu).unbind('keyup').keyup(function () {
+                            var tongModal = parseInt(bxVinhFn.utils.getNumberFormMoney(TongTruyThu.val()));
+                            var giamModal = parseInt(bxVinhFn.utils.getNumberFormMoney(GiamTru.val()));
+                            var conModal = tongModal - giamModal;
+                            ConLai.val(bxVinhFn.utils.convertNumberToMoney(conModal));
+                        });
+                        $(GiamTru).unbind('keyup').keyup(function () {
+                            var tongModal = parseInt(bxVinhFn.utils.getNumberFormMoney(TongTruyThu.val()));
+                            var giamModal = parseInt(bxVinhFn.utils.getNumberFormMoney(GiamTru.val()));
+                            var conModal = tongModal - giamModal;
+                            ConLai.val(bxVinhFn.utils.convertNumberToMoney(conModal));
+                        });
+
+                        $(GiaTienDichVuTrongHopDong).unbind('keyup').keyup(function () {
+                            var soChuyen = parseInt(bxVinhFn.utils.getNumberFormMoney(SoChuyenBieuDo.val()));
+                            var giaChuyen = parseInt(bxVinhFn.utils.getNumberFormMoney(GiaTienDichVuTrongHopDong.val()));
+                            var tongModal = (soChuyen * giaChuyen);
+                            TongTruyThu.val(bxVinhFn.utils.convertNumberToMoney(tongModal));
+                            var giamModal = parseInt(GiamTru.val());
+                            var conModal = tongModal - giamModal;
+                            ConLai.val(bxVinhFn.utils.convertNumberToMoney(conModal));
+                        });
+
+
+                               
+                        ////////////////////////////////////////////////////////////////////////////////////////////////////////
+                        // HÀM TÍNH TOÁN FORM THU
+                        ////////////////////////////////////////////////////////////////////////////////////////////////////////
+                        bxVinhFn.utils.formatTien(pnl.find('.money-input'));
+
+                        // HÀM TÍNH TOÁN TRÊN CLIENT
+                        bxVinhFn.normalFormFn.phepTinh(pnl);
+                               
+                    }
+                });
+
+                data = [];
+                data.push({ name: 'subAct', value: 'BangChamCongTheoXe' });
+                data.push({ name: 'XE_ID', value: id });
+                data.push({ name: 'NgayXuatBen', value: NgayXuatBen.val() });
+                $.ajax({
+                    url: '/lib/ajax/ChamCong/Default.aspx'
+                    , type: 'POST'
+                    , data: data
+                    , success: function (rs) {
+                        TruyThuChamCongPnl.html(rs);
+                    }
+                });
+        }
+        , XeVaoBenTodayList: function () {
+            var url = '/lib/ajax/XeVaoBen/Default.aspx';
+            var pnl = $('.XeRaVaoToDayList');
+            if ($(pnl).length > 0) {
+                var timerXeVaoRaTodayList;
+
+                var ajaxUpdateTodayList = function () {
+                    $.ajax({
+                        url: url,
+                        data: {
+                            subAct: 'GetNewers'
+                        },
+                        success: function (rs) {
+                            pnl.html('');
+                            $(rs).prependTo(pnl);
+                            if (timerXeVaoRaTodayList) clearTimeout(timerXeVaoRaTodayList);
+                            timerXeVaoRaTodayList = setTimeout(function () {
+                                ajaxUpdateTodayList();
+                            }, globalTimeout);
+                        }
+                    });
+                };
+
+                ajaxUpdateTodayList();
+
+            }
+
+            $(pnl).on('click', 'button', function() {
+                var item = $(this);
+                item.removeClass('btn-warning');
+                item.addClass('btn-default');
+                var id = item.attr('data-id');
+                $.ajax({
+                    url: url,
+                    data: {
+                        subAct: 'YeuCauXuLy'
+                        , Id : id
+                    },
+                    success: function (rs) {
+                    }
+                });
+            });
+
+
+            var phoiHangDoiPnl = $('.Phoi-HangDoi-XeYeuCauXuLy-Pnl');
+            if ($(phoiHangDoiPnl).length > 0) {
+                var body = phoiHangDoiPnl.find('.Phoi-HangDoi-XeYeuCauXuLy-Body');
+                
+                var timerYeuCauXuLyHangDoiList;
+
+                var ajaxYeuCauXuLyHangDoi = function() {
+                    $.ajax({
+                        url: url,
+                        data: {
+                            subAct: 'GetYeuCauXuLyListByUsername'
+                        },
+                        success: function (rs) {
+                            body.html('');
+                            $(rs).prependTo(body);
+                            if (timerYeuCauXuLyHangDoiList) clearTimeout(timerYeuCauXuLyHangDoiList);
+                            timerYeuCauXuLyHangDoiList = setTimeout(function () {
+                                ajaxYeuCauXuLyHangDoi();
+                            }, globalTimeout);
+                        }
+                    });
+                };
+                ajaxYeuCauXuLyHangDoi();
+
+
+                $(phoiHangDoiPnl).on('click', '.list-group-item', function () {
+                    var item = $(this);
+                    var id = item.attr('data-id');
+                    var xvbId = item.attr('data-xvbId');
+                    var bx = item.attr('data-bx');
+                    item.fadeOut(1000);
+                    setTimeout(function() {
+                        item.remove();
+                    }, 400);
+                    $('.XVB_ID').val(xvbId);
+                    bxVinhFn.normalFormFn.chonXeHandler(id, bx, xvbId);
+                    $('.restoreBtn').show();
+                });
+            }
+        }
+        , XeChoThanhToanList: function () {
+            var url = '/lib/ajax/XeVaoBen/Default.aspx';
+            var pnl = $('.XeChoThanhToanList');
+            if ($(pnl).length > 0) {
+                var timerChoThanhToanList;
+
+                var ajaxUpdateChoThanhToanList = function () {
+                    $.ajax({
+                        url: url,
+                        data: {
+                            subAct: 'GetChoThanhToan'
+                        },
+                        success: function (rs) {
+                            pnl.html('');
+                            $(rs).prependTo(pnl);
+                            if (timerChoThanhToanList) clearTimeout(timerChoThanhToanList);
+                            timerChoThanhToanList = setTimeout(function () {
+                                ajaxUpdateChoThanhToanList();
+                            }, globalTimeout);
+                        }
+                    });
+                };
+
+                ajaxUpdateChoThanhToanList();
+
+            }
+
+            $(pnl).on('click', 'button', function () {
+                var item = $(this);
+                item.removeClass('btn-warning');
+                item.addClass('btn-default');
+                var id = item.attr('data-id');
+                $.ajax({
+                    url: url,
+                    data: {
+                        subAct: 'YeuCauThanhToan'
+                        , Id: id
+                    },
+                    success: function (rs) {
+                    }
+                });
+            });
+            
+            var phoiHangDoiPnl = $('.ThuChi-HangDoi-XeYeuCauThanhToan-Pnl');
+            if ($(phoiHangDoiPnl).length > 0) {
+                var body = phoiHangDoiPnl.find('.ThuChi-HangDoi-XeYeuCauThanhToan-Body');
+
+                var timerYeuCauThanhToanHangDoiList;
+
+                var ajaxYeuCauThanhToanHangDoi = function () {
+                    $.ajax({
+                        url: url,
+                        data: {
+                            subAct: 'GetYeuCauThanhToan'
+                        },
+                        success: function (rs) {
+                            body.html('');
+                            $(rs).prependTo(body);
+                            if (timerYeuCauThanhToanHangDoiList) clearTimeout(timerYeuCauThanhToanHangDoiList);
+                            timerYeuCauThanhToanHangDoiList = setTimeout(function () {
+                                ajaxYeuCauThanhToanHangDoi();
+                            }, globalTimeout);
+                        }
+                    });
+                };
+                ajaxYeuCauThanhToanHangDoi();
+
+
+                $(phoiHangDoiPnl).on('click', '.list-group-item', function () {
+                    var item = $(this);
+                    var id = item.attr('data-xvBI');
+                    //item.fadeOut(1000);
+                    setTimeout(function () {
+                        //item.remove();
+                    }, 1000);
+                    $('.restoreBtn').show();
+                    $('.XVB_ID').val(id);
+                    $.ajax({
+                        url: url,
+                        data: {
+                            subAct: 'NhanYeuCauThanhToan'
+                            , ID: id
+                        },
+                        success: function (rs) {
+                            var dt = eval(rs);
+                            bxVinhFn.normalFormFn.ThuCapPhoiHanler(dt);
+                        }
+                    });
+                });
+            }
+           
+        }
+        , XeDaThanhToanList: function () {
+            var url = '/lib/ajax/XeVaoBen/Default.aspx';
+            var pnl = $('.XeDaThanhToanList');
+            if ($(pnl).length > 0) {
+                var timerChoThanhToanList;
+
+                var ajaxUpdateChoThanhToanList = function () {
+                    $.ajax({
+                        url: url,
+                        data: {
+                            subAct: 'GetDaThanhToan'
+                        },
+                        success: function (rs) {
+                            pnl.html('');
+                            $(rs).prependTo(pnl);
+                            if (timerChoThanhToanList) clearTimeout(timerChoThanhToanList);
+                            timerChoThanhToanList = setTimeout(function () {
+                                ajaxUpdateChoThanhToanList();
+                            }, globalTimeout);
+                        }
+                    });
+                };
+
+                ajaxUpdateChoThanhToanList();
+
+            }
+
+        }
+        , ThuCapPhoiHanler:function (dt) {
+            var pnl1 = $('.ThuCapPhoi-Pnl-Add');
+            var sTTBX = pnl1.find('.STTBX');
+            var sTTALL = pnl1.find('.STTALL');
+            var xE_BienSo = pnl1.find('.XE_BienSo');
+            var xE_ID = pnl1.find('.XE_ID');
+            var tien = pnl1.find('.Tien');
+            var pHOI_ID = pnl1.find('.PHOI_ID');
+
+            sTTBX.val(dt.STTBXStr);
+            sTTALL.val(dt.STTALLStr);
+            xE_BienSo.val(dt.Phoi.Xe.BienSoStr);
+            xE_ID.val(dt.Phoi.XE_ID);
+            tien.val(bxVinhFn.utils.convertNumberToMoney(dt.Phoi.PHI_Tong));
+            pHOI_ID.val(dt.Phoi.ID);
+        }
+        , ThuCapPhoiFn: function () {
+            var pnl = $('.ThuCapPhoi-Pnl-Add');
+            if ($(pnl).length > 0) {
+                bxVinhFn.normalFormFn.clearThuCapPhoiForm();
+                var autoCompletePhoiChonXe = pnl.find('.form-autocomplete-input-ThuChi-ChonXe');
+                $.each(autoCompletePhoiChonXe, function (i, j) {
+                    var itemEl = $(j);
+                    var parentEl = itemEl.parent();
+                    var btnAutocomplete = parentEl.find('.autocomplete-btn');
+                    var refId = itemEl.attr('data-refId');
+                    var refEl = parentEl.find('.' + refId);
+                    var src = itemEl.attr('data-src');
+                    btnAutocomplete.unbind('click').click(function () {
+                        itemEl.autocomplete('search', '');
+                    });
+                    itemEl.unbind('click').click(function () {
+                        itemEl.autocomplete('search', '');
+                    });
+                    bxVinhFn.utils.autoCompleteSearch(itemEl, src, refId
+                        , function (event, ui) {
+                            refEl.val(ui.item.id);
+                            //bxVinhFn.normalFormFn.chonXeHandler(ui.item.id, ui.item.label);
+
+                            //Phoi-TruyThuPnl-ChamCongPnl
+                        }
+                        , function (matcher, item) {
+                            if (matcher.test(item.Hint.toLowerCase()) || matcher.test(adm.normalizeStr(item.Hint.toLowerCase()))) {
+                                return {
+                                    label: item.Bien,
+                                    value: item.Bien,
+                                    id: item.ID,
+                                    hint: item.Hint
+                                };
+                            }
+                        }
+                    );
+
+                    itemEl.data('ui-autocomplete')._renderItem = function (ul, item) {
+                        return $("<li></li>")
+                            .data("item.autocomplete", item)
+                            .append("<a href=\"javascript:;\">" + item.label + "</a>")
+                            .appendTo(ul);
+                    };
+
+                });
+            }
+        }
+        , clearThuCapPhoiForm: function () {
+            var pnl = $('.ThuCapPhoi-Pnl-Add');
+            if ($(pnl).length > 0) {
+                pnl.find('input:not([form-control-hasDefalltValue])').val('');
+                pnl.find('.restoreBtn').hide();
+            }
         }
     }
 }

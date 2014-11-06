@@ -11,7 +11,7 @@
             </th>
             <%foreach (var d in listThang.Ngay)
               { %>
-                <th class="<%= (d.Day.Day == DateTime.Now.Day && d.Day.Month == DateTime.Now.Month) ? " danger" : " " %>">
+                <th class="<%= (d.Day.Day == Today.Day && d.Day.Month == Today.Month) ? " danger" : " " %>">
                     <%=d.Day.Day %>
                 </th>
             <%} %>
@@ -27,7 +27,7 @@
             </td>
             <%foreach (var d in listThang.Ngay)
               { %>
-                <td class="<%=d.KieuChamCongClass %><%=d.Clickable ? " ChamCongTd-Item-Clickable" : "" %><%=d.Clickactive ? " ChamCongTd-Item-Clickable-Active" : "" %>" title="<%= d.KieuChamCong%>">
+                <td class="<%=d.KieuChamCongClass %><%=d.Clickable ? " ChamCongTd-Item-Clickable" : "" %><%=d.Clickactive ? " ChamCongTd-Item-Clickable-Active" : "" %>" title="<%= d.KieuChamCongStr%>">
                     <%=d.SoChuyen == 0 ? "" : d.SoChuyen.ToString() %>
                     <input style="display: none;" name="<%=d.Clickactive ? "NgayChamCong" : "" %>" type="text" value="<%=d.Day.ToString("dd/MM/yyyy") %>"/>
                 </td>

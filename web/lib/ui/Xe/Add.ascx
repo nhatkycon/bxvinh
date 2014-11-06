@@ -148,7 +148,7 @@
                 </div>
                 <label for="MucPhi" class="col-sm-2 control-label">Mức phí:</label>
                 <div class="col-sm-2">
-                    <input type="text" name="MucPhi" id="MucPhi" value="<%=Item.MucPhi %>" class="form-control MucPhi">
+                    <input type="text" name="MucPhi" id="MucPhi" value="<%=Item.MucPhi %>" class="form-control MucPhi money-input">
                 </div>
             </div>
             
@@ -156,7 +156,7 @@
             <div class="form-group">
                 <label for="GiaVe" class="col-sm-2 control-label">Giá vé:</label>
                 <div class="col-sm-2">
-                    <input type="text" name="GiaVe" id="GiaVe" value="<%=Item.GiaVe %>" class="form-control GiaVe">
+                    <input type="text" name="GiaVe" id="GiaVe" value="<%=Item.GiaVe %>" class="form-control GiaVe money-input">
                 </div>
                 <label for="GioXuatBen" class="col-sm-2 control-label">Giờ xuất bến:</label>
                 <div class="col-sm-2">
@@ -180,16 +180,9 @@
             </div>
             
             <div class="form-group">
-                <label for="XeVangLai" class="col-sm-2 control-label">Vãng lai:</label>
+                <label for="Ghe" class="col-sm-2 control-label">Năm S/X:</label>
                 <div class="col-sm-2">
-                    <%if (Item.XeVangLai)
-                    {%>
-                        <input class="XeVangLai input-sm" id="XeVangLai" checked="checked" name="XeVangLai" type="checkbox"/>
-                    <%}
-                    else
-                    {%>
-                        <input class="XeVangLai input-sm" id="XeVangLai" name="XeVangLai" type="checkbox"/>
-                    <% } %>
+                    <input type="text" name="NamSanXuat" id="NamSanXuat" value="<%=Item.NamSanXuat %>" class="form-control NamSanXuat">
                 </div>
                 <label for="XeTai" class="col-sm-2 control-label">Xe tải:</label>
                 <div class="col-sm-2">
@@ -214,8 +207,32 @@
                     <% } %>
                 </div>
             </div>
-
-
+            
+            
+            <div class="form-group">
+                <label for="XeVangLai" class="col-sm-2 control-label">Vãng lai:</label>
+                <div class="col-sm-2">
+                    <%if (Item.XeVangLai)
+                    {%>
+                        <input class="XeVangLai input-sm" id="XeVangLai" checked="checked" name="XeVangLai" type="checkbox"/>
+                    <%}
+                    else
+                    {%>
+                        <input class="XeVangLai input-sm" id="Checkbox1" name="XeVangLai" type="checkbox"/>
+                    <% } %>
+                </div>
+                <label for="ChuaDangKy" class="col-sm-2 control-label">Đã đăng ký:</label>
+                <div class="col-sm-2">
+                    <%if (!Item.ChuaDangKy)
+                    {%>
+                        <input class="ChuaDangKy input-sm" id="ChuaDangKy" checked="checked" name="ChuaDangKy" type="checkbox"/>
+                    <%}
+                    else
+                    {%>
+                        <input class="ChuaDangKy input-sm" id="ChuaDangKy" name="ChuaDangKy" type="checkbox"/>
+                    <% } %>
+                </div>
+            </div>
             <%if (!string.IsNullOrEmpty(Id)){ %>
                 <div class="help-block">
                     <div class="well well-sm">

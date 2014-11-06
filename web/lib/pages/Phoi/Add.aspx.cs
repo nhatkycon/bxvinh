@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using docsoft;
 using docsoft.entities;
 
@@ -10,12 +11,10 @@ public partial class lib_pages_Phoi_Add : System.Web.UI.Page
     {
         var id = Request["ID"];
         var idNull = string.IsNullOrEmpty(id);
-        var loggedIn = Security.IsAuthenticated();
         if(idNull)
         {
-            var member = loggedIn ? new Member() : MemberDal.SelectByUser(Security.Username);
-            Item = PhoiDal.SelectLastest(member.CQ_ID.ToString());
-            Item.CQ_ID = member.CQ_ID;
+            Item = PhoiDal.SelectLastest(Security.CqId.ToString());
+            Item.CQ_ID = Security.CqId;
             Item.Xe = new Xe() {Tuyen = new Tuyen(), LoaiBieuDo = new LoaiBieuDo()};
             Item.LaiXe=new LaiXe();
             Item.ChamCongList=new List<ChamCong>();
@@ -41,7 +40,7 @@ public partial class lib_pages_Phoi_Add : System.Web.UI.Page
             var year = DateTime.Now.Year;
             var prevMonth = month == 1 ? 12 : month - 1;
             var tuNgay = new DateTime(year, prevMonth, 1).AddDays(-1);
-            var chamCongList = ChamCongDal.SelectByXeTuNgay(id, tuNgay.ToString("dd/MM/yyyy"), Xe.ID);
+            var chamCongList = ChamCongDal.SelectByXeTuNgay(id, tuNgay.ToString("dd/MM/yyyy"), Xe.ID).Where(x => x.Ngay < Item.NgayTao).ToList();
             var chamCongListCurrent = ChamCongDal.SelectByTruyThuId(TruyThuItem.ID);
             Item.ChamCongList = chamCongList;
             Item.ChamCongListCurrent = chamCongListCurrent;

@@ -1,0 +1,5 @@
+﻿Quy trình xe vào ra bến
+
+1. Nhập biển số vào
+- Nếu biển đã tồn tại, thêm xe vào tblBx_XeVaoBen: 
+    - TrangThai: 100

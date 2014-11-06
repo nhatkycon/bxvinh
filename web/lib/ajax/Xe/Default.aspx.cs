@@ -24,6 +24,7 @@ public partial class lib_ajax_Xe_Default : basePage
         var LOAIXE_Ten = Request["LOAIXE_Ten"];
         var TUYEN_Ten = Request["TUYEN_Ten"];
         var DONVI_Ten = Request["DONVI_Ten"];
+        var NamSanXuat = Request["NamSanXuat"];
 
         var TuyenCoDinh = Request["TuyenCoDinh"];
         var LuuHanh = Request["LuuHanh"];
@@ -36,8 +37,9 @@ public partial class lib_ajax_Xe_Default : basePage
         var XeTai = Request["XeTai"];
         var BaoHiem = Request["BaoHiem"];
         var BIEUDO_ID = Request["BIEUDO_ID"];
-
+        var ChuaDangKy = Request["ChuaDangKy"];
         var Khoa = Request["Khoa"];
+        var XVB_ID = Request["XVB_ID"];
 
         var q = Request["q"];
 
@@ -53,12 +55,15 @@ public partial class lib_ajax_Xe_Default : basePage
                       ? "true"
                       : "false";
 
+        ChuaDangKy = !string.IsNullOrEmpty(ChuaDangKy)
+                      ? "true"
+                      : "false";
+
         var Inserted = string.IsNullOrEmpty(Id);
 
         switch (subAct)
         {
             case "save":
-
                 #region save
 
                 if (!loggedIn || !string.IsNullOrEmpty(BienSo_Chu) || !string.IsNullOrEmpty(BienSo_So))
@@ -78,14 +83,20 @@ public partial class lib_ajax_Xe_Default : basePage
                     Item.SoKhach = Convert.ToInt16(SoKhach);
                     Item.MucPhi = Convert.ToDouble(MucPhi);
                     Item.GiaVe = Convert.ToDouble(GiaVe);
-
+                    Item.NamSanXuat = Convert.ToInt16(NamSanXuat);
                     Item.GioXuatBen = GioXuatBen;
                     Item.BIEUDO_ID = Convert.ToInt32(BIEUDO_ID);
 
                     Item.XeTai = Convert.ToBoolean(XeTai);
                     Item.XeVangLai = Convert.ToBoolean(XeVangLai);
                     Item.Khoa = Convert.ToBoolean(Khoa);
+                    
+                    if(Item.ID != 0 && Item.ChuaDangKy && Convert.ToBoolean(ChuaDangKy)) // Đăng ký mới lần đầu
+                    {
+                        XeVaoBenDal.UpdateXeChuaDangKy(Item.ID);
+                    }
 
+                    Item.ChuaDangKy = !Convert.ToBoolean(ChuaDangKy);
                     if (Inserted)
                     {
                         Item.Username = Security.Username;
@@ -107,7 +118,6 @@ public partial class lib_ajax_Xe_Default : basePage
                 break;
 
                 #endregion
-
             case "remove":
                 #region remove
                 if (loggedIn)
@@ -130,6 +140,16 @@ public partial class lib_ajax_Xe_Default : basePage
                     Item.Tuyen = TuyenDal.SelectById(Item.TUYEN_ID);
                     Item.LoaiBieuDo = LoaiBieuDoDal.SelectById(Item.BIEUDO_ID);
                     Item.LaiXe = LaiXeDal.SelectByXeId(Item.ID);
+
+                    if(!string.IsNullOrEmpty(XVB_ID))
+                    {
+                        var xvb = XeVaoBenDal.SelectById(Convert.ToInt64(XVB_ID));
+                        xvb.TrangThai = 300;
+                        xvb.NgayXuLyYeuCau = DateTime.Now;
+                        xvb.NgayCapNhat = DateTime.Now;
+                        xvb = XeVaoBenDal.Update(xvb);
+                    }
+
                     rendertext(string.Format("({0})", JavaScriptConvert.SerializeObject(Item)));
                 }
                 rendertext("-1");
@@ -137,7 +157,7 @@ public partial class lib_ajax_Xe_Default : basePage
                 #endregion
             case "search":
                 #region search
-                var pgResult = XeDal.SearchSQL(q);
+                var pgResult = XeTinyDal.SearchSQL(q);
                 rendertext(JavaScriptConvert.SerializeObject(pgResult), "text/javascript");
                 break;
                 #endregion

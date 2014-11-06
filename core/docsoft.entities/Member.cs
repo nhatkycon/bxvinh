@@ -12,7 +12,6 @@ namespace docsoft.entities
 {
     #region Member
     #region BO
-    [Serializable()]
     public class Member : BaseEntity
     {
         #region Properties
@@ -57,6 +56,7 @@ namespace docsoft.entities
         public String GH_Ten { get; set; }
         public Int32 GH_ID { get; set; }
         public double Luong { get; set; }
+        public GiaoCa GiaoCa { get; set; }
         #endregion
         public override BaseEntity getFromReader(IDataReader rd)
         {
@@ -637,11 +637,16 @@ namespace docsoft.entities
         }
         public static Member SelectByUsername(string p)
         {
-            Member Item = new Member();
-            SqlParameter[] obj = new SqlParameter[1];
+            var Item = new Member();
+            var obj = new SqlParameter[1];
             obj[0] = new SqlParameter("MEM_Username", p);
-            Item.Username = p;
-            Item.Password = SqlHelper.ExecuteScalar(DAL.con(), CommandType.StoredProcedure, "sp_tblMember_Select_SelectByUserName_linhnx", obj).ToString();
+            using (IDataReader rd = SqlHelper.ExecuteReader(DAL.con(), CommandType.StoredProcedure, "sp_tblMember_Select_SelectByUserName_linhnx", obj))
+            {
+                while (rd.Read())
+                {
+                    Item = getFromReader(rd);
+                }
+            }
             return Item;
         }
         public static Member SelectAllByUserName(string strMem)
