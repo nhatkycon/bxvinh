@@ -1,17 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using CongVaoApp.BxVinh.WebSrv;
 using Emgu.CV;
-using Emgu.CV.Structure;
-using Emgu.Util;
+using linh.common;
 
 namespace CongVaoApp
 {
@@ -19,14 +14,17 @@ namespace CongVaoApp
     {
 
         private List<Xe> XeList { get; set; }
+        private String[] XeListStrArray;
         private List<LoaiXe> LoaiXeList { get; set; }
         private BxVinh.WebSrv.WebService Wsrv { get; set; }
         private long XeVaoBenInsertRs { get; set; }
         private string BienSoStr { get; set; }
         private int LoaiXeInt { get; set; }
-        private int XeId { get; set; }
+        private long XeId { get; set; }
+        public string Tien { get; set; }
         private string NgayStr { get; set; }
         private bool XeVangLai { get; set; }
+        private Int16 Loai { get; set; }
         public string Username { get; set; }
         public string Ten { get; set; }
         public int DonVi_Id { get; set; }
@@ -35,6 +33,7 @@ namespace CongVaoApp
         private Capture capture;        //takes images from camera as image frames
         private bool captureInProgress; // checks if capture is executing
 
+        #region contructors
         public Form1(string username, string ten, int donVi_Id)
         {
             InitializeComponent();
@@ -51,7 +50,7 @@ namespace CongVaoApp
             Ten = ten;
             DonVi_Id = donVi_Id;
             GiaoCa = giaoCa;
-            lblTongSo.Text = GiaoCa.TongSoPhoi.ToString();
+            lblTongSo.Text = GiaoCa.DoanhThu.TienVietNam();
             this.Text = string.Format("{0} - {1} - {2}", username, ten, donVi_Id);
             Wsrv = new WebService();
         }
@@ -60,6 +59,8 @@ namespace CongVaoApp
             InitializeComponent();
             Wsrv = new WebService();
         }
+        #endregion
+
         private void ProcessFrame(object sender, EventArgs arg)
         {
             var imageFrame = capture.QueryFrame();  //line 1
@@ -72,10 +73,6 @@ namespace CongVaoApp
             backgroundWorker1.RunWorkerAsync();
             drlBienSo.Enabled = cbxLoaiXe.Enabled = false;
             KeyPreview = true;
-
-            
-
-
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -85,9 +82,8 @@ namespace CongVaoApp
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            bool bHandled = false;
-            // switch case is the easy way, a hash or map would be better, 
-            // but more work to get set up.
+            var bHandled = false;
+            
             switch (keyData)
             {
                 case Keys.Alt | Keys.F:
@@ -111,44 +107,28 @@ namespace CongVaoApp
                         Application.Idle += ProcessFrame;
                         captureInProgress = !captureInProgress;
                     }
+                    return true;
                     #endregion
                     break;
                 case Keys.F8:
-                    BienSoStr = drlBienSo.Text;
-                    LoaiXeInt = Convert.ToInt32(cbxLoaiXe.SelectedValue);
-                    NgayStr = txtThoiGian.Text;
-                    XeId = Convert.ToInt32(drlBienSo.SelectedValue);
-                    XeVangLai = false;
-                    Debug.WriteLine(string.Format("Bien so: {0}", BienSoStr));
-                    Debug.WriteLine(string.Format("Xe id: {0}", XeId));
-                    Debug.WriteLine(string.Format("Loai xe: {0}", LoaiXeInt));
-                    if (!string.IsNullOrEmpty(BienSoStr) && LoaiXeInt != 0)
-                    {
-                        if (!backgroundWorker2.IsBusy)
-                        {
-                            backgroundWorker2.RunWorkerAsync();
-                        }
-                    }
+                    this.btnCapLenh.PerformClick();
+                    return true;
                     break;
                 case Keys.F9:
-                    BienSoStr = drlBienSo.Text;
-                    LoaiXeInt = Convert.ToInt32(cbxLoaiXe.SelectedValue);
-                    NgayStr = txtThoiGian.Text;
-                    XeId = Convert.ToInt32(drlBienSo.SelectedValue);
-                    XeVangLai = true;
-                    Debug.WriteLine(string.Format("Bien so: {0}", BienSoStr));
-                    Debug.WriteLine(string.Format("Xe id: {0}", XeId));
-                    Debug.WriteLine(string.Format("Loai xe: {0}", LoaiXeInt));
-                    if (!string.IsNullOrEmpty(BienSoStr) && LoaiXeInt != 0)
-                    {
-                        if (!backgroundWorker2.IsBusy)
-                        {
-                            backgroundWorker2.RunWorkerAsync();
-                        }
-                    }
+                    this.btnTraKhach.PerformClick();
+                    return true;
+                    break;
+                case Keys.F10:
+                   this.btnVangLLai.PerformClick();
+                   return true;
+                    break;
+                case Keys.F2: // Get fresh data from Server
+                    backgroundWorker1.RunWorkerAsync();
+                    return true;
                     break;
             }
-            return bHandled;
+
+            return base.ProcessCmdKey(ref msg, keyData);
         }
 
 
@@ -156,6 +136,7 @@ namespace CongVaoApp
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
             XeList = Wsrv.XeGetAll(string.Empty,1000).ToList();
+            XeListStrArray = XeList.Select(x => x.BienSo).ToArray();
             LoaiXeList = Wsrv.LoaiXeGetAll().ToList();
         }
 
@@ -167,17 +148,15 @@ namespace CongVaoApp
         {
             #region bien So
 
-            var xe = new Xe { ID = 0, BienSo_Chu = "", BienSo_So = "", LOAIXE_ID = 0 };
+            var xe = new Xe { ID = 0, BienSo = "" , LOAIXE_ID = 0 };
             XeList.Insert(0, xe);
 
-            drlBienSo.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-            drlBienSo.AutoCompleteSource = AutoCompleteSource.ListItems;
+            drlBienSo.AutoCompleteMode = AutoCompleteMode.Suggest;
+            drlBienSo.AutoCompleteSource = AutoCompleteSource.CustomSource;
 
-            drlBienSo.DataSource = XeList;
             drlBienSo.DroppedDown = false;
-            drlBienSo.DisplayMember = "BienSo";
-            drlBienSo.ValueMember = "ID";
             drlBienSo.Enabled = true;
+         
             #endregion
 
             #region Loai xe
@@ -201,36 +180,43 @@ namespace CongVaoApp
 
         #endregion
 
-        private void drlBienSo_SelectionChangeCommitted(object sender, EventArgs e)
-        {
-            var item = (Xe)drlBienSo.SelectedItem;
-            cbxLoaiXe.SelectedValue = item.LOAIXE_ID;
-        }
+       
 
+        #region save xe vao ben
         private void backgroundWorker2_DoWork(object sender, DoWorkEventArgs e)
         {
-            Debug.WriteLine("--background thread");
-            Debug.WriteLine(string.Format("Bien so: {0}", BienSoStr));
-            Debug.WriteLine(string.Format("Loai xe: {0}", LoaiXeInt));
-            XeVaoBenInsertRs = Wsrv.XeVaoBenInsert(BienSoStr, LoaiXeInt, NgayStr, Username, DonVi_Id, XeVangLai, GiaoCa.ID);
+            XeVaoBenInsertRs = Wsrv.XeVaoBenInsert(BienSoStr, LoaiXeInt, NgayStr, Username, DonVi_Id, Loai, GiaoCa.ID);
 
         }
-
         private void backgroundWorker2_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            drlBienSo.SelectedValue = 0;
             cbxLoaiXe.SelectedValue = 0;
             drlBienSo.Focus();
 
             Debug.WriteLine(XeVaoBenInsertRs == 0 ? string.Format("Lỗi: {0}", XeVaoBenInsertRs) : string.Format("ID: {0}", XeVaoBenInsertRs));
             backgroundWorker2.Dispose();
 
-            // Lấy dữ liệu mới khi phát hiện thêm xe vào hệ thống
+            // binding new item
             if (XeId == 0 && !backgroundWorker1.IsBusy)
             {
+                #region Plain solution: Just add new item to exists list without update to server
+                var xe = new Xe()
+                {
+                    BienSo = BienSoStr
+                    ,
+                    LOAIXE_ID = LoaiXeInt
+                };
+                XeList.Insert(1, xe);
+                XeListStrArray = XeList.Select(x => x.BienSo.ToLower()).ToArray();
+
+                #endregion
+
+                #region Chance to get new list
                 backgroundWorker1.RunWorkerAsync();
+                #endregion
             }
         }
+        #endregion
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -248,6 +234,120 @@ namespace CongVaoApp
             Process.GetCurrentProcess().Kill();
         }
 
+        private void btnCapLenh_Click(object sender, EventArgs e)
+        {
+            BienSoStr = drlBienSo.Text;
+            LoaiXeInt = Convert.ToInt32(cbxLoaiXe.SelectedValue);
+            NgayStr = txtThoiGian.Text;
+            Tien = txtTien.Text;
+            Loai = 200;
+            if (string.IsNullOrEmpty(BienSoStr) || LoaiXeInt == 0) return;
+            if (!backgroundWorker2.IsBusy)
+            {
+                backgroundWorker2.RunWorkerAsync();
+            }
+            drlBienSo.Text = "";
+            drlBienSo.DroppedDown = false;
+        }
+
+        private void btnTraKhach_Click(object sender, EventArgs e)
+        {
+            BienSoStr = drlBienSo.Text;
+            LoaiXeInt = Convert.ToInt32(cbxLoaiXe.SelectedValue);
+            var item = LoaiXeList.FirstOrDefault(x => x.ID == LoaiXeInt);
+            if (item != null)
+            {
+                Tien = item.MucThu.ToString();
+                GiaoCa.DoanhThu += item.MucThu;
+                lblTongSo.Text = GiaoCa.DoanhThu.TienVietNam();
+            }
+            
+            NgayStr = txtThoiGian.Text;
+            Loai = 100;
+
+
+            if (string.IsNullOrEmpty(BienSoStr) || LoaiXeInt == 0) return;
+            if (!backgroundWorker2.IsBusy)
+            {
+                backgroundWorker2.RunWorkerAsync();
+            }
+            drlBienSo.Text = "";
+            drlBienSo.DroppedDown = false;
+        }
+
+        private void btnVangLLai_Click(object sender, EventArgs e)
+        {
+            BienSoStr = drlBienSo.Text;
+            LoaiXeInt = Convert.ToInt32(cbxLoaiXe.SelectedValue);
+            NgayStr = txtThoiGian.Text;
+            GiaoCa.DoanhThu += txtTien.Text.ToMoney();
+            lblTongSo.Text = GiaoCa.DoanhThu.TienVietNam();
+            Tien = txtTien.Text;
+            Loai = 0;
+            if (string.IsNullOrEmpty(BienSoStr) || LoaiXeInt == 0) return;
+            if (!backgroundWorker2.IsBusy)
+            {
+                backgroundWorker2.RunWorkerAsync();
+            }
+            drlBienSo.Text = "";
+            drlBienSo.DroppedDown = false;
+        }
+        private void cbxLoaiXe_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cbxLoaiXe.SelectedIndex == 1) return;
+            if (cbxLoaiXe.SelectedValue == null) return;
+            var id = 0;
+            Int32.TryParse(cbxLoaiXe.SelectedValue.ToString(), out id);
+            var item = LoaiXeList.FirstOrDefault(x => x.ID == id);
+            if (item != null)
+            {
+                txtTien.Text = item.MucThu.TienVietNam();
+            }
+        }
+
+        private void drlBienSo_TextChanged(object sender, EventArgs e)
+        {
+            var term = drlBienSo.Text;
+            Debug.WriteLine(term);
+            if (term.Length == 0 || term.Length > 20) term = "";
+            #region binding 
+            var list = string.IsNullOrEmpty(term)
+                           ? XeListStrArray
+                           : XeListStrArray.Where(x => x.ToLower().Contains(term.ToLower())).ToArray();
+
+            if (list==null || !list.Any())
+            {
+                drlBienSo.DroppedDown = false;
+                return;
+            }
+            drlBienSo.Items.Clear();
+            foreach (var s in list)
+            {
+                drlBienSo.Items.Add(s);
+            }
+            drlBienSo.Select(term.Length, 1);
+            drlBienSo.DroppedDown = true;
+            #endregion
+            Debug.WriteLine(term);
+            if(term.Length==0) return;
+            var item = XeList.FirstOrDefault(x => x.BienSo.ToLower() == term.ToLower());
+            XeId = 0;
+            if (item == null) return;
+            Console.WriteLine(item.BienSo);
+            cbxLoaiXe.SelectedValue = item.LOAIXE_ID;
+            XeId = item.ID;
+            if (!item.XeVangLai)
+            {
+                txtTien.Text = string.Empty;
+                return;
+            }
+            var loaiXe = LoaiXeList.FirstOrDefault(x => x.ID == item.LOAIXE_ID);
+            if (loaiXe != null)
+            {
+                txtTien.Text = loaiXe.MucThu.TienVietNam();
+            }
+
+        }
     }
 }
 

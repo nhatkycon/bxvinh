@@ -1,0 +1,35 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="Print.master.cs" Inherits="lib_master_Print" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <link href="/lib/css/web/print.css" rel="stylesheet" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <asp:ContentPlaceHolder id="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <asp:ContentPlaceHolder id="ContentPlaceHolder1" runat="server">
+        </asp:ContentPlaceHolder>
+    </form>
+    <script type="text/javascript">
+        function PrintWindow() {
+            window.print();
+            CheckWindowState();
+        }
+
+        function CheckWindowState() {
+            if (document.readyState == "complete") {
+                window.close();
+            }
+            else {
+                setTimeout("CheckWindowState()", 100);
+            }
+        }
+
+        //PrintWindow();
+</script>
+</body>
+</html>

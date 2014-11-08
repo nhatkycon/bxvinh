@@ -6,8 +6,10 @@
             <%=Item.ID %>
         </a>
     </td>
-    <td >
-        <%=Item.STTBXStr %>
+    <td>
+        <a href="<%=Item.Url %>">
+            <%=Item.STTBXStr %>
+        </a>
     </td>
     <td class="hidden-xs">
         <a href="/lib/pages/Phoi/Default.aspx?xe_id=<%=Item.XE_ID %>">
@@ -19,11 +21,11 @@
             <%=Item.DONVI_Ten %>
         </a>
     </td>
-    <td class="hidden-xs">
-        <%=Lib.TienVietNam(Item.PHI_Tong) %>
+    <td class="hidden-xs" style="text-align: right;">
+        <%=Item.PHI_Tong.TienVietNam() %>
     </td>
     <td class="hidden-xs">
-        <%=Item.NgayXuatBen.ToString("dd/MM/yyyy") %>
+        <%=Item.NgayXuatBen.NgayVn() %>
     </td>
     <td class="hidden-xs">
         <a href="/lib/pages/Phoi/Default.aspx?nguoiTao=<%=Item.Username %>">
@@ -38,6 +40,6 @@
         <%} %>
     </td>
     <td>
-        <%=Item.TINHTRANG %>
+        <%=Item.TrangThai.XvbTrangThaiStr() %>
     </td>
 </tr>

@@ -1,4 +1,5 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="Item.ascx.cs" Inherits="lib_ui_TruyThu_templates_Item" %>
+<%@ Import Namespace="linh.common" %>
 <tr class="<%=Item.Duyet ? "success" : "warning"%>">
     <td class="">
         <a href="/lib/pages/TruyThu/Add.aspx?ID=<%=Item.ID %>">
@@ -19,7 +20,10 @@
         <%=Item.PHOI_ID %>
     </td>
     <td class="hidden-xs">
-        <%=Item.TongTruyThu %>
+        <%=Item.TongTruyThu.TienVietNam() %>
+    </td>
+    <td class="hidden-xs">
+        <%=Item.SoChuyenThieu %>
     </td>
     <td class="hidden-xs">
         <%=Item.SoChuyenDeNghi %>

@@ -3,11 +3,17 @@
 
 <div class="col-md-2">
     <div class="list-group">
-        <a href="/lib/pages/TruyThu/Default.aspx?Duyet=0" class="list-group-item">
+        <a href="/lib/pages/TruyThu/Default.aspx" class="list-group-item">
+            Tất cả
+        </a>
+        <a href="/lib/pages/TruyThu/Default.aspx?Duyet=0&DeNghi=1" class="list-group-item">
             Chưa duyệt
         </a>
-        <a href="/lib/pages/TruyThu/Default.aspx?Duyet=1" class="list-group-item">
+        <a href="/lib/pages/TruyThu/Default.aspx?Duyet=1&DeNghi=1" class="list-group-item">
             Đã duyệt
+        </a>
+        <a href="/lib/pages/TruyThu/Default.aspx?&DeNghi=0" class="list-group-item">
+            Thường
         </a>
     </div>
 </div>
@@ -81,6 +87,9 @@
                 </th>
                 <th class="hidden-xs">
                     Tổng
+                </th>
+                <th class="hidden-xs">
+                    Số chuyến thiếu
                 </th>
                 <th class="hidden-xs">
                     Số chuyến đề nghị

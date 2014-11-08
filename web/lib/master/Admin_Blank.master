@@ -46,9 +46,6 @@
 <body>
     <div id="form1" runat="server">
         <asp:ContentPlaceHolder id="ContentPlaceHolder1" runat="server"></asp:ContentPlaceHolder>
-     <script>
-         var domain = '<%=Domain %>';
-     </script>
     <uc1:AdmAlert runat="server" ID="AdmAlert" />
     </div>
     <script src="/lib/js/jQueryLib/jquery.hotkeys.js"></script>

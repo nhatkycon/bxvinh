@@ -1009,4 +1009,65 @@ namespace linh.common
             return CreateHierarchy(allItems, default(TEntity), idProperty, parentIdProperty, 0);
         }
     }
+    public static class Extension
+    {
+        public static string TienVietNam(this double str)
+        {
+            return string.Format(new CultureInfo("vi-Vn"), "{0:c}", str).Replace(" ₫", "").Replace(",00", "");
+        }
+        public static double ToMoney(this string str)
+        {
+            return Convert.ToDouble(str.Replace(".", ""));
+        }
+        public static string XvbTrangThaiStr(this Int16 trangThai)
+        {
+            switch (trangThai)
+            {
+                case 100:
+                    return "Vào bến"; // Ngày vào bến
+                    break;
+                case 110:
+                    return "Vào bến chưa đăng ký";
+                    break;
+                case 200:
+                    return "Yêu cầu lên phơi"; //Ngày yêu cầu lên phơi
+                    break;
+                case 300:
+                    return "Đang xử lý lên phơi"; //Ngày nhận xử lý
+                    break;
+                case 400:
+                    return "Đã lên phơi-Chờ thanh toán"; // Ngày lên phơi
+                    break;
+                case 500:
+                    return "Chờ duyệt truy thu";
+                    break;
+                case 510:
+                    return "Đã duyệt truy thu";// Ngày lãnh đạo duyệt truy thu
+                    break;
+                case 600:
+                    return "Yêu cầu thanh toán"; // Ngày yêu cầu thanh toán
+                    break;
+                case 700:
+                    return "Đang thanh toán"; // Ngày nhận xử lý
+                    break;
+                case 800:
+                    return "Thanh toán hoàn tất"; // Ngày thanh toán hoàn tất
+                    break;
+                case 810:
+                    return "Đăng tài"; // Ngày đăng tài
+                    break;
+                case 900:
+                    return "Đã ra cổng"; // Ngày ra cổng
+                    break;
+
+            }
+            return string.Empty;
+        }
+
+        public static string NgayVn(this DateTime date)
+        {
+            return date.ToString("dd/MM/yyyy");
+        }
+
+    }
 }

@@ -61,7 +61,7 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "web", "web\", "{CC439979-ED
 		Release.AspNetCompiler.Debug = "False"
 		VWDPort = "42905"
 		VWDDynamicPort = "true"
-		VWDVirtualPath = "/web"
+		VWDVirtualPath = "/"
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "linh.httpModule", "core\linh.httpModule\linh.httpModule.csproj", "{5B2E54B7-A83C-4100-8285-A0630E7CED19}"

@@ -187,7 +187,7 @@
             <s:element minOccurs="0" maxOccurs="1" name="Ngay" type="s:string" />
             <s:element minOccurs="0" maxOccurs="1" name="Username" type="s:string" />
             <s:element minOccurs="1" maxOccurs="1" name="Cq_Id" type="s:int" />
-            <s:element minOccurs="1" maxOccurs="1" name="VangLai" type="s:boolean" />
+            <s:element minOccurs="1" maxOccurs="1" name="loai" type="s:short" />
             <s:element minOccurs="1" maxOccurs="1" name="giaoCa_Id" type="s:int" />
           </s:sequence>
         </s:complexType>

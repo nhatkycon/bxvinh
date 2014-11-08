@@ -25,7 +25,7 @@ public partial class lib_ajax_Xe_Default : basePage
         var TUYEN_Ten = Request["TUYEN_Ten"];
         var DONVI_Ten = Request["DONVI_Ten"];
         var NamSanXuat = Request["NamSanXuat"];
-
+        var NgayXuatBen = Request["NgayXuatBen"];
         var TuyenCoDinh = Request["TuyenCoDinh"];
         var LuuHanh = Request["LuuHanh"];
         var Ghe = Request["Ghe"];
@@ -40,8 +40,10 @@ public partial class lib_ajax_Xe_Default : basePage
         var ChuaDangKy = Request["ChuaDangKy"];
         var Khoa = Request["Khoa"];
         var XVB_ID = Request["XVB_ID"];
-
         var q = Request["q"];
+
+        //For search
+        var VangLai = Request["XeVangLai"];
 
         XeVangLai = !string.IsNullOrEmpty(XeVangLai)
                       ? "true"
@@ -140,6 +142,15 @@ public partial class lib_ajax_Xe_Default : basePage
                     Item.Tuyen = TuyenDal.SelectById(Item.TUYEN_ID);
                     Item.LoaiBieuDo = LoaiBieuDoDal.SelectById(Item.BIEUDO_ID);
                     Item.LaiXe = LaiXeDal.SelectByXeId(Item.ID);
+                    
+                    var ngay = DateTime.Now;
+                    if(!string.IsNullOrEmpty(NgayXuatBen))
+                    {
+                        ngay = Convert.ToDateTime(ngay, new CultureInfo("Vi-vn"));
+                    }
+                    var ngaySoSanh = ngay.AddDays(BxVinhConfig.SoNgayHetHan);
+                    Item.HopLeAll = (ngaySoSanh < Item.BaoHiem) && (ngaySoSanh < Item.LuuHanh) &&
+                                    (ngaySoSanh < Item.BaoHiem);
 
                     if(!string.IsNullOrEmpty(XVB_ID))
                     {
@@ -157,7 +168,7 @@ public partial class lib_ajax_Xe_Default : basePage
                 #endregion
             case "search":
                 #region search
-                var pgResult = XeTinyDal.SearchSQL(q);
+                var pgResult = XeTinyDal.SearchSQL(q, VangLai);
                 rendertext(JavaScriptConvert.SerializeObject(pgResult), "text/javascript");
                 break;
                 #endregion

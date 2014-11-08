@@ -1,5 +1,6 @@
 ﻿using System;
 using docsoft;
+using docsoft.entities;
 
 public partial class lib_ui_HeThong_LoginForm : System.Web.UI.UserControl
 {
@@ -19,6 +20,7 @@ public partial class lib_ui_HeThong_LoginForm : System.Web.UI.UserControl
         var ok = Security.Login(Username.Text, Pwd.Text, ckb.Checked.ToString());
         if (ok)
         {
+            GiaoCaDal.Current(Security.CqId, Security.Username);
             var ret = Request["ret"];
             Response.Redirect(string.IsNullOrEmpty(ret) ? "/KhachHang/" : Server.UrlDecode(ret));
         }

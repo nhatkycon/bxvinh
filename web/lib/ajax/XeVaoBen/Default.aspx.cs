@@ -76,6 +76,22 @@ public partial class lib_ajax_XeVaoBen_Default : basePage
                     }
                 }
                 break;
+            case "ListDuyetDeNghiTruyThu":
+                if (loggedIn)
+                {
+                    var list = XeVaoBenDal.ListTruyThu(DAL.con(), Security.CqId, 100).OrderByDescending(x => x.TrangThai).
+                            ThenByDescending(x => x.ID).ToList();
+                    if (list.Any())
+                    {
+                        AjaxListDuyetDeNghiTruyThu.List = list;
+                        AjaxListDuyetDeNghiTruyThu.Visible = true;
+                    }
+                    else
+                    {
+                        rendertext("");
+                    }
+                }
+                break;
             case "GetYeuCauXuLyListByUsername":
                 if (loggedIn)
                 {
@@ -130,6 +146,17 @@ public partial class lib_ajax_XeVaoBen_Default : basePage
                     phoi.Xe = xe;
                     thuChi.Phoi = phoi;
                     rendertext(string.Format("({0})", JavaScriptConvert.SerializeObject(thuChi)));
+                }
+                break;
+            case "GetCurrentCapPhoi":
+                if (loggedIn)
+                {
+                    var item = XeVaoBenDal.ListByTrangThaiCqId(DAL.con(), Security.CqId, 300, 1, 200).FirstOrDefault();
+                    if(item!=null)
+                    {
+                        rendertext(string.Format("({0})", JavaScriptConvert.SerializeObject(item)));                        
+                    }
+                    rendertext("");
                 }
                 break;
             default:

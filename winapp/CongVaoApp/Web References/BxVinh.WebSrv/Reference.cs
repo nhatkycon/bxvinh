@@ -185,25 +185,25 @@ namespace CongVaoApp.BxVinh.WebSrv {
         
         /// <remarks/>
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://tempuri.org/XeVaoBenInsert", RequestNamespace="http://tempuri.org/", ResponseNamespace="http://tempuri.org/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public long XeVaoBenInsert(string BienSo, int LoaiXe, string Ngay, string Username, int Cq_Id, bool VangLai, int giaoCa_Id) {
+        public long XeVaoBenInsert(string BienSo, int LoaiXe, string Ngay, string Username, int Cq_Id, short loai, int giaoCa_Id) {
             object[] results = this.Invoke("XeVaoBenInsert", new object[] {
                         BienSo,
                         LoaiXe,
                         Ngay,
                         Username,
                         Cq_Id,
-                        VangLai,
+                        loai,
                         giaoCa_Id});
             return ((long)(results[0]));
         }
         
         /// <remarks/>
-        public void XeVaoBenInsertAsync(string BienSo, int LoaiXe, string Ngay, string Username, int Cq_Id, bool VangLai, int giaoCa_Id) {
-            this.XeVaoBenInsertAsync(BienSo, LoaiXe, Ngay, Username, Cq_Id, VangLai, giaoCa_Id, null);
+        public void XeVaoBenInsertAsync(string BienSo, int LoaiXe, string Ngay, string Username, int Cq_Id, short loai, int giaoCa_Id) {
+            this.XeVaoBenInsertAsync(BienSo, LoaiXe, Ngay, Username, Cq_Id, loai, giaoCa_Id, null);
         }
         
         /// <remarks/>
-        public void XeVaoBenInsertAsync(string BienSo, int LoaiXe, string Ngay, string Username, int Cq_Id, bool VangLai, int giaoCa_Id, object userState) {
+        public void XeVaoBenInsertAsync(string BienSo, int LoaiXe, string Ngay, string Username, int Cq_Id, short loai, int giaoCa_Id, object userState) {
             if ((this.XeVaoBenInsertOperationCompleted == null)) {
                 this.XeVaoBenInsertOperationCompleted = new System.Threading.SendOrPostCallback(this.OnXeVaoBenInsertOperationCompleted);
             }
@@ -213,7 +213,7 @@ namespace CongVaoApp.BxVinh.WebSrv {
                         Ngay,
                         Username,
                         Cq_Id,
-                        VangLai,
+                        loai,
                         giaoCa_Id}, this.XeVaoBenInsertOperationCompleted, userState);
         }
         

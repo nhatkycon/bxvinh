@@ -46,7 +46,7 @@ public class WebService : System.Web.Services.WebService {
 
     #region XeVaoBen
     [WebMethod]
-    public long XeVaoBenInsert(string BienSo, int LoaiXe, string Ngay, string Username, int Cq_Id, bool VangLai, int giaoCa_Id)
+    public long XeVaoBenInsert(string BienSo, int LoaiXe, string Ngay, string Username, int Cq_Id, Int16 loai, int giaoCa_Id)
     {
         if (string.IsNullOrEmpty(BienSo)) return 0;// Không cung cấp biển số xe
         var spaceCharIndex = BienSo.IndexOf(" ", System.StringComparison.Ordinal);
@@ -62,7 +62,10 @@ public class WebService : System.Web.Services.WebService {
             giaoCa.TongSoPhoi += 1;
 
             var xe = XeDal.SelectByBienSo(con, bienSo_Chu, bienSo_So);
-            var xeVaoBen = new XeVaoBen();
+            var loaiXe = LoaiXeDal.SelectById(con, LoaiXe);
+
+            var xeVaoBen = XeVaoBenDal.SelectLastest(Cq_Id);
+
             if (xe.ID == 0) // Xe chưa có trong hệ thống
             {
                 xeVaoBen.TrangThai = 110;
@@ -72,7 +75,7 @@ public class WebService : System.Web.Services.WebService {
                 xe.LOAIXE_ID = Convert.ToInt32(LoaiXe);
                 xe.NgayTao = NgayTao;
                 xe.Username = Username;
-                xe.XeVangLai = VangLai;
+                xe.XeVangLai = loai==0;
                 xe.ChuaDangKy = true;
                 xe = XeDal.Insert(xe);
             }
@@ -80,9 +83,15 @@ public class WebService : System.Web.Services.WebService {
             {
                 xeVaoBen.TrangThai = 100;
             }
-            if (VangLai)
+            if (loai == 0 || loai==100)
             {
+                xeVaoBen.Tien = loaiXe.MucThu;
                 giaoCa.DoanhThu += xeVaoBen.Tien;
+            }
+            else
+            {
+                xeVaoBen.Tien = 0;
+                
             }
             // Thêm xe vào bến
             xeVaoBen.XE_ID = xe.ID;
@@ -90,10 +99,11 @@ public class WebService : System.Web.Services.WebService {
             xeVaoBen.NgayVao = NgayTao;
             xeVaoBen.CQ_ID = Cq_Id;
             xeVaoBen.Username = Username;
-            xeVaoBen = XeVaoBenDal.Insert(xeVaoBen);
-            xeVaoBen.VangLai = VangLai;
+            xeVaoBen.Loai = loai;
             xeVaoBen.GIAOCA_ID = giaoCa_Id;
+            xeVaoBen = XeVaoBenDal.Insert(xeVaoBen);
 
+            giaoCa.NgayCapNhat = DateTime.Now;
             GiaoCaDal.Update(giaoCa);
             return xeVaoBen.ID;
         }

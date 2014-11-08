@@ -80,19 +80,14 @@ public partial class lib_ajax_Phoi_Default : basePage
         {
             case "save":
                 #region save
-
+                /////////////////////////////////////////
+                // Ý tưởng cơ bản là check số NgayChamCong != Null => Có truy thu.
+                // Nếu số chuyến đề nghị =0 nghĩa là tự nguyện truy thu. Ngược lại là có phát sinh đề nghị truy thu.
+                ////////////////////////////////////////
                 if (!loggedIn || !string.IsNullOrEmpty(STTBX) || !string.IsNullOrEmpty(XE_BienSo))
                 {
-                    var Item = Inserted ? new Phoi() : PhoiDal.SelectById(Convert.ToInt64(Id));
-
-                    if (!string.IsNullOrEmpty(STTBX))
-                    {
-                        Item.STTBX = Convert.ToInt64(STTBX);
-                    }
-                    if (!string.IsNullOrEmpty(STTALL))
-                    {
-                        Item.STTALL = Convert.ToInt64(STTALL);
-                    }
+                    var Item = Inserted ? PhoiDal.SelectLastest(Security.CqId.ToString()) : PhoiDal.SelectById(Convert.ToInt64(Id));
+                   
                     if (!string.IsNullOrEmpty(NgayXuatBen))
                     {
                         Item.NgayXuatBen = Convert.ToDateTime(NgayXuatBen, new CultureInfo("vi-vn"));
@@ -136,6 +131,7 @@ public partial class lib_ajax_Phoi_Default : basePage
                     {
                         Item.PHI_HoaHongBanVe = Convert.ToDouble(PHI_HoaHongBanVe);
                     }
+                    // Truy thu
                     if (!string.IsNullOrEmpty(KhachTruyThu))
                     {
                         Item.KhachTruyThu = Convert.ToInt16(KhachTruyThu);
@@ -187,6 +183,14 @@ public partial class lib_ajax_Phoi_Default : basePage
                         Item.Username = Security.Username;
                         Item.NgayTao = DateTime.Now;
                         Item.RowId = Guid.NewGuid();
+                        //Update Ca làm việc
+                        var giaoCa = GiaoCaDal.Current(Security.CqId, Security.Username);
+                        Item.GIAOCA_ID = giaoCa.ID;                        
+                        giaoCa.TongSoPhoi += 1;
+                        giaoCa.DoanhThu += Item.PHI_Tong;
+                        giaoCa.NgayCapNhat = DateTime.Now;
+                        GiaoCaDal.Update(giaoCa);
+
                     }
 
                     Item.NgayCapNhat = DateTime.Now;
@@ -209,62 +213,47 @@ public partial class lib_ajax_Phoi_Default : basePage
                         chamCong.RowId = Guid.NewGuid();
                         chamCong = ChamCongDal.Insert(chamCong);
 
-                        if (!string.IsNullOrEmpty(XVB_ID))
-                        {
-                            var xvb = XeVaoBenDal.SelectById(Convert.ToInt64(XVB_ID));
-                            xvb.TrangThai = 400;
-                            xvb.NgayDuyetPhoi=xvb.NgayCapNhat = DateTime.Now;
-                            xvb.NguoiDuyetPhoi = Security.Username;
-                            xvb.PHOI_ID = Item.ID;
-                            xvb = XeVaoBenDal.Update(xvb);
-                        }
-                        else
-                        {
-                            var xvb=new XeVaoBen();
-                            xvb.TrangThai = 400;
-                            xvb.NgayDuyetPhoi = xvb.NgayCapNhat = DateTime.Now;
-                            xvb.NguoiDuyetPhoi = Security.Username;
-                            xvb.PHOI_ID = Item.ID;
-                            xvb.XE_ID = Item.XE_ID;
-                            xvb.Ao = true;
-                            xvb.Username = Security.Username;
-                            xvb.CQ_ID = Security.CqId;
-                            xvb = XeVaoBenDal.Insert(xvb);
-                        }
+                        
                         
                     }
-
+                    var truyThu = new TruyThu();
                     var idTruyThuNull = string.IsNullOrEmpty(TRUYTHU_ID);
 
                     if (idTruyThuNull)
                     {
+                        #region tạo mới truy thu
                         if (!string.IsNullOrEmpty(NgayChamCong))
                         {
-                            var truyThu = new TruyThu();
+                            truyThu = TruyThuDal.SelectLastest(Security.CqId);
                             if (!string.IsNullOrEmpty(DANHGIA_ID))
                             {
                                 truyThu.DANHGIA_ID = new Guid(DANHGIA_ID);
                             }
                             if (!string.IsNullOrEmpty(NOIDUNG_ID))
                             {
-                                truyThu.DANHGIA_ID = new Guid(NOIDUNG_ID);
+                                truyThu.NOIDUNG_ID = new Guid(NOIDUNG_ID);
                             }
                             if (!string.IsNullOrEmpty(SoChuyenDeNghi))
                             {
                                 truyThu.SoChuyenDeNghi = Convert.ToInt16(SoChuyenDeNghi);
                             }
+
+
+                            truyThu.SoChuyenThieu = Item.ChuyenTruyThu;
+                            truyThu.TongTruyThu = Item.PHI_ChuyenTruyThu;
+                            truyThu.Duyet = truyThu.SoChuyenDeNghi == 0;                                
+                            truyThu.CQ_ID = Security.CqId;
                             truyThu.PHOI_ID = Item.ID;
                             truyThu.DeNghiCuaNhaXe = DeNghiCuaNhaXe;
                             truyThu.PHOI_ID = Item.ID;
                             truyThu.XE_ID = Item.XE_ID;
                             truyThu.DeNghi = truyThu.SoChuyenDeNghi != 0;
-                            truyThu.Duyet = false;
                             truyThu.NgayCapNhat = DateTime.Now;
                             truyThu.Username = Security.Username;
                             truyThu.NgayTao = DateTime.Now;
                             truyThu.RowId = Guid.NewGuid();
-                            truyThu = TruyThuDal.Insert(truyThu);
                             truyThu.NguoiLap = Security.Username;
+                            truyThu = TruyThuDal.Insert(truyThu);
 
                             var ngayChamCongArray = NgayChamCong.Split(new char[] { ',' });
                             foreach (var NgayDuyetTruyThuDate in from NgayDuyetTruyThu in ngayChamCongArray
@@ -293,36 +282,38 @@ public partial class lib_ajax_Phoi_Default : basePage
                                 chamCong.RowId = Guid.NewGuid();
                                 chamCong = ChamCongDal.Insert(chamCong);
                             }
-                        }                                                
+
+
+                        }
+                        #endregion
                     }
                     else
                     {
-                        if(!string.IsNullOrEmpty(NgayChamCong))
+                        #region cập nhật truy thu
+                        if (!string.IsNullOrEmpty(NgayChamCong))
                         {
-                            var truyThu = TruyThuDal.SelectById(Convert.ToInt64(TRUYTHU_ID));
+                            truyThu = TruyThuDal.SelectById(Convert.ToInt64(TRUYTHU_ID));
                             if (!string.IsNullOrEmpty(DANHGIA_ID))
                             {
                                 truyThu.DANHGIA_ID = new Guid(DANHGIA_ID);
                             }
                             if (!string.IsNullOrEmpty(NOIDUNG_ID))
                             {
-                                truyThu.DANHGIA_ID = new Guid(NOIDUNG_ID);
+                                truyThu.NOIDUNG_ID = new Guid(NOIDUNG_ID);
                             }
                             if (!string.IsNullOrEmpty(SoChuyenDeNghi))
                             {
                                 truyThu.SoChuyenDeNghi = Convert.ToInt16(SoChuyenDeNghi);
                             }
+                            truyThu.SoChuyenThieu = Item.ChuyenTruyThu;
+                            truyThu.TongTruyThu = Item.PHI_ChuyenTruyThu;
                             truyThu.DeNghiCuaNhaXe = DeNghiCuaNhaXe;
                             truyThu.PHOI_ID = Item.ID;
                             truyThu.XE_ID = Item.XE_ID;
                             truyThu.DeNghi = truyThu.SoChuyenDeNghi != 0;
                             truyThu.Duyet = false;
                             truyThu.NgayCapNhat = DateTime.Now;
-                            truyThu.Username = Security.Username;
-                            truyThu.NgayTao = DateTime.Now;
-                            truyThu.RowId = Guid.NewGuid();
                             truyThu = TruyThuDal.Update(truyThu);
-
                             ChamCongDal.DeleteByTruyThuId(Convert.ToInt64(TRUYTHU_ID));
 
                             var ngayChamCongArray = NgayChamCong.Split(new char[] { ',' });
@@ -359,22 +350,75 @@ public partial class lib_ajax_Phoi_Default : basePage
                             ChamCongDal.DeleteByTruyThuId(Convert.ToInt64(TRUYTHU_ID));
 
                         }
-                    }
 
+                        #endregion
+                        
+                    }
+                    // Xử lý phần XeVaoBen
+                    if (!string.IsNullOrEmpty(XVB_ID))
+                    {
+                        var xvb = XeVaoBenDal.SelectById(Convert.ToInt64(XVB_ID));
+                        xvb.NgayDuyetPhoi = xvb.NgayCapNhat = DateTime.Now;
+                        xvb.NguoiDuyetPhoi = Security.Username;
+                        xvb.PHOI_ID = Item.ID;
+
+                        xvb.TrangThai = 400;
+                        if (!string.IsNullOrEmpty(NgayChamCong)) // Có phát sinh truy thu
+                        {
+                            if (truyThu.SoChuyenDeNghi > 0 && !truyThu.Duyet) // Có đề nghị truy thu và truy thu này chưa duyệt
+                            {
+                                xvb.TrangThai = 500; // Chờ duyệt truy thu
+                            }
+                            xvb.TRUYTHU_ID = truyThu.ID;
+                        }
+                        xvb = XeVaoBenDal.Update(xvb);
+                    }
+                    else
+                    {
+                        var xvb = new XeVaoBen();
+                        xvb.TrangThai = 400;
+                        xvb.NgayDuyetPhoi = xvb.NgayCapNhat = DateTime.Now;
+                        xvb.NguoiDuyetPhoi = Security.Username;
+                        xvb.PHOI_ID = Item.ID;
+                        xvb.XE_ID = Item.XE_ID;
+                        xvb.Loai = 300;
+                        xvb.Username = Security.Username;
+                        xvb.CQ_ID = Security.CqId;
+                        xvb.TrangThai = 400;
+                        if (!string.IsNullOrEmpty(NgayChamCong)) // Có phát sinh truy thu
+                        {
+                            if (truyThu.SoChuyenDeNghi > 0 && !truyThu.Duyet) // Có đề nghị truy thu và truy thu này chưa duyệt
+                            {
+                                xvb.TrangThai = 500; // Chờ duyệt truy thu
+                            }
+                            xvb.TRUYTHU_ID = truyThu.ID;
+                        }
+                        xvb = XeVaoBenDal.Insert(xvb);
+                    }
                     rendertext(Item.ID.ToString());
                 }
                 rendertext("0");
                 break;
 
                 #endregion
+            case "getLatest":
+                #region getLatest
+                if (loggedIn)
+                {
+                    var Item = PhoiDal.SelectLastest(Security.CqId.ToString());
+                    rendertext(string.Format("({0})", JavaScriptConvert.SerializeObject(Item)));
+                }
+                rendertext("-1");
+                break;
+                #endregion
             case "remove":
                 #region remove
                 if (loggedIn)
                 {
-                    var Item = XeDal.SelectById(Convert.ToInt32(Id));
+                    var Item = PhoiDal.SelectById(Convert.ToInt32(Id));
                     if (Item.Username == Security.Username)
                     {
-                        XeDal.DeleteById(Item.ID);
+                        PhoiDal.DeleteById(Item.ID);
                         rendertext("0");
                     }
                 }

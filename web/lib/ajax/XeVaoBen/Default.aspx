@@ -4,8 +4,10 @@
 <%@ Register Src="~/lib/ui/XeVaoBen/TS_XeChoThanhToan-Ajax.ascx" TagPrefix="uc1" TagName="TS_XeChoThanhToanAjax" %>
 <%@ Register Src="~/lib/ui/XeVaoBen/AjaxList-YeuCauThanhToan-HangDoi.ascx" TagPrefix="uc1" TagName="AjaxListYeuCauThanhToanHangDoi" %>
 <%@ Register Src="~/lib/ui/XeVaoBen/TS_XeDaThanhToan-Ajax.ascx" TagPrefix="uc1" TagName="TS_XeDaThanhToanAjax" %>
+<%@ Register Src="~/lib/ui/XeVaoBen/AjaxList-DuyetDeNghiTruyThu.ascx" TagPrefix="uc1" TagName="AjaxListDuyetDeNghiTruyThu" %>
 <uc1:TS_XeChoLenPhoiAjax runat="server" ID="ListTodayAjax" Visible="False"/>
 <uc1:AjaxListYeuCauXuLyHangDoi runat="server" ID="AjaxListYeuCauXuLyHangDoi" Visible="False" />
 <uc1:TS_XeChoThanhToanAjax runat="server" ID="TS_XeChoThanhToanAjax" Visible="False"/>
 <uc1:AjaxListYeuCauThanhToanHangDoi runat="server" ID="AjaxListYeuCauThanhToanHangDoi" Visible="False"/>
 <uc1:TS_XeDaThanhToanAjax runat="server" ID="TS_XeDaThanhToanAjax"  Visible="False"/>
+<uc1:AjaxListDuyetDeNghiTruyThu runat="server" ID="AjaxListDuyetDeNghiTruyThu" Visible="False"/>

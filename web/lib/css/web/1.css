@@ -132,3 +132,18 @@ ul,li, ol {
 .Phoi-NghiepVu-HanPnl .form-group {
     margin-bottom: 0px;
 }
+.Phoi-DeNghiTruyThu-Pnl {
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    border-top: solid 1px #ccc;
+    background-color: #FFF;
+    display: none;
+}
+.Phoi-DeNghiTruyThu-Body {
+    margin: 5px;
+}
+.DateValidator-Fail {
+    color: red;
+}

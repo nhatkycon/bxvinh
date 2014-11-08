@@ -48,6 +48,9 @@
             this.backgroundWorker3 = new System.ComponentModel.BackgroundWorker();
             this.txtTien = new System.Windows.Forms.TextBox();
             this.lblTien = new System.Windows.Forms.Label();
+            this.btnCapLenh = new System.Windows.Forms.Button();
+            this.btnTraKhach = new System.Windows.Forms.Button();
+            this.btnVangLLai = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox2)).BeginInit();
             this.panel1.SuspendLayout();
@@ -120,6 +123,7 @@
             this.cbxLoaiXe.Name = "cbxLoaiXe";
             this.cbxLoaiXe.Size = new System.Drawing.Size(219, 32);
             this.cbxLoaiXe.TabIndex = 2;
+            this.cbxLoaiXe.SelectedIndexChanged += new System.EventHandler(this.cbxLoaiXe_SelectedIndexChanged);
             // 
             // panel1
             // 
@@ -156,7 +160,7 @@
             this.drlBienSo.Name = "drlBienSo";
             this.drlBienSo.Size = new System.Drawing.Size(219, 32);
             this.drlBienSo.TabIndex = 1;
-            this.drlBienSo.SelectionChangeCommitted += new System.EventHandler(this.drlBienSo_SelectionChangeCommitted);
+            this.drlBienSo.TextChanged += new System.EventHandler(this.drlBienSo_TextChanged);
             // 
             // imageBox4
             // 
@@ -218,6 +222,42 @@
             this.lblTien.Text = "Tiền:";
             this.lblTien.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
+            // btnCapLenh
+            // 
+            this.btnCapLenh.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
+            this.btnCapLenh.ForeColor = System.Drawing.Color.Black;
+            this.btnCapLenh.Location = new System.Drawing.Point(676, 385);
+            this.btnCapLenh.Name = "btnCapLenh";
+            this.btnCapLenh.Size = new System.Drawing.Size(99, 70);
+            this.btnCapLenh.TabIndex = 19;
+            this.btnCapLenh.Text = "Cấp lệnh (F8)";
+            this.btnCapLenh.UseVisualStyleBackColor = true;
+            this.btnCapLenh.Click += new System.EventHandler(this.btnCapLenh_Click);
+            // 
+            // btnTraKhach
+            // 
+            this.btnTraKhach.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
+            this.btnTraKhach.ForeColor = System.Drawing.Color.Black;
+            this.btnTraKhach.Location = new System.Drawing.Point(791, 385);
+            this.btnTraKhach.Name = "btnTraKhach";
+            this.btnTraKhach.Size = new System.Drawing.Size(99, 70);
+            this.btnTraKhach.TabIndex = 20;
+            this.btnTraKhach.Text = "Trả khách (F9)";
+            this.btnTraKhach.UseVisualStyleBackColor = true;
+            this.btnTraKhach.Click += new System.EventHandler(this.btnTraKhach_Click);
+            // 
+            // btnVangLLai
+            // 
+            this.btnVangLLai.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
+            this.btnVangLLai.ForeColor = System.Drawing.Color.Black;
+            this.btnVangLLai.Location = new System.Drawing.Point(905, 385);
+            this.btnVangLLai.Name = "btnVangLLai";
+            this.btnVangLLai.Size = new System.Drawing.Size(99, 70);
+            this.btnVangLLai.TabIndex = 21;
+            this.btnVangLLai.Text = "Vãng lai (F10)";
+            this.btnVangLLai.UseVisualStyleBackColor = true;
+            this.btnVangLLai.Click += new System.EventHandler(this.btnVangLLai_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -225,6 +265,9 @@
             this.AutoSize = true;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(1016, 741);
+            this.Controls.Add(this.btnVangLLai);
+            this.Controls.Add(this.btnTraKhach);
+            this.Controls.Add(this.btnCapLenh);
             this.Controls.Add(this.txtTien);
             this.Controls.Add(this.lblTien);
             this.Controls.Add(this.button1);
@@ -274,6 +317,9 @@
         private System.ComponentModel.BackgroundWorker backgroundWorker3;
         private System.Windows.Forms.TextBox txtTien;
         private System.Windows.Forms.Label lblTien;
+        private System.Windows.Forms.Button btnCapLenh;
+        private System.Windows.Forms.Button btnTraKhach;
+        private System.Windows.Forms.Button btnVangLLai;
     }
 }
 

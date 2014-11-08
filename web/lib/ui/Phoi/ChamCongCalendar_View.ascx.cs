@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -200,14 +201,13 @@ public partial class lib_ui_Phoi_ChamCongCalendar_View : System.Web.UI.UserContr
         var date = Today;
         var currentDate = new DateTime(date.Year, date.Month, date.Day);
         var ngayDauThang = new DateTime(currentDate.Year, currentDate.Month, 1);
-        var ngayDauThangTruoc = ngayDauThang.AddMonths(-1);
         var ngayCuoiThang = ngayDauThang.AddMonths(1);
-        var ngayChamCongCuoiCung = chamCongList.Any() ? chamCongList.Last().Ngay : ngayDauThangTruoc.AddDays(-1);
+        var ngayChamCongCuoiCung = chamCongList.Any() ? chamCongList.Last().Ngay : ngayDauThang.AddDays(-1);
         var tongNgay = (currentDate - ngayChamCongCuoiCung).Days;
 
 
         var list = new List<LichItem>();
-
+        if (loaiBieuDo.ID == 0) return list;
 
         if(!loaiBieuDo.KhoanTuyen) // Nếu biểu đồ là biểu đồ cách ngày
         {
@@ -225,7 +225,6 @@ public partial class lib_ui_Phoi_ChamCongCalendar_View : System.Web.UI.UserContr
             var soChuyenConLai = totalChuyen - soChuyenDaChayTrongThang;
             var soNgayConLaiTrongThang = (ngayCuoiThang - currentDate).Days;
 
-            var soChuyenCanTruyThu = 0;
 
             // Nếu là ngày cuối cùng của tháng sẽ truy thu các chuyến còn thiếu của tháng.
             if(soNgayConLaiTrongThang == 0)
@@ -244,7 +243,7 @@ public partial class lib_ui_Phoi_ChamCongCalendar_View : System.Web.UI.UserContr
             {
                 if(soChuyenConLai > soNgayConLaiTrongThang)
                 {
-                    soChuyenCanTruyThu = soChuyenConLai - soNgayConLaiTrongThang;
+                    var soChuyenCanTruyThu = soChuyenConLai - soNgayConLaiTrongThang;
                     for (var d = currentDate; d > currentDate.AddDays(-soChuyenCanTruyThu); d = d.AddDays(-1))
                     {
                         if (d == ngayChamCongCuoiCung || d == currentDate) continue;

@@ -1,7 +1,7 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="ThuCapPhoi-Add.ascx.cs" Inherits="lib_ui_ThuChi_ThuCapPhoi_Add" %>
 <%@ Import Namespace="docsoft" %>
 <div class="row">
-    <div class="col-md-1 ThuChi-HangDoi-XeYeuCauThanhToan-Pnl">
+    <div class="col-md-2 ThuChi-HangDoi-XeYeuCauThanhToan-Pnl">
         <div class="panel panel-default">
             <div data-toggle="collapse" data-target="#ThuChi-HangDoi-XeYeuCauThanhToan-Body" class="panel-heading">
                 <span class="pull-right">
@@ -16,7 +16,7 @@
             </div>    
         </div>
     </div>
-    <div class="col-md-11">
+    <div class="col-md-10">
         <div class="panel panel-default Normal-Pnl-Add ThuCapPhoi-Pnl-Add" 
             data-url="/lib/ajax/ThuChi/default.aspx"
             data-success="/lib/pages/ThuChi/ThuCapPhoi-Add.aspx?ID="
@@ -41,7 +41,7 @@
                        <label for="XE_BienSo" class="col-sm-2 control-label">Xe:</label>
                         <div class="col-sm-2">
                             <div class="input-group">
-                                <input type="text" placeholder="Nhập biển số xe" data-src="/lib/ajax/Xe/Default.aspx" 
+                                <input type="text" placeholder="Nhập biển số xe" data-src="/lib/ajax/Xe/Default.aspx?VangLai=0" 
                                     data-refId="XE_ID" class="form-control form-autocomplete-input-ThuChi-ChonXe XE_BienSo" name="XE_BienSo" id="XE_BienSo" value="<%=Item.XE_BienSo %>"/>
                                 <span class="input-group-btn">
                                     <button class="btn btn-default autocomplete-btn" tabindex="-1" type="button">

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Login));
             this.label1 = new System.Windows.Forms.Label();
             this.txtUsername = new System.Windows.Forms.TextBox();
             this.txtPwd = new System.Windows.Forms.TextBox();
@@ -39,7 +40,7 @@
             // label1
             // 
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
-            this.label1.Location = new System.Drawing.Point(15, 36);
+            this.label1.Location = new System.Drawing.Point(59, 116);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(106, 28);
             this.label1.TabIndex = 0;
@@ -49,7 +50,7 @@
             // txtUsername
             // 
             this.txtUsername.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
-            this.txtUsername.Location = new System.Drawing.Point(127, 36);
+            this.txtUsername.Location = new System.Drawing.Point(171, 116);
             this.txtUsername.Name = "txtUsername";
             this.txtUsername.Size = new System.Drawing.Size(226, 29);
             this.txtUsername.TabIndex = 1;
@@ -57,7 +58,7 @@
             // txtPwd
             // 
             this.txtPwd.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
-            this.txtPwd.Location = new System.Drawing.Point(127, 93);
+            this.txtPwd.Location = new System.Drawing.Point(171, 173);
             this.txtPwd.Name = "txtPwd";
             this.txtPwd.Size = new System.Drawing.Size(226, 29);
             this.txtPwd.TabIndex = 3;
@@ -66,7 +67,7 @@
             // label2
             // 
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
-            this.label2.Location = new System.Drawing.Point(15, 93);
+            this.label2.Location = new System.Drawing.Point(59, 173);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(106, 28);
             this.label2.TabIndex = 2;
@@ -76,7 +77,7 @@
             // button1
             // 
             this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
-            this.button1.Location = new System.Drawing.Point(127, 146);
+            this.button1.Location = new System.Drawing.Point(171, 226);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(226, 50);
             this.button1.TabIndex = 4;
@@ -93,15 +94,21 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(380, 219);
+            this.BackgroundImage = global::CongVaoApp.Properties.Resources.title_topsite;
+            this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.ClientSize = new System.Drawing.Size(482, 296);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.txtPwd);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.txtUsername);
             this.Controls.Add(this.label1);
+            this.DoubleBuffered = true;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Login";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Login";
+            this.Text = "Phần mềm quản lý Bến Xe - Đăng nhập";
+            this.TopMost = true;
+            this.TransparencyKey = System.Drawing.Color.Aqua;
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Login_FormClosed);
             this.ResumeLayout(false);
             this.PerformLayout();
