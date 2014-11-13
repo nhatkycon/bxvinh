@@ -11,7 +11,6 @@ public partial class lib_ui_Tuyen_Add : System.Web.UI.UserControl
     public Tuyen Item { get; set; }
     public string Ret { get; set; }
     public string Id { get; set; }
-    public List<DanhMuc> DiaDiem { get; set; }
     protected void Page_Load(object sender, EventArgs e)
     {
         Ret = Request["ret"];
@@ -20,7 +19,5 @@ public partial class lib_ui_Tuyen_Add : System.Web.UI.UserControl
         {
             Ret = Server.UrlDecode(Ret);
         }
-        DI_ID.List = DiaDiem;
-        DEN_ID.List = DiaDiem;
     }
 }

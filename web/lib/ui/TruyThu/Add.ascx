@@ -10,10 +10,8 @@
         <a href="/lib/pages/TruyThu/" class="btn btn-default"><i class="glyphicon glyphicon-chevron-left"></i></a>
         <%if (!string.IsNullOrEmpty(Id))
             {%>
-            <%if(!Item.Duyet){ %>
                 <a href="javascript:;" data-ret="<%=Ret %>" class="btn btn-success duyetbtn">Duyệt</a>
                 <a href="javascript:;" data-ret="<%=Ret %>" class="btn btn-warning khongDuyetBtn">Không duyệt</a>
-            <%} %>
             <%if (Item.Username == Security.Username)
               { %>
                 <a href="javascript:;" data-id="<%=Item.ID %>" class="btn btn-warning xoaBtn">Xóa</a>
@@ -145,10 +143,8 @@
         <a href="/lib/pages/TruyThu/" class="btn btn-default"><i class="glyphicon glyphicon-chevron-left"></i></a>
         <%if (!string.IsNullOrEmpty(Id))
             {%>
-            <%if(!Item.Duyet){ %>
                 <a href="javascript:;" data-ret="<%=Ret %>" class="btn btn-success duyetbtn">Duyệt</a>
                 <a href="javascript:;" data-ret="<%=Ret %>" class="btn btn-warning khongDuyetBtn">Không duyệt</a>
-            <%} %>
             <%if (Item.Username == Security.Username)
               { %>
                 <a href="javascript:;" data-id="<%=Item.ID %>" class="btn btn-warning xoaBtn">Xóa</a>

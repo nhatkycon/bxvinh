@@ -27,16 +27,43 @@ public partial class lib_ajax_TruyThu_Default : basePage
                         item.SoChuyenDuocDuyet = Convert.ToInt16(soChuyenDuocDuyet);
                         item.YKienChiDao = yKienChiDao;
                         item.NgayCapNhat = item.NgayDuyet;
+                        item.TrangThai = 2;
                         item = TruyThuDal.Update(item);
 
                         var phoi = PhoiDal.SelectById(con,item.PHOI_ID);
                         phoi.PHI_TruyThuGiam = phoi.PHI_BenBai * (phoi.ChuyenTruyThu - Convert.ToInt16(soChuyenDuocDuyet));
                         phoi.PHI_Tong = phoi.PHI_Tong - phoi.PHI_TruyThuGiam;
                         phoi.NgayCapNhat = item.NgayDuyet;
+                        
                         PhoiDal.Update(phoi);
 
                         var xvb = XeVaoBenDal.SelectByPhoiId(con, phoi.ID);
                         xvb.TrangThai = 510;
+                        xvb.NgayCapNhat = DateTime.Now;
+                        xvb.NguoiDuyetTruyThu = Security.Username;
+                        xvb.NgayLanhDaoDuyetTruyThu = item.NgayDuyet;
+                        xvb = XeVaoBenDal.Update(xvb);
+
+                        rendertext(Id);
+                    }
+                }
+                break;
+            case "nhaXeChapNhan":
+                if (loggedIn && !string.IsNullOrEmpty(Id))
+                {
+                    using (var con = DAL.con())
+                    {
+                        var item = TruyThuDal.SelectById(con, Convert.ToInt64(Id));
+                        item.TrangThai = 4;
+                        item.NgayCapNhat = DateTime.Now;
+                        item = TruyThuDal.Update(item);
+                        // Duyệt toàn bộ chấm công
+                        ChamCongDal.UpdateDuyetByTruyThuId(con, item.ID);
+                        
+
+
+                        var xvb = XeVaoBenDal.SelectByPhoiId(con, item.PHOI_ID);
+                        xvb.TrangThai = 400;
                         xvb.NgayCapNhat = DateTime.Now;
                         xvb.NguoiDuyetTruyThu = Security.Username;
                         xvb.NgayLanhDaoDuyetTruyThu = item.NgayDuyet;
@@ -58,6 +85,7 @@ public partial class lib_ajax_TruyThu_Default : basePage
                         item.SoChuyenDuocDuyet = Convert.ToInt16(soChuyenDuocDuyet);
                         item.YKienChiDao = yKienChiDao;
                         item.NgayCapNhat = DateTime.Now;
+                        item.TrangThai = 2;
                         item = TruyThuDal.Update(item);
 
                         var phoi = PhoiDal.SelectById(con, item.PHOI_ID);
@@ -70,6 +98,49 @@ public partial class lib_ajax_TruyThu_Default : basePage
                         xvb.NguoiDuyetTruyThu = Security.Username;
                         xvb.NgayLanhDaoDuyetTruyThu = item.NgayDuyet;
                         xvb = XeVaoBenDal.Update(xvb);
+                        rendertext(Id);
+                    }
+                }
+                break;
+            case "nhaXeKienNghi":
+                if (loggedIn && !string.IsNullOrEmpty(Id))
+                {
+                    using (var con = DAL.con())
+                    {
+                        var item = TruyThuDal.SelectById(con, Convert.ToInt64(Id));
+                        item.NgayCapNhat = DateTime.Now;
+                        item.TrangThai = 3;
+                        item.Duyet = false;
+                        item = TruyThuDal.Update(item);
+
+                        var xvb = XeVaoBenDal.SelectByPhoiId(con, item.PHOI_ID);
+                        xvb.TrangThai = 500;
+                        xvb.NgayCapNhat = DateTime.Now;
+                        xvb = XeVaoBenDal.Update(xvb);
+
+                        rendertext(Id);
+                    }
+                }
+                break;
+            case "huyTruyThu":
+                if (loggedIn && !string.IsNullOrEmpty(Id))
+                {
+                    using (var con = DAL.con())
+                    {
+                        var item = TruyThuDal.SelectById(con, Convert.ToInt64(Id));
+                        item.NgayCapNhat = DateTime.Now;
+                        item.TrangThai = 5;
+                        item.Duyet = false;
+                        item = TruyThuDal.Update(item);
+                        // Xóa bỏ hết chấm công
+                        ChamCongDal.DeleteByTruyThuId(item.ID);
+
+
+                        var xvb = XeVaoBenDal.SelectByPhoiId(con, item.PHOI_ID);
+                        xvb.TrangThai = 200;
+                        xvb.NgayCapNhat = DateTime.Now;
+                        xvb = XeVaoBenDal.Update(xvb);
+
                         rendertext(Id);
                     }
                 }

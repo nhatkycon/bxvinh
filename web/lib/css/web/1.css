@@ -147,3 +147,6 @@ ul,li, ol {
 .DateValidator-Fail {
     color: red;
 }
+.panel-footer-insert, .panel-footer-saved {
+    display: none;
+}

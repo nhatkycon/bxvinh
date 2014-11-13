@@ -21,7 +21,8 @@ namespace linh.common
     public class Lib
     {
 
-        private const string MaFull = "000000000";
+        public const string MaFull = "000000000";
+        public const string MaShort = "000000";
         public static string FormatMa(int Ma, string maFull)
         {
             if (Ma == 0) return string.Empty;
@@ -1019,6 +1020,49 @@ namespace linh.common
         {
             return Convert.ToDouble(str.Replace(".", ""));
         }
+        /// <summary>
+        /// 0: Truy thu thường. 1: Đề nghị truy thu chưa duyệt. 2: Đề nghị truy thu đã duyệt-chờ ý kiến chủ xe. 3: Chủ xe không đồng ý với truy thu. 4: Chủ xe đồng ý với ý kiến.
+        /// </summary>
+        /// <param name="trangThai"></param>
+        /// <returns></returns>
+        public static string TruyThuTrangThaiStr(this Int16 trangThai)
+        {
+            switch (trangThai)
+            {
+                case 0:
+                    return "Truy thu thường";
+                case 1:
+                    return "Đề nghị truy thu chưa duyệt";
+                case 2:
+                    return "Đề nghị truy thu đã duyệt-chờ ý kiến chủ xe";
+                case 3:
+                    return "Chủ xe không đồng ý với truy thu";
+                case 4:
+                    return "Chủ xe đồng ý với ý kiến";
+                default:
+                    return string.Empty;
+            }
+        }
+        /// <summary>
+        /// 0: Không nợ. 1: Có nợ - chưa trả. 2: Có nợ - đã trả.
+        /// </summary>
+        /// <param name="trangThai"></param>
+        /// <returns></returns>
+        public static string ChamCongTrangThaiNoStr(this Int16 trangThai)
+        {
+            switch (trangThai)
+            {
+                case 0:
+                    return "Không nợ";
+                case 1:
+                    return "Có nợ - chưa trả";
+                case 2:
+                    return "Có nợ - đã trả";
+                default:
+                    return string.Empty;
+            }
+        }
+
         public static string XvbTrangThaiStr(this Int16 trangThai)
         {
             switch (trangThai)
@@ -1056,6 +1100,9 @@ namespace linh.common
                 case 810:
                     return "Đăng tài"; // Ngày đăng tài
                     break;
+                case 820:
+                    return "Xin ra ngoài trả khách"; // Ngày đăng tài
+                    break;
                 case 900:
                     return "Đã ra cổng"; // Ngày ra cổng
                     break;
@@ -1063,11 +1110,47 @@ namespace linh.common
             }
             return string.Empty;
         }
-
+        /// <summary>
+        /// Trả về ngày theo định dạng dd/MM/yyyy. Trả về Empty nếu ngày rỗng.
+        /// </summary>
+        /// <param name="date"></param>
+        /// <returns></returns>
         public static string NgayVn(this DateTime date)
         {
+            if (date == DateTime.MinValue) return string.Empty;
             return date.ToString("dd/MM/yyyy");
         }
 
+        /// <summary>
+        /// Hiển thị số chuyến sang ký tự X
+        /// </summary>
+        /// <param name="chuyen">số lượng chuyến</param>
+        /// <returns></returns>
+        public static string ChamCongHienThiStr(this int chuyen)
+        {
+            if(chuyen==0) return string.Empty;
+            var sb = new StringBuilder();
+            for(var i = 0; i<chuyen;i++)
+            {
+                sb.Append("x");
+            }
+            return sb.ToString();
+        }
+
+
+        public static string SttbxStr(this long ma)
+        {
+            if (ma == 0) return string.Empty;
+            if (string.IsNullOrEmpty(Lib.MaShort)) return string.Empty;
+            var maLen = ma.ToString().Length;
+            return Lib.MaShort.PadRight(maLen) + ma.ToString();
+        }
+        public static string SttAllStr(this long ma)
+        {
+            if (ma == 0) return string.Empty;
+            if (string.IsNullOrEmpty(Lib.MaFull)) return string.Empty;
+            var maLen = ma.ToString().Length;
+            return Lib.MaFull.PadRight(maLen) + ma.ToString();
+        }
     }
 }

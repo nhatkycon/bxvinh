@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using docsoft;
 using docsoft.entities;
 using linh.json;
@@ -23,8 +25,8 @@ public partial class lib_ajax_DanhMuc_Default : basePage
         {
             case "search":
                 #region search
-                var pgResult = DanhMucDal.SelectByLDMMa(LDM);
-                rendertext(JavaScriptConvert.SerializeObject(pgResult), "text/javascript");
+                var list =  !string.IsNullOrEmpty(q) ? DanhMucDal.SelectByLDMMa(LDM).Where(x => x.Ten.ToLower().Contains(q) || x.Ma.ToLower().Contains(q)).ToList() : DanhMucDal.SelectByLDMMa(LDM);
+                rendertext(JavaScriptConvert.SerializeObject(list), "text/javascript");
                 break;
                 #endregion
             default:

@@ -17,6 +17,7 @@
         <%if (!string.IsNullOrEmpty(Id))
             {%>
             <a href="javascript:;" data-ret="<%=Ret %>" class="btn btn-primary savebtn">Lưu</a>
+            <a href="/lib/pages/Tuyen/Add.aspx" class="btn btn-success">Thêm</a>
             <%if (Item.Username == Security.Username)
               { %>
                 <a href="javascript:;" data-id="<%=Item.ID %>" class="btn btn-warning xoaBtn">Xóa</a>
@@ -39,18 +40,34 @@
             <div class="form-group">
                 <label for="DI_ID" class="col-sm-2 control-label">Đi:</label>
                 <div class="col-sm-4">
-                    <uc1:ListDmByLdmMa CssName="DI_ID" runat="server" ID="DI_ID"  ClientIDMode="Static"/>
+                    <div class="input-group">
+                        <input type="text" data-src="/lib/ajax/DanhMuc/Default.aspx?LDM=BenXe" data-refId="DI_ID" class="form-control form-autocomplete-input DI_Ten" name="DI_Ten" id="DI_Ten" value="<%=Item.DI_Ten %>"/>
+                        <span class="input-group-btn">
+                        <button class="btn btn-default autocomplete-btn" tabindex="-1" type="button">
+                            <i class="glyphicon glyphicon-search"></i>
+                        </button>
+                        </span>
+                        <input type="text" style="display: none;" class="form-control DI_ID" name="DI_ID" id="DI_ID" value="<%=Item.DI_ID == Guid.Empty ? "" : Item.DI_ID.ToString() %>"/>
+                    </div>
                 </div>
                 <label for="DEN_ID" class="col-sm-2 control-label">Đến:</label>
                 <div class="col-sm-4">
-                    <uc1:ListDmByLdmMa CssName="DEN_ID" runat="server" ID="DEN_ID" ClientIDMode="Static" />
+                    <div class="input-group">
+                        <input type="text" data-src="/lib/ajax/DanhMuc/Default.aspx?LDM=BenXe" data-refId="DEN_ID" class="form-control form-autocomplete-input DEN_Ten" name="DEN_Ten" id="DEN_Ten" value="<%=Item.DEN_Ten %>"/>
+                        <span class="input-group-btn">
+                        <button class="btn btn-default autocomplete-btn" tabindex="-1" type="button">
+                            <i class="glyphicon glyphicon-search"></i>
+                        </button>
+                        </span>
+                        <input type="text" style="display: none;" class="form-control DEN_ID" name="DEN_ID" id="DEN_ID" value="<%=Item.DEN_ID == Guid.Empty ? "" : Item.DEN_ID.ToString() %>"/>
+                    </div>
                 </div>
             </div>
             
             <div class="form-group">
                 <label for="VeSinhLuuBen" class="col-sm-2 control-label">Vệ sinh lưu bến:</label>
                 <div class="col-sm-4">
-                    <input type="text" name="VeSinhLuuBen" id="VeSinhLuuBen" value="<%=Item.VeSinhLuuBen %>" class="form-control VeSinhLuuBen">
+                    <input type="text" name="VeSinhLuuBen" id="VeSinhLuuBen" value="<%=Item.VeSinhLuuBen %>" class="form-control VeSinhLuuBen money-input">
                 </div>            
                 <label for="HoaHongBanVe" class="col-sm-2 control-label">Hoa hồng bán vé:</label>
                 <div class="col-sm-4">
@@ -94,7 +111,7 @@
         <%if (!string.IsNullOrEmpty(Id))
             {%>
             <a href="javascript:;" data-ret="<%=Ret %>" class="btn btn-primary savebtn">Lưu</a>
-           
+           <a href="/lib/pages/Tuyen/Add.aspx" class="btn btn-success">Thêm</a>
             <%if(Item.Username == Security.Username){ %>
                 <a href="javascript:;" data-id="<%=Item.ID %>" class="btn btn-warning xoaBtn">Xóa</a>
             <%} %>
@@ -105,13 +122,3 @@
         <%} %>
     </div>
 </div>
-
-<%if(!string.IsNullOrEmpty(Id))
-  {%>
-  <script>
-      $(function() {
-          $('.DI_ID').val('<%=Item.DI_ID%>');
-          $('.DEN_ID').val('<%=Item.DEN_ID%>');
-      });
-  </script>    
-<%  } %>

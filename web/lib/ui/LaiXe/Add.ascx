@@ -16,6 +16,7 @@
         <%if (!string.IsNullOrEmpty(Id))
             {%>
             <a href="javascript:;" data-ret="<%=Ret %>" class="btn btn-primary savebtn">Lưu</a>
+            <a href="/lib/pages/LaiXe/Add.aspx" class="btn btn-success">Thêm</a>
             <%if (Item.Username == Security.Username)
               { %>
                 <a href="javascript:;" data-id="<%=Item.ID %>" class="btn btn-warning xoaBtn">Xóa</a>
@@ -167,7 +168,7 @@
         <%if (!string.IsNullOrEmpty(Id))
             {%>
             <a href="javascript:;" data-ret="<%=Ret %>" class="btn btn-primary savebtn">Lưu</a>
-           
+            <a href="/lib/pages/LaiXe/Add.aspx" class="btn btn-success">Thêm</a>
             <%if(Item.Username == Security.Username){ %>
                 <a href="javascript:;" data-id="<%=Item.ID %>" class="btn btn-warning xoaBtn">Xóa</a>
             <%} %>

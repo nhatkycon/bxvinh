@@ -38,6 +38,10 @@ namespace CongVaoApp.BxVinh.WebSrv {
         
         private System.Threading.SendOrPostCallback XeVaoBenInsertOperationCompleted;
         
+        private System.Threading.SendOrPostCallback XeVaoBenGetXeRaCongOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback XeVaoBenUpdateRaCongOperationCompleted;
+        
         private System.Threading.SendOrPostCallback LoginOperationCompleted;
         
         private System.Threading.SendOrPostCallback MemberGetByUsernameOperationCompleted;
@@ -91,6 +95,12 @@ namespace CongVaoApp.BxVinh.WebSrv {
         
         /// <remarks/>
         public event XeVaoBenInsertCompletedEventHandler XeVaoBenInsertCompleted;
+        
+        /// <remarks/>
+        public event XeVaoBenGetXeRaCongCompletedEventHandler XeVaoBenGetXeRaCongCompleted;
+        
+        /// <remarks/>
+        public event XeVaoBenUpdateRaCongCompletedEventHandler XeVaoBenUpdateRaCongCompleted;
         
         /// <remarks/>
         public event LoginCompletedEventHandler LoginCompleted;
@@ -221,6 +231,64 @@ namespace CongVaoApp.BxVinh.WebSrv {
             if ((this.XeVaoBenInsertCompleted != null)) {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
                 this.XeVaoBenInsertCompleted(this, new XeVaoBenInsertCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://tempuri.org/XeVaoBenGetXeRaCong", RequestNamespace="http://tempuri.org/", ResponseNamespace="http://tempuri.org/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public XeVaoBen[] XeVaoBenGetXeRaCong(int CqId) {
+            object[] results = this.Invoke("XeVaoBenGetXeRaCong", new object[] {
+                        CqId});
+            return ((XeVaoBen[])(results[0]));
+        }
+        
+        /// <remarks/>
+        public void XeVaoBenGetXeRaCongAsync(int CqId) {
+            this.XeVaoBenGetXeRaCongAsync(CqId, null);
+        }
+        
+        /// <remarks/>
+        public void XeVaoBenGetXeRaCongAsync(int CqId, object userState) {
+            if ((this.XeVaoBenGetXeRaCongOperationCompleted == null)) {
+                this.XeVaoBenGetXeRaCongOperationCompleted = new System.Threading.SendOrPostCallback(this.OnXeVaoBenGetXeRaCongOperationCompleted);
+            }
+            this.InvokeAsync("XeVaoBenGetXeRaCong", new object[] {
+                        CqId}, this.XeVaoBenGetXeRaCongOperationCompleted, userState);
+        }
+        
+        private void OnXeVaoBenGetXeRaCongOperationCompleted(object arg) {
+            if ((this.XeVaoBenGetXeRaCongCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.XeVaoBenGetXeRaCongCompleted(this, new XeVaoBenGetXeRaCongCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://tempuri.org/XeVaoBenUpdateRaCong", RequestNamespace="http://tempuri.org/", ResponseNamespace="http://tempuri.org/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public bool XeVaoBenUpdateRaCong(long Id) {
+            object[] results = this.Invoke("XeVaoBenUpdateRaCong", new object[] {
+                        Id});
+            return ((bool)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void XeVaoBenUpdateRaCongAsync(long Id) {
+            this.XeVaoBenUpdateRaCongAsync(Id, null);
+        }
+        
+        /// <remarks/>
+        public void XeVaoBenUpdateRaCongAsync(long Id, object userState) {
+            if ((this.XeVaoBenUpdateRaCongOperationCompleted == null)) {
+                this.XeVaoBenUpdateRaCongOperationCompleted = new System.Threading.SendOrPostCallback(this.OnXeVaoBenUpdateRaCongOperationCompleted);
+            }
+            this.InvokeAsync("XeVaoBenUpdateRaCong", new object[] {
+                        Id}, this.XeVaoBenUpdateRaCongOperationCompleted, userState);
+        }
+        
+        private void OnXeVaoBenUpdateRaCongOperationCompleted(object arg) {
+            if ((this.XeVaoBenUpdateRaCongCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.XeVaoBenUpdateRaCongCompleted(this, new XeVaoBenUpdateRaCongCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
         
@@ -380,6 +448,8 @@ namespace CongVaoApp.BxVinh.WebSrv {
         private LoaiBieuDo loaiBieuDoField;
         
         private LaiXe laiXeField;
+        
+        private bool hopLeAllField;
         
         /// <remarks/>
         public long ID {
@@ -730,6 +800,16 @@ namespace CongVaoApp.BxVinh.WebSrv {
                 this.laiXeField = value;
             }
         }
+        
+        /// <remarks/>
+        public bool HopLeAll {
+            get {
+                return this.hopLeAllField;
+            }
+            set {
+                this.hopLeAllField = value;
+            }
+        }
     }
     
     /// <remarks/>
@@ -903,6 +983,7 @@ namespace CongVaoApp.BxVinh.WebSrv {
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(Role))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(CoQuan))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(Member))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(XeVaoBen))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(LoaiXe))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(LaiXe))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(LoaiBieuDo))]
@@ -2155,6 +2236,435 @@ namespace CongVaoApp.BxVinh.WebSrv {
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://tempuri.org/")]
+    public partial class XeVaoBen : BaseEntity {
+        
+        private short trangThaiField;
+        
+        private long idField;
+        
+        private long gIAOCA_IDField;
+        
+        private long sTTBXField;
+        
+        private long sTTALLField;
+        
+        private int cQ_IDField;
+        
+        private long xE_IDField;
+        
+        private double tienField;
+        
+        private System.DateTime ngayVaoField;
+        
+        private System.DateTime ngayYeuCauXuLyField;
+        
+        private System.DateTime ngayXuLyYeuCauField;
+        
+        private string nguoiXuLyYeuCauField;
+        
+        private System.DateTime ngayDuyetPhoiField;
+        
+        private string nguoiDuyetPhoiField;
+        
+        private System.DateTime ngayLanhDaoDuyetTruyThuField;
+        
+        private string nguoiDuyetTruyThuField;
+        
+        private System.DateTime ngayYeuCauThanhToanField;
+        
+        private System.DateTime ngayNhanYeuCauThanhToanField;
+        
+        private string nguoiNhanYeuCauThanhToanField;
+        
+        private System.DateTime ngayThanhToanXongField;
+        
+        private string nguoiXuLyThanhToanField;
+        
+        private System.DateTime ngayDangTaiField;
+        
+        private System.DateTime ngayRaField;
+        
+        private bool daRaField;
+        
+        private System.DateTime ngayTaoField;
+        
+        private System.DateTime ngayCapNhatField;
+        
+        private System.Guid rowIdField;
+        
+        private long pHOI_IDField;
+        
+        private long tC_IDField;
+        
+        private long tRUYTHU_IDField;
+        
+        private string usernameField;
+        
+        private short loaiField;
+        
+        private long pHOI_STTBXField;
+        
+        private string bienSoField;
+        
+        private int lOAIXE_IDField;
+        
+        /// <remarks/>
+        public short TrangThai {
+            get {
+                return this.trangThaiField;
+            }
+            set {
+                this.trangThaiField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public long ID {
+            get {
+                return this.idField;
+            }
+            set {
+                this.idField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public long GIAOCA_ID {
+            get {
+                return this.gIAOCA_IDField;
+            }
+            set {
+                this.gIAOCA_IDField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public long STTBX {
+            get {
+                return this.sTTBXField;
+            }
+            set {
+                this.sTTBXField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public long STTALL {
+            get {
+                return this.sTTALLField;
+            }
+            set {
+                this.sTTALLField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int CQ_ID {
+            get {
+                return this.cQ_IDField;
+            }
+            set {
+                this.cQ_IDField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public long XE_ID {
+            get {
+                return this.xE_IDField;
+            }
+            set {
+                this.xE_IDField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public double Tien {
+            get {
+                return this.tienField;
+            }
+            set {
+                this.tienField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public System.DateTime NgayVao {
+            get {
+                return this.ngayVaoField;
+            }
+            set {
+                this.ngayVaoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public System.DateTime NgayYeuCauXuLy {
+            get {
+                return this.ngayYeuCauXuLyField;
+            }
+            set {
+                this.ngayYeuCauXuLyField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public System.DateTime NgayXuLyYeuCau {
+            get {
+                return this.ngayXuLyYeuCauField;
+            }
+            set {
+                this.ngayXuLyYeuCauField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string NguoiXuLyYeuCau {
+            get {
+                return this.nguoiXuLyYeuCauField;
+            }
+            set {
+                this.nguoiXuLyYeuCauField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public System.DateTime NgayDuyetPhoi {
+            get {
+                return this.ngayDuyetPhoiField;
+            }
+            set {
+                this.ngayDuyetPhoiField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string NguoiDuyetPhoi {
+            get {
+                return this.nguoiDuyetPhoiField;
+            }
+            set {
+                this.nguoiDuyetPhoiField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public System.DateTime NgayLanhDaoDuyetTruyThu {
+            get {
+                return this.ngayLanhDaoDuyetTruyThuField;
+            }
+            set {
+                this.ngayLanhDaoDuyetTruyThuField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string NguoiDuyetTruyThu {
+            get {
+                return this.nguoiDuyetTruyThuField;
+            }
+            set {
+                this.nguoiDuyetTruyThuField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public System.DateTime NgayYeuCauThanhToan {
+            get {
+                return this.ngayYeuCauThanhToanField;
+            }
+            set {
+                this.ngayYeuCauThanhToanField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public System.DateTime NgayNhanYeuCauThanhToan {
+            get {
+                return this.ngayNhanYeuCauThanhToanField;
+            }
+            set {
+                this.ngayNhanYeuCauThanhToanField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string NguoiNhanYeuCauThanhToan {
+            get {
+                return this.nguoiNhanYeuCauThanhToanField;
+            }
+            set {
+                this.nguoiNhanYeuCauThanhToanField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public System.DateTime NgayThanhToanXong {
+            get {
+                return this.ngayThanhToanXongField;
+            }
+            set {
+                this.ngayThanhToanXongField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string NguoiXuLyThanhToan {
+            get {
+                return this.nguoiXuLyThanhToanField;
+            }
+            set {
+                this.nguoiXuLyThanhToanField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public System.DateTime NgayDangTai {
+            get {
+                return this.ngayDangTaiField;
+            }
+            set {
+                this.ngayDangTaiField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public System.DateTime NgayRa {
+            get {
+                return this.ngayRaField;
+            }
+            set {
+                this.ngayRaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool DaRa {
+            get {
+                return this.daRaField;
+            }
+            set {
+                this.daRaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public System.DateTime NgayTao {
+            get {
+                return this.ngayTaoField;
+            }
+            set {
+                this.ngayTaoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public System.DateTime NgayCapNhat {
+            get {
+                return this.ngayCapNhatField;
+            }
+            set {
+                this.ngayCapNhatField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public System.Guid RowId {
+            get {
+                return this.rowIdField;
+            }
+            set {
+                this.rowIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public long PHOI_ID {
+            get {
+                return this.pHOI_IDField;
+            }
+            set {
+                this.pHOI_IDField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public long TC_ID {
+            get {
+                return this.tC_IDField;
+            }
+            set {
+                this.tC_IDField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public long TRUYTHU_ID {
+            get {
+                return this.tRUYTHU_IDField;
+            }
+            set {
+                this.tRUYTHU_IDField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string Username {
+            get {
+                return this.usernameField;
+            }
+            set {
+                this.usernameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public short Loai {
+            get {
+                return this.loaiField;
+            }
+            set {
+                this.loaiField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public long PHOI_STTBX {
+            get {
+                return this.pHOI_STTBXField;
+            }
+            set {
+                this.pHOI_STTBXField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string BienSo {
+            get {
+                return this.bienSoField;
+            }
+            set {
+                this.bienSoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int LOAIXE_ID {
+            get {
+                return this.lOAIXE_IDField;
+            }
+            set {
+                this.lOAIXE_IDField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.0.30319.34234")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://tempuri.org/")]
     public partial class LoaiXe : BaseEntity {
         
         private int idField;
@@ -2319,6 +2829,8 @@ namespace CongVaoApp.BxVinh.WebSrv {
         private string dONVI_TenField;
         
         private string xE_BienSoField;
+        
+        private bool hopLeAllField;
         
         /// <remarks/>
         public long ID {
@@ -2487,6 +2999,16 @@ namespace CongVaoApp.BxVinh.WebSrv {
             }
             set {
                 this.xE_BienSoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool HopLeAll {
+            get {
+                return this.hopLeAllField;
+            }
+            set {
+                this.hopLeAllField = value;
             }
         }
     }
@@ -2720,6 +3242,58 @@ namespace CongVaoApp.BxVinh.WebSrv {
             get {
                 this.RaiseExceptionIfNecessary();
                 return ((long)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.17929")]
+    public delegate void XeVaoBenGetXeRaCongCompletedEventHandler(object sender, XeVaoBenGetXeRaCongCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.17929")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class XeVaoBenGetXeRaCongCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal XeVaoBenGetXeRaCongCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public XeVaoBen[] Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((XeVaoBen[])(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.17929")]
+    public delegate void XeVaoBenUpdateRaCongCompletedEventHandler(object sender, XeVaoBenUpdateRaCongCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.17929")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class XeVaoBenUpdateRaCongCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal XeVaoBenUpdateRaCongCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public bool Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((bool)(this.results[0]));
             }
         }
     }

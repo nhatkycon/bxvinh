@@ -40,10 +40,18 @@ public partial class lib_ajax_Xe_Default : basePage
         var ChuaDangKy = Request["ChuaDangKy"];
         var Khoa = Request["Khoa"];
         var XVB_ID = Request["XVB_ID"];
+
+        var NgayKyGuiBanVe = Request["NgayKyGuiBanVe"];
+        var KyGuiBanVe = Request["KyGuiBanVe"];
+
         var q = Request["q"];
 
         //For search
         var VangLai = Request["XeVangLai"];
+
+        KyGuiBanVe = !string.IsNullOrEmpty(KyGuiBanVe)
+                      ? "true"
+                      : "false";
 
         XeVangLai = !string.IsNullOrEmpty(XeVangLai)
                       ? "true"
@@ -77,10 +85,22 @@ public partial class lib_ajax_Xe_Default : basePage
                     Item.LOAIXE_ID = Convert.ToInt32(LOAIXE_ID);
                     Item.TUYEN_ID = Convert.ToInt32(TUYEN_ID);
                     Item.DONVI_ID = Convert.ToInt32(DONVI_ID);
-                    Item.TuyenCoDinh = Convert.ToDateTime(TuyenCoDinh, new CultureInfo("vi-vn"));
-                    Item.LuuHanh = Convert.ToDateTime(LuuHanh, new CultureInfo("vi-vn"));
-                    Item.BaoHiem = Convert.ToDateTime(BaoHiem, new CultureInfo("vi-vn"));
-
+                    if (!string.IsNullOrEmpty(TuyenCoDinh))
+                    {
+                        Item.TuyenCoDinh = Convert.ToDateTime(TuyenCoDinh, new CultureInfo("vi-vn"));                        
+                    }
+                    if (!string.IsNullOrEmpty(LuuHanh))
+                    {
+                        Item.LuuHanh = Convert.ToDateTime(LuuHanh, new CultureInfo("vi-vn"));
+                    }
+                    if (!string.IsNullOrEmpty(BaoHiem))
+                    {
+                        Item.BaoHiem = Convert.ToDateTime(BaoHiem, new CultureInfo("vi-vn"));
+                    }
+                    if (!string.IsNullOrEmpty(NgayKyGuiBanVe))
+                    {
+                        Item.NgayKyGuiBanVe = Convert.ToDateTime(NgayKyGuiBanVe, new CultureInfo("vi-vn"));
+                    }
                     Item.Ghe = Convert.ToInt16(Ghe);
                     Item.SoKhach = Convert.ToInt16(SoKhach);
                     Item.MucPhi = Convert.ToDouble(MucPhi);
@@ -92,7 +112,8 @@ public partial class lib_ajax_Xe_Default : basePage
                     Item.XeTai = Convert.ToBoolean(XeTai);
                     Item.XeVangLai = Convert.ToBoolean(XeVangLai);
                     Item.Khoa = Convert.ToBoolean(Khoa);
-                    
+                    Item.KyGuiBanVe = Convert.ToBoolean(KyGuiBanVe);
+
                     if(Item.ID != 0 && Item.ChuaDangKy && Convert.ToBoolean(ChuaDangKy)) // Đăng ký mới lần đầu
                     {
                         XeVaoBenDal.UpdateXeChuaDangKy(Item.ID);
@@ -156,8 +177,8 @@ public partial class lib_ajax_Xe_Default : basePage
                     {
                         var xvb = XeVaoBenDal.SelectById(Convert.ToInt64(XVB_ID));
                         xvb.TrangThai = 300;
-                        xvb.NgayXuLyYeuCau = DateTime.Now;
-                        xvb.NgayCapNhat = DateTime.Now;
+                        xvb.NguoiXuLyYeuCau = Security.Username;
+                        xvb.NgayXuLyYeuCau = xvb.NgayCapNhat = DateTime.Now;
                         xvb = XeVaoBenDal.Update(xvb);
                     }
 

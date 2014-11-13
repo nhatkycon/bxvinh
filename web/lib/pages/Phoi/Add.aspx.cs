@@ -35,7 +35,7 @@ public partial class lib_pages_Phoi_Add : System.Web.UI.Page
                 var LaiXe = LaiXeDal.SelectById(con, Item.LAIXE_ID);
                 var LoaiBieuDo = LoaiBieuDoDal.SelectById(con, Xe.BIEUDO_ID);
                 var Tuyen = TuyenDal.SelectById(con, Xe.TUYEN_ID);
-                var TruyThuItem = TruyThuDal.SelectByPhoiId(con, Convert.ToInt64(Item.ID));
+                var TruyThuItem = TruyThuDal.SelectByPhoiId(con, Item.ID);
                 var XeVaoBen = XeVaoBenDal.SelectByPhoiId(con, Item.ID);
                 
                 Item.XeVaoBen = XeVaoBen;
@@ -57,10 +57,10 @@ public partial class lib_pages_Phoi_Add : System.Web.UI.Page
                 // Duyệt truy thu nên đẩy XeVaoBen sang thu ngân
                 if(act=="approvedTruyThu")
                 {
-                    var xvb = XeVaoBenDal.SelectByPhoiId(con, Item.ID);
-                    xvb.TrangThai = 400;
-                    xvb.NgayCapNhat = DateTime.Now;
-                    xvb = XeVaoBenDal.Update(xvb);
+                    //var xvb = XeVaoBenDal.SelectByPhoiId(con, Item.ID);
+                    //xvb.TrangThai = 400;
+                    //xvb.NgayCapNhat = DateTime.Now;
+                    //xvb = XeVaoBenDal.Update(xvb);
                 }
             }
         }

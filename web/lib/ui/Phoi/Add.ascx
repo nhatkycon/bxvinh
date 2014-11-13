@@ -16,9 +16,7 @@
                 </span>
                 Xe chờ
             </div>    
-            <div id="Phoi-HangDoi-XeYeuCauXuLy-Body" class="list-group Phoi-HangDoi-XeYeuCauXuLy-Body collapse in">
-                        
-            </div>    
+            <div id="Phoi-HangDoi-XeYeuCauXuLy-Body" class="list-group Phoi-HangDoi-XeYeuCauXuLy-Body collapse in"></div>    
         </div>
     </div>
     <div class="col-md-10">
@@ -116,11 +114,11 @@
                                         
                                 <%if (Item.XeThayThe)
                                     {%>
-                                        <input class="XeThayThe" id="XeThayThe" checked="checked" name="XeThayThe" type="checkbox"/>
+                                        <input class="XeThayThe" id="XeThayThe" form-control-hasDefalltValue checked="checked" name="XeThayThe" type="checkbox"/>
                                     <%}
                                     else
                                     {%>
-                                        <input class="XeThayThe" id="Checkbox2" name="XeThayThe" type="checkbox"/>
+                                        <input class="XeThayThe" id="XeThayThe" form-control-hasDefalltValue name="XeThayThe" type="checkbox"/>
                                     <% } %>
                                     </span>
                                     <input type="text" data-src="/lib/ajax/Xe/Default.aspx" data-refId="XeThayThe_ID" class="form-control form-autocomplete-input XeThayThe_BienSo" name="XeThayThe_BienSo" id="XeThayThe_BienSo" value="<%=Item.XeThayThe_BienSo %>"/>
@@ -134,17 +132,17 @@
                             </div>
                             <label for="DONVI_Ten" class="col-sm-1 control-label">Chủ xe:</label>
                             <div class="col-sm-3">
-                                <input type="text" name="DONVI_Ten" disabled id="DONVI_Ten" value="<%=Item.DONVI_Ten %>" class="form-control DONVI_Ten">
+                                <input type="text" name="DONVI_Ten" disabled id="DONVI_Ten" value="<%=Item.Xe.DONVI_Ten %>" class="form-control DONVI_Ten">
                             </div>      
                             <label for="XeTangCuong" class="col-sm-1 control-label">Tăng cường:</label>
                             <div class="col-sm-3">
                                 <%if (Item.XeTangCuong)
                                 {%>
-                                    <input class="XeTangCuong input-sm" id="XeTangCuong" checked="checked" name="XeTangCuong" type="checkbox"/>
+                                    <input class="XeTangCuong input-sm" id="XeTangCuong" form-control-hasDefalltValue  checked="checked" name="XeTangCuong" type="checkbox"/>
                                 <%}
                                 else
                                 {%>
-                                    <input class="XeTangCuong input-sm" id="XeTangCuong" name="XeTangCuong" type="checkbox"/>
+                                    <input class="XeTangCuong input-sm" id="XeTangCuong" form-control-hasDefalltValue  name="XeTangCuong" type="checkbox"/>
                                 <% } %>
                             </div>   
                         </div>
@@ -188,105 +186,113 @@
                             </div>
                         </div>
                     <div class="Phoi-TruyThuPnl">
-                        <h3>
-                            <span class="BIEUDO_Ten">
-                                <%=string.IsNullOrEmpty(Id) ? "Loại biểu đồ" : Item.Xe.LoaiBieuDo.Ten %>                        
-                            </span>
-                        </h3>
-                        <hr/>
                         <div class="Phoi-TruyThuPnl-ChamCongPnl">
-                    
                             <uc1:ChamCongCalendar_View runat="server" ID="ChamCongCalendar_View" />                    
                         </div>
                     </div>  
             
                     <div class="">
                         <div class="Phoi-ThuPhi-Pnl">
-                            <h3>Thu phí</h3>
-                            <hr/>
-                            <div class="form-group">
-                                <label for="PHI_BenBai" class="col-sm-2 control-label">Bến bãi:</label>
-                                <div class="col-sm-2">
-                                    <input type="text" name="PHI_BenBai" id="PHI_BenBai" value="<%=Item.PHI_BenBai %>" class="form-control PHI_BenBai ThuPhi-Input-Item money-input">
-                                </div>                                  
-                                <label for="PHI_XeDauDem" class="col-sm-2 control-label">Xe đậu đêm:</label>
-                                <div class="col-sm-2">
-                                    <input type="text" name="PHI_XeDauDem" id="PHI_XeDauDem" value="<%=Item.PHI_XeDauDem %>" class="form-control PHI_XeDauDem ThuPhi-Input-Item money-input">
-                                </div>                                  
-                                <label for="PHI_VeSinhBenBai" class="col-sm-2 control-label">Phí vệ sinh bến bãi:</label>
-                                <div class="col-sm-2">
-                                    <input type="text" name="PHI_VeSinhBenBai" id="Text1" value="<%=Item.PHI_VeSinhBenBai %>" class="form-control PHI_VeSinhBenBai ThuPhi-Input-Item money-input">
-                                </div>              
-                            </div>                    
-                            <div class="form-group">
-                                <label for="Ve" class="col-sm-2 col-xs-12 control-label">Phí hoa hồng vé</label>
-                                <div class="col-sm-6 col-xs-2">
-                                    <div class="input-group">
-                                        <input type="text" name="GiaVe" id="GiaVe" value="<%=Item.GiaVe %>" class="form-control GiaVe money-input">
-                                        <span class="input-group-addon">X</span>
-                                        <input type="text" name="HoaHongBanVe" id="HoaHongBanVe" value="<%=Item.Xe.Tuyen.HoaHongBanVe %>" class="form-control HoaHongBanVe money-input">
-                                        <%--<span class="input-group-addon">=</span>
-                                        <input type="text" name="PhiTrenMotVe" disabled id="PhiTrenMotVe" value="<%=Item.GiaVe * Item.Xe.Tuyen.HoaHongBanVe / 100 %>" class="form-control PhiTrenMotVe money-input">--%>
-                                        <span class="input-group-addon">X</span>
-                                        <input type="text" name="Ve" id="Ve" value="<%=Item.Ve %>" class="form-control Ve money-input">
-                                        <span class="input-group-addon">=</span>
-                                        <input type="text" name="PHI_HoaHongBanVe" disabled id="PHI_HoaHongBanVe" value="<%=Item.PHI_HoaHongBanVe %>" class="form-control PHI_HoaHongBanVe ThuPhi-Input-Item money-input">
+                            <p>                                
+                                <strong>Thu phí</strong>
+                                <button class="btn btn-link btn-sm" data-toggle="collapse" data-target="#Phoi-ThuPhiForm-Pnl">
+                                    <i class="glyphicon glyphicon-plus"></i>
+                                </button>
+                            </p>
+                                <hr/>
+                            <div class="Phoi-ThuPhiForm-Pnl collapse" id="Phoi-ThuPhiForm-Pnl">
+                                <div class="form-group">
+                                    <label for="PHI_BenBai" class="col-sm-1 control-label">Bến bãi:</label>
+                                    <div class="col-sm-2">
+                                        <input type="text" name="PHI_BenBai" id="PHI_BenBai" value="<%=Item.PHI_BenBai %>" class="form-control PHI_BenBai ThuPhiMotChuyen-Input-Item ThuPhi-Input-Item money-input">
+                                    </div>                                  
+                                    <label for="PHI_XeDauDem" class="col-sm-1 control-label">Đậu đêm:</label>
+                                    <div class="col-sm-2">
+                                        <input type="text" name="PHI_XeDauDem" id="PHI_XeDauDem" value="<%=Item.PHI_XeDauDem %>" class="form-control PHI_XeDauDem ThuPhi-Input-Item money-input">
+                                    </div>                                  
+                                    <label for="PHI_VeSinhBenBai" class="col-sm-1 control-label">Vệ sinh:</label>
+                                    <div class="col-sm-2">
+                                        <input type="text" name="PHI_VeSinhBenBai" id="Text1" value="<%=Item.PHI_VeSinhBenBai %>" class="form-control ThuPhiMotChuyen-Input-Item PHI_VeSinhBenBai ThuPhi-Input-Item money-input">
+                                    </div>              
+                                    <label for="PHI_XeLuuBen" class="col-sm-1 control-label">Lưu bến:</label>
+                                    <div class="col-sm-2">
+                                        <input type="text" name="PHI_XeLuuBen" id="PHI_XeLuuBen" value="<%=Item.PHI_XeLuuBen %>" class="form-control PHI_XeLuuBen ThuPhiMotChuyen-Input-Item ThuPhi-Input-Item money-input">
                                     </div>
-                                </div>
-                                <label for="KhachTruyThu" class="col-sm-1 col-xs-12 control-label">
-                                    Khách thêm:
-                                </label>
-                                <div class="col-sm-3 col-xs-2">
-                                    <div class="input-group">
-                                        <input type="text" name="KhachTruyThu" id="KhachTruyThu" value="<%=Item.KhachTruyThu %>" class="form-control KhachTruyThu money-input">
-                                        <span class="input-group-addon">=</span>
-                                        <input type="text" name="PHI_KhachTruyThu" disabled id="PHI_KhachTruyThu" value="<%=Item.PHI_KhachTruyThu %>" class="form-control ThuPhi-Input-Item PHI_KhachTruyThu money-input">
+                                </div>                    
+                                <div class="form-group">
+                                    <label for="Ve" class="col-sm-1 col-xs-12 control-label">Bán vé</label>
+                                    <div class="col-sm-6 col-xs-2">
+                                        <div class="input-group">
+                                            <input type="text" name="GiaVe" id="GiaVe" value="<%=Item.GiaVe %>" class="form-control GiaVe money-input">
+                                            <span class="input-group-addon">X</span>
+                                            <input type="text" name="HoaHongBanVe" id="HoaHongBanVe" value="<%=Item.Xe.Tuyen.HoaHongBanVe %>" class="form-control HoaHongBanVe money-input">
+                                            <%--<span class="input-group-addon">=</span>
+                                            <input type="text" name="PhiTrenMotVe" disabled id="PhiTrenMotVe" value="<%=Item.GiaVe * Item.Xe.Tuyen.HoaHongBanVe / 100 %>" class="form-control PhiTrenMotVe money-input">--%>
+                                            <span class="input-group-addon">X</span>
+                                            <input type="text" name="Ve" id="Ve" value="<%=Item.Ve %>" class="form-control Ve money-input">
+                                            <span class="input-group-addon">=</span>
+                                            <input type="text" name="PHI_HoaHongBanVe" disabled id="PHI_HoaHongBanVe" value="<%=Item.PHI_HoaHongBanVe %>" class="form-control ThuPhiMotChuyen-Input-Item PHI_HoaHongBanVe ThuPhi-Input-Item money-input">
+                                        </div>
+                                    </div>
+                                    <label for="KhachTruyThu" class="col-sm-1 col-xs-12 control-label">
+                                        Khách thêm:
+                                    </label>
+                                    <div class="col-sm-3 col-xs-2">
+                                        <div class="input-group">
+                                            <input type="text" name="KhachTruyThu" id="KhachTruyThu" value="<%=Item.KhachTruyThu %>" class="form-control KhachTruyThu money-input">
+                                            <span class="input-group-addon">=</span>
+                                            <input type="text" name="PHI_KhachTruyThu" disabled id="PHI_KhachTruyThu" value="<%=Item.PHI_KhachTruyThu %>" class="form-control ThuPhi-Input-Item PHI_KhachTruyThu money-input">
+                                        </div>    
                                     </div>    
-                                </div>    
                                
-                            </div>
-                            <div class="form-group">
-                                <label for="ChuyenTruyThu"  class="col-sm-2 control-label">Số chuyến truy thu:</label>
-                                <div class="col-sm-2">
-                                    <div class="input-group">
-                                        <%--<span class="add-on input-group-addon" data-toggle="modal" data-target="#TruyThuModal"  >
-                                            <button class="btn btn-default glyphicon glyphicon-paperclip">
-                                            </button>
-                                        </span>--%>
-                                        <input type="text" name="ChuyenTruyThu" disabled id="ChuyenTruyThu" value="<%=Item.ChuyenTruyThu %>" class="form-control ChuyenTruyThu money-input">
-                                        <span class="input-group-btn">
-                                        <button data-toggle="modal" data-target="#TruyThuModal" class="btn btn-default" type="button">
-                                            <i class="glyphicon glyphicon-paperclip"></i>
-                                        </button>
-                                        </span>
-                                    </div>
-                                </div>                                  
-                                <label for="PHI_ChuyenTruyThu" class="col-sm-2 control-label">Phí truy thu:</label>
-                                <div class="col-sm-2">
-                                    <input type="text" name="PHI_ChuyenTruyThu" id="PHI_ChuyenTruyThu" value="<%=Item.PHI_ChuyenTruyThu %>" class="form-control PHI_ChuyenTruyThu ThuPhi-Input-Item money-input">
-                                </div>              
-                                <label for="PHI_TruyThuGiam" class="col-sm-2 control-label">Giảm trừ:</label>
-                                <div class="col-sm-2">
-                                    <input type="text" name="PHI_TruyThuGiam" id="PHI_TruyThuGiam" value="<%=Item.PHI_TruyThuGiam %>" class="form-control PHI_TruyThuGiam money-input">
-                                </div>              
-                            </div>
-                            <div class="form-group">
-                                <label for="PHI_XeLuuBen" class="col-sm-2 control-label">Phí xe lưu bến:</label>
-                                <div class="col-sm-2">
-                                    <input type="text" name="PHI_XeLuuBen" id="PHI_XeLuuBen" value="<%=Item.PHI_XeLuuBen %>" class="form-control PHI_XeLuuBen ThuPhi-Input-Item money-input">
                                 </div>
-                                <label for="PHI_Khac" class="col-sm-2 control-label">Khác:</label>
-                                <div class="col-sm-6">
-                                    <input type="text" name="PHI_Khac" id="PHI_Khac" value="<%=Item.PHI_Khac %>" class="form-control PHI_Khac ThuPhi-Input-Item money-input">
-                                </div>              
+                                <div class="form-group">
+                                    <label for="ChuyenTruyThu"  class="col-sm-1 control-label">Truy thu:</label>
+                                    <div class="col-sm-3">
+                                        <div class="input-group">
+                                            <span class="input-group-btn" title="Click để đề nghị truy thu">
+                                                <button data-toggle="modal" data-target="#TruyThuModal" class="btn btn-default" type="button">
+                                                    <i class="glyphicon glyphicon-paperclip"></i>
+                                                </button>
+                                            </span>
+                                            <input type="text" name="ChuyenTruyThu" placeholder="Số chuyến truy thu" disabled id="ChuyenTruyThu" value="<%=Item.ChuyenTruyThu %>" class="form-control ChuyenTruyThu money-input">
+                                            <span class="input-group-addon" title="Tick nếu chỉ truy thu phí bến bãi">
+                                                <%if (Item.PHI_ChiThuBenBai)
+                                                {%>
+                                                    <input class="PHI_ChiThuBenBai" form-control-hasDefalltValue id="PHI_ChiThuBenBai" checked="checked" name="PHI_ChiThuBenBai" type="checkbox"/>
+                                                <%}
+                                                else
+                                                {%>
+                                                    <input class="PHI_ChiThuBenBai" form-control-hasDefalltValue id="PHI_ChiThuBenBai" name="PHI_ChiThuBenBai" type="checkbox"/>
+                                                <% } %>
+                                            </span>
+                                            <input type="text" name="PHI_ChuyenTruyThu" id="PHI_ChuyenTruyThu" value="<%=Item.PHI_ChuyenTruyThu %>" class="form-control PHI_ChuyenTruyThu ThuPhi-Input-Item money-input">
+                                        
+                                        </div>
+                                    </div>                                  
+                                    <%--<label for="PHI_ChuyenTruyThu" class="col-sm-2 control-label">Phí truy thu:</label>
+                                    <div class="col-sm-2">
+                                        <div class="input-group">
+                                        
+                                        </div>
+                                    </div>--%>
+                                    <label for="PHI_TruyThuGiam" class="col-sm-1 control-label">Giảm trừ:</label>
+                                    <div class="col-sm-2">
+                                        <input type="text" name="PHI_TruyThuGiam" id="PHI_TruyThuGiam" value="<%=Item.PHI_TruyThuGiam %>" class="form-control PHI_TruyThuGiam money-input">
+                                    </div>  
+                                    <label for="PHI_Khac" class="col-sm-1 control-label">Khác:</label>
+                                    <div class="col-sm-2">
+                                        <input type="text" name="PHI_Khac" id="PHI_Khac" value="<%=Item.PHI_Khac %>" class="form-control PHI_Khac ThuPhi-Input-Item money-input">
+                                    </div>             
+                                </div>    
+                                <hr/>
                             </div>
-                            <hr/>
                             <div class="form-group">
-                                <label for="PHI_Tong" class="col-sm-2 control-label">Tổng:</label>
-                                <div class="col-sm-2">
+                                <label for="PHI_Tong" class="col-sm-1 control-label">Tổng:</label>
+                                <div class="col-sm-3">
                                     <input type="text" name="PHI_Tong" id="PHI_Tong" disabled value="<%=Item.PHI_Tong %>" class="form-control PHI_Tong ThuPhi-Input-Sum money-input input-lg">
                                 </div>        
-                                <div class="hidden">
+                                <div class="">
                                     <label for="PHI_Nop" class="col-sm-2 control-label">Thu:</label>
                                     <div class="col-sm-2">
                                         <input type="text" name="PHI_Nop" id="PHI_Nop" value="<%=Item.PHI_Nop %>" class="form-control PHI_Nop money-input">
@@ -312,7 +318,7 @@
                                 </p>
                                 <%if(Item.TruyThuItem.ID!= 0 && Item.TruyThuItem.Duyet){ %>
                                     <p>
-                                        <%=Item.TruyThuItem.LanhDaoDuyet %> duyệt <%=Item.TruyThuItem.SoChuyenDuocDuyet %> chuyến, ngày <%=Item.TruyThuItem.NgayDuyet.NgayVn() %>
+                                        <strong><%=Item.TruyThuItem.LanhDaoDuyet %></strong> duyệt <strong><%=Item.TruyThuItem.SoChuyenDuocDuyet %></strong> chuyến, ngày <%=Item.TruyThuItem.NgayDuyet.NgayVn() %>
                                     </p>                                
                                 <%} %>
                             </div>
@@ -335,10 +341,18 @@
                             <button class="btn restoreBtn btn-lg btn-default">Đóng-F10</button>    
                     </div>
                     <div class="panel-footer-saved">
-                        <a href="/lib/pages/Phoi/In/Phoi-NgoaiTinh.aspx?ID=<%=Item.ID %>" data-id="" data-url="/lib/pages/Phoi/In/Phoi-NgoaiTinh.aspx" target="_blank" class="btn printBtn btn-lg btn-primary">In</a>
+                        <%if (Item.TruyThuItem.TrangThai == 2 && Request["act"] == "approvedTruyThu")
+                          { %>
+                            <button  class="btn chapNhanTruyThuBtn btn-lg btn-primary">Chấp nhận truy thu</button>
+                            <button  class="btn kienNghiTruyThuBtn btn-lg btn-default">Kiến nghị</button>
+                        <% } %>
+                        <a href="/lib/pages/Phoi/In/Phoi-NgoaiTinh.aspx?ID=<%=Item.ID %>" data-id="" data-url="/lib/pages/Phoi/In/Phoi-NgoaiTinh.aspx" target="_blank" class="btn printBtn btn-lg btn-primary">In</a>                        
                         <button  class="btn newBtn btn-lg btn-success">Thêm-F6</button>
-                        <button  data-id="" class="btn editBtn btn-lg btn-default">Sửa</button>
-                        <a href="javascript:;" data-id="" class="btn btn-warning btn-lg xoaBtn">Xóa</a>
+                        <a href="/lib/pages/Phoi/Add.aspx?ID=<%=Item.ID %>" data-url="/lib/pages/Phoi/Add.aspx" data-id="" class="btn editBtn btn-lg btn-default">Sửa</a>
+                        <%if (Item.Username == Security.Username)
+                        { %>
+                            <a href="javascript:;" data-id="" class="btn btn-warning btn-lg xoaBtn">Xóa</a>
+                        <%}%>
                     </div>
                 <%}
                 else
@@ -349,9 +363,10 @@
                         <button class="btn restoreBtn btn-lg btn-default">Đóng-F10</button>    
                     </div>
                     <div class="panel-footer-saved">
+                        
                         <a  data-id="" data-url="/lib/pages/Phoi/In/Phoi-NgoaiTinh.aspx" target="_blank" class="btn printBtn btn-lg btn-primary">In</a>
                         <button  class="btn newBtn btn-lg btn-success">Thêm-F6</button>
-                        <button  data-id="" class="btn editBtn btn-lg btn-default">Sửa</button>
+                        <a data-url="/lib/pages/Phoi/Add.aspx" data-id="" class="btn editBtn btn-lg btn-default">Sửa</a>
                         <a href="javascript:;" data-id="" class="btn btn-warning btn-lg xoaBtn">Xóa</a>
                     </div>
                     
@@ -363,11 +378,9 @@
 </div>
 <div class="Phoi-DeNghiTruyThu-Pnl">
     <div class="row Phoi-DeNghiTruyThu-Body">
-        
     </div>
 </div>
 <script src="/lib/js/jQueryLib/bootstrap-timepicker.min.js"></script>
-<script src="/lib/js/jQueryLib/datefn.js"></script>
 <script>
 <%if(!string.IsNullOrEmpty(Id))
   {%>

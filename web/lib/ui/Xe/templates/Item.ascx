@@ -1,4 +1,5 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="Item.ascx.cs" Inherits="lib_ui_Xe_templates_Item" %>
+<%@ Import Namespace="linh.common" %>
 <tr>
     <td class="">
         <a href="<%=Item.Url %>">
@@ -29,13 +30,13 @@
         <%=Item.Ghe %>
     </td>
     <td class="<% = Item.TuyenCoDinh < DateTime.Now.AddDays(-1) ? "danger" : "" %>">
-        <%=Item.TuyenCoDinh.ToString("dd/MM/yyyy") %>
+        <%=Item.TuyenCoDinh.NgayVn() %>
     </td>
     <td class="<% = Item.BaoHiem < DateTime.Now.AddDays(-1) ? "danger" : "" %>">
-        <%=Item.BaoHiem.ToString("dd/MM/yyyy") %>
+        <%=Item.BaoHiem.NgayVn() %>
     </td>
     <td class="<% = Item.LuuHanh < DateTime.Now.AddDays(-1) ? "danger" : "" %>">
-        <%=Item.LuuHanh.ToString("dd/MM/yyyy") %>
+        <%=Item.LuuHanh.NgayVn() %>
     </td>
     <td class="<% = Item.Khoa ? "danger" : "" %>">
         <%=Item.Khoa ? "KHÓA" : "OK" %>

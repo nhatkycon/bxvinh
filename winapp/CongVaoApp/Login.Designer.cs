@@ -106,7 +106,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Login";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Phần mềm quản lý Bến Xe - Đăng nhập";
+            this.Text = "Cổng Vào - CÔNG TY CP BX NA - Đăng nhập";
             this.TopMost = true;
             this.TransparencyKey = System.Drawing.Color.Aqua;
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Login_FormClosed);

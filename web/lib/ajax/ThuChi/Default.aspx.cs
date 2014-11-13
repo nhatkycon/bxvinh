@@ -53,7 +53,14 @@ public partial class lib_ajax_ThuChi_Default : basePage
                         Item.RowId = Guid.NewGuid();
                         
                     }
-
+                    if(Inserted)
+                    {
+                        var giaoCa = GiaoCaDal.Current(Security.CqId, Security.Username);
+                        Item.GIAOCA_ID = giaoCa.ID;
+                        giaoCa.DoanhThu += Item.Tien;
+                        giaoCa.NgayCapNhat = DateTime.Now;
+                        GiaoCaDal.Update(giaoCa);
+                    }
                     Item.NgayCapNhat = DateTime.Now;
                     Item = Inserted ? ThuChiDal.Insert(Item) : ThuChiDal.Update(Item);
 
@@ -65,9 +72,11 @@ public partial class lib_ajax_ThuChi_Default : basePage
                             var xvb = XeVaoBenDal.SelectById(Convert.ToInt64(XVB_ID));
                             xvb.TC_ID = Item.ID;
                             xvb.TrangThai = 800;
+                            xvb.NguoiXuLyThanhToan = Security.Username;
                             xvb.NgayThanhToanXong = xvb.NgayCapNhat = DateTime.Now;
                             xvb = XeVaoBenDal.Update(xvb);
                         }
+
                     }
 
                     rendertext(Item.ID.ToString());
@@ -78,7 +87,6 @@ public partial class lib_ajax_ThuChi_Default : basePage
                 #endregion
 
             case "remove":
-
                 #region remove
 
                 if (loggedIn)
@@ -94,7 +102,16 @@ public partial class lib_ajax_ThuChi_Default : basePage
                 break;
 
                 #endregion
-
+            case "getLatest":
+                #region getLatest
+                if (loggedIn)
+                {
+                    var item = ThuChiDal.SelectByLastest(DAL.con(), Security.CqId);
+                    rendertext(string.Format("({0})", JavaScriptConvert.SerializeObject(item)));
+                }
+                rendertext("-1");
+                break;
+                #endregion
             case "search":
 
                 #region search

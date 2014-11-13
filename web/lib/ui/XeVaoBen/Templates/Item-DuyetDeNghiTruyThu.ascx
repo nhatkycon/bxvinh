@@ -1,6 +1,6 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="Item-DuyetDeNghiTruyThu.ascx.cs" Inherits="lib_ui_XeVaoBen_Templates_Item_DuyetDeNghiTruyThu" %>
 <div class="col-md-1">
-    <a href="/lib/pages/Phoi/Add.aspx?ID=<%=Item.PHOI_ID %><%=Item.TrangThai==510 ? "&act=approvedTruyThu" : "" %>" 
+    <a href="/lib/pages/TruyThu/KetQuaDuyet.aspx?ID=<%=Item.TRUYTHU_ID %><%=Item.TrangThai==510 ? "&act=approvedTruyThu" : "" %>" 
         data-bx="<%=Item.BienSo %>" 
         data-id="<%=Item.XE_ID %>" 
         data-phoiId="<%=Item.PHOI_ID %>"

@@ -1,0 +1,9 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="CongRaApp.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="Cổng_ra_BxVinh_WebSrv_WebService" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://bxvinh.vn/lib/WebService.asmx</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

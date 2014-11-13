@@ -61,10 +61,18 @@ public partial class lib_ajax_Phoi_Default : basePage
         var NgayChamCong = Request["NgayChamCong"];
         var XVB_ID = Request["XVB_ID"];
         var XeTangCuong = Request["XeTangCuong"];
+        var PHI_ChiThuBenBai = Request["PHI_ChiThuBenBai"];
+        var saveType = Request["saveType"];
+        var hopLe = Request["hopLe"];
 
         XeTangCuong = !string.IsNullOrEmpty(XeTangCuong)
                       ? "true"
                       : "false";
+
+        PHI_ChiThuBenBai = !string.IsNullOrEmpty(PHI_ChiThuBenBai)
+                      ? "true"
+                      : "false";
+
 
         var XeThayThe = Request["XeThayThe"];
 
@@ -173,6 +181,7 @@ public partial class lib_ajax_Phoi_Default : basePage
                     {
                         Item.PHI_ConNo = Convert.ToDouble(PHI_ConNo);
                     }
+                    Item.PHI_ChiThuBenBai = Convert.ToBoolean(PHI_ChiThuBenBai);
                     Item.XeThayThe = Convert.ToBoolean(XeThayThe);
                     Item.XeTangCuong = Convert.ToBoolean(XeTangCuong);
                     Item.CQ_ID = Security.CqId;
@@ -200,21 +209,25 @@ public partial class lib_ajax_Phoi_Default : basePage
 
                     if (Inserted)
                     {
-                        // Thêm chấm công mới
-                        chamCong.Loai = 1;
-                        chamCong.Duyet = true;
-                        chamCong.Ngay = new DateTime(Item.NgayXuatBen.Year, Item.NgayXuatBen.Month, Item.NgayXuatBen.Day);
-                        chamCong.PHOI_ID = Item.ID;
-                        chamCong.XE_ID = Item.XE_ID;
+                        if (string.IsNullOrEmpty(saveType)) saveType = "";
+                        if (!saveType.ToLower().Contains("truythu")) // Trong trường hợp không truy thu
+                        {
+                            // Thêm chấm công mới
+                            short loaiChamCong = 1;
+                            if (hopLe == "0") loaiChamCong = 2;
+                            chamCong.Loai = loaiChamCong;
+                            chamCong.Duyet = true;
+                            chamCong.Ngay = new DateTime(Item.NgayXuatBen.Year, Item.NgayXuatBen.Month, Item.NgayXuatBen.Day);
+                            chamCong.PHOI_ID = Item.ID;
+                            chamCong.XE_ID = Item.XE_ID;
 
-                        chamCong.NgayCapNhat = DateTime.Now;
-                        chamCong.Username = Security.Username;
-                        chamCong.NgayTao = DateTime.Now;
-                        chamCong.RowId = Guid.NewGuid();
-                        chamCong = ChamCongDal.Insert(chamCong);
-
-                        
-                        
+                            chamCong.TrangThaiNo = 0;                            
+                            chamCong.NgayCapNhat = DateTime.Now;
+                            chamCong.Username = Security.Username;
+                            chamCong.NgayTao = DateTime.Now;
+                            chamCong.RowId = Guid.NewGuid();
+                            chamCong = ChamCongDal.Insert(chamCong);
+                        }
                     }
                     var truyThu = new TruyThu();
                     var idTruyThuNull = string.IsNullOrEmpty(TRUYTHU_ID);
@@ -248,6 +261,14 @@ public partial class lib_ajax_Phoi_Default : basePage
                             truyThu.PHOI_ID = Item.ID;
                             truyThu.XE_ID = Item.XE_ID;
                             truyThu.DeNghi = truyThu.SoChuyenDeNghi != 0;
+                            if (truyThu.DeNghi)
+                            {
+                                truyThu.TrangThai = 1;
+                            }
+                            else
+                            {
+                                truyThu.TrangThai = 0;
+                            }
                             truyThu.NgayCapNhat = DateTime.Now;
                             truyThu.Username = Security.Username;
                             truyThu.NgayTao = DateTime.Now;
@@ -265,12 +286,20 @@ public partial class lib_ajax_Phoi_Default : basePage
                                 if (truyThu.DeNghi)
                                 {
                                     chamCong.Loai = 3;
+                                    chamCong.Duyet = false;
+                                    chamCong.TrangThaiNo = 1;
                                 }
                                 else
                                 {
                                     chamCong.Loai = 2;
+                                    chamCong.Duyet = true;
+                                    chamCong.TrangThaiNo = 0;
                                 }
-                                chamCong.Duyet = false;
+
+                                chamCong.Tien = Item.PHI_ChiThuBenBai
+                                                    ? Item.PHI_BenBai
+                                                    : (Item.PHI_HoaHongBanVe + Item.PHI_BenBai);
+
                                 chamCong.Ngay = new DateTime(NgayDuyetTruyThuDate.Year, NgayDuyetTruyThuDate.Month, NgayDuyetTruyThuDate.Day);
                                 chamCong.PHOI_ID = Item.ID;
                                 chamCong.XE_ID = Item.XE_ID;
@@ -311,6 +340,14 @@ public partial class lib_ajax_Phoi_Default : basePage
                             truyThu.PHOI_ID = Item.ID;
                             truyThu.XE_ID = Item.XE_ID;
                             truyThu.DeNghi = truyThu.SoChuyenDeNghi != 0;
+                            if (truyThu.DeNghi)
+                            {
+                                truyThu.TrangThai = 1;
+                            }
+                            else
+                            {
+                                truyThu.TrangThai = 0;
+                            }
                             truyThu.Duyet = false;
                             truyThu.NgayCapNhat = DateTime.Now;
                             truyThu = TruyThuDal.Update(truyThu);
@@ -326,11 +363,18 @@ public partial class lib_ajax_Phoi_Default : basePage
                                 if (truyThu.DeNghi)
                                 {
                                     chamCong.Loai = 3;
+                                    chamCong.Duyet = false;
+                                    chamCong.TrangThaiNo = 1;
                                 }
                                 else
                                 {
                                     chamCong.Loai = 2;
+                                    chamCong.Duyet = true;
+                                    chamCong.TrangThaiNo = 0;
                                 }
+                                chamCong.Tien = Item.PHI_ChiThuBenBai
+                                                    ? Item.PHI_BenBai
+                                                    : (Item.PHI_HoaHongBanVe + Item.PHI_BenBai);
                                 chamCong.Duyet = false;
                                 chamCong.Ngay = new DateTime(ngayDuyetTruyThuDate.Year, ngayDuyetTruyThuDate.Month, ngayDuyetTruyThuDate.Day);
                                 chamCong.PHOI_ID = Item.ID;
@@ -361,7 +405,7 @@ public partial class lib_ajax_Phoi_Default : basePage
                         xvb.NgayDuyetPhoi = xvb.NgayCapNhat = DateTime.Now;
                         xvb.NguoiDuyetPhoi = Security.Username;
                         xvb.PHOI_ID = Item.ID;
-
+                        xvb.Tien = Item.PHI_Tong;
                         xvb.TrangThai = 400;
                         if (!string.IsNullOrEmpty(NgayChamCong)) // Có phát sinh truy thu
                         {
@@ -385,6 +429,7 @@ public partial class lib_ajax_Phoi_Default : basePage
                         xvb.Username = Security.Username;
                         xvb.CQ_ID = Security.CqId;
                         xvb.TrangThai = 400;
+                        xvb.Tien = Item.PHI_Tong;
                         if (!string.IsNullOrEmpty(NgayChamCong)) // Có phát sinh truy thu
                         {
                             if (truyThu.SoChuyenDeNghi > 0 && !truyThu.Duyet) // Có đề nghị truy thu và truy thu này chưa duyệt

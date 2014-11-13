@@ -133,16 +133,28 @@ public partial class lib_ajax_XeVaoBen_Default : basePage
                     xvb = XeVaoBenDal.Update(xvb);
                 }
                 break;
+            case "RestoreXeChuaThanhToan":
+                if (!string.IsNullOrEmpty(Id))
+                {
+                    var xvb = XeVaoBenDal.SelectById(Convert.ToInt64(Id));
+                    xvb.TrangThai = 400;
+                    xvb.NgayCapNhat = DateTime.Now;
+                    xvb = XeVaoBenDal.Update(xvb);
+                }
+                break;
             case "NhanYeuCauThanhToan":
                 if (!string.IsNullOrEmpty(Id))
                 {
                     var xvb = XeVaoBenDal.SelectById(Convert.ToInt64(Id));
                     xvb.TrangThai = 700;
+                    xvb.NguoiNhanYeuCauThanhToan = Security.Username;
                     xvb.NgayNhanYeuCauThanhToan = xvb.NgayCapNhat = DateTime.Now;
                     xvb = XeVaoBenDal.Update(xvb);
+
                     var thuChi = ThuChiDal.SelectByLastest(DAL.con(), Security.CqId);
                     var phoi = PhoiDal.SelectById(xvb.PHOI_ID);
                     var xe = XeDal.SelectById(phoi.XE_ID);
+                    thuChi.XeVaoBen = xvb;
                     phoi.Xe = xe;
                     thuChi.Phoi = phoi;
                     rendertext(string.Format("({0})", JavaScriptConvert.SerializeObject(thuChi)));
@@ -151,10 +163,27 @@ public partial class lib_ajax_XeVaoBen_Default : basePage
             case "GetCurrentCapPhoi":
                 if (loggedIn)
                 {
-                    var item = XeVaoBenDal.ListByTrangThaiCqId(DAL.con(), Security.CqId, 300, 1, 200).FirstOrDefault();
+                    var item = XeVaoBenDal.ListByCurrentCapPhoiByUser(DAL.con(), Security.CqId, Security.Username).FirstOrDefault();
                     if(item!=null)
                     {
                         rendertext(string.Format("({0})", JavaScriptConvert.SerializeObject(item)));                        
+                    }
+                    rendertext("");
+                }
+                break;
+            case "GetCurrentThuCapPhoi":
+                if (loggedIn)
+                {
+                    var item = XeVaoBenDal.ListByCurrentThuCapPhoiByUser(DAL.con(), Security.CqId, Security.Username).FirstOrDefault();
+                    if (item != null)
+                    {
+                        var thuChi = ThuChiDal.SelectByLastest(DAL.con(), Security.CqId);
+                        var phoi = PhoiDal.SelectById(item.PHOI_ID);
+                        var xe = XeDal.SelectById(phoi.XE_ID);
+                        thuChi.XeVaoBen = item;
+                        phoi.Xe = xe;
+                        thuChi.Phoi = phoi;
+                        rendertext(string.Format("({0})", JavaScriptConvert.SerializeObject(thuChi)));
                     }
                     rendertext("");
                 }

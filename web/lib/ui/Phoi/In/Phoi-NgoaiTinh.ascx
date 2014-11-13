@@ -69,10 +69,10 @@
         </tr>
         <tr>
             <td style="width: 100px; text-align: right;">
-                Xuất bến:
+                <%--Xuất bến:--%>
             </td>
             <td>
-                <%=Item.Xe.GioXuatBen %>
+                <%--<%=Item.Xe.GioXuatBen %>--%>
             </td>
             <td style="width: 100px; text-align: right;">
                 Ngày:

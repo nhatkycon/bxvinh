@@ -60,31 +60,6 @@
                             <textarea id="DeNghiCuaNhaXe" name="DeNghiCuaNhaXe" type="text" rows="3" class="form-control"><%=Item.DeNghiCuaNhaXe %></textarea>
                         </div>              
                    </div>
-                    <%if(Item.Duyet){ %>
-                        <hr/>
-                        <div class="form-group">
-                            <label for="SoChuyenDuocDuyet" class="col-sm-4 control-label">
-                                Số chuyến được duyệt:
-                            </label>
-                            <div class="col-sm-8">
-                                <input type="text" name="SoChuyenDuocDuyet" id="SoChuyenDuocDuyet" value="<%=Item.SoChuyenDuocDuyet %>" class="form-control SoChuyenDuocDuyet">
-                            </div>              
-                       </div>
-                        <div class="form-group">
-                            <label for="YKienChiDao" class="col-sm-4 control-label">
-                                Ý kiến lãnh đạo:
-                            </label>
-                            <div class="col-sm-8">
-                                <textarea id="YKienChiDao" name="YKienChiDao" type="text" rows="3" class="form-control"><%=Item.YKienChiDao %></textarea>
-                            </div>              
-                       </div>
-                    <div class="help-block">
-                        <div class="well well-sm">
-                            <i class="glyphicon glyphicon-info-sign"></i>
-                            <strong><%=Item.LanhDaoDuyet %></strong> duyệt ngày <%=Item.NgayDuyet.ToString("HH:mm dd/MM/yyyy") %>.                            
-                        </div>
-                    </div>
-                    <%} %>
           </div>                      
       </div>
       <div class="modal-footer">

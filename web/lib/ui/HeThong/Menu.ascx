@@ -15,10 +15,10 @@
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                <% foreach (var Item in List.Where( x => x.ID==369 || x.ID == 376))
+                <% foreach (var Item in List.Where(y => y.Level==1 && !y.Ten.Contains("QT")))
                    {%>
                     <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><%=Item.Ten %><b class="caret"></b></a>
+                        <a data-id="<%=Item.ID %>" data-level="<%=Item.Level %>" href="#" class="dropdown-toggle" data-toggle="dropdown"><%=Item.Ten %><b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             <% foreach (var item in List.Where( y => y.PID == Item.ID))
                                {%>

@@ -2,10 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
 using docsoft.entities;
 
 public partial class lib_ui_Phoi_ChamCongCalendar_View : System.Web.UI.UserControl
@@ -39,6 +35,10 @@ public partial class lib_ui_Phoi_ChamCongCalendar_View : System.Web.UI.UserContr
     /// </summary>
     public List<ListThang> Thangs { get; set; }
 
+    /// <summary>
+    /// Số chuyến chấm công còn nợ
+    /// </summary>
+    public int SoChuyenNo { get; set; }
     public int PrevMonthLabel { get; set; }
     public int CurrentMonthLabel { get; set; }
 
@@ -57,6 +57,10 @@ public partial class lib_ui_Phoi_ChamCongCalendar_View : System.Web.UI.UserContr
         Today = string.IsNullOrEmpty(NgayXuatBen)
                     ? DateTime.Now
                     : Convert.ToDateTime(NgayXuatBen, new CultureInfo("Vi-vn"));
+
+        SoChuyenNo = ListChamCong.Count(x => x.TrangThaiNo == 1);
+
+        ListChamCong = ListChamCong.Where(x => x.TrangThaiNo != 1).ToList();
 
         var month = Today.Month;
         var year = Today.Year;
@@ -169,7 +173,7 @@ public partial class lib_ui_Phoi_ChamCongCalendar_View : System.Web.UI.UserContr
         });
     }
     /// <summary>
-    /// Hàm tính
+    /// Hàm tính tổng số ngày theo biểu đồ
     /// </summary>
     /// <param name="loaiBieuDo"></param>
     /// <param name="year"></param>
@@ -202,7 +206,7 @@ public partial class lib_ui_Phoi_ChamCongCalendar_View : System.Web.UI.UserContr
         var currentDate = new DateTime(date.Year, date.Month, date.Day);
         var ngayDauThang = new DateTime(currentDate.Year, currentDate.Month, 1);
         var ngayCuoiThang = ngayDauThang.AddMonths(1);
-        var ngayChamCongCuoiCung = chamCongList.Any() ? chamCongList.Last().Ngay : ngayDauThang.AddDays(-1);
+        var ngayChamCongCuoiCung = chamCongList.Any() ? chamCongList.Last().Ngay : ngayDauThang.AddDays(-1).AddMonths(-1);
         var tongNgay = (currentDate - ngayChamCongCuoiCung).Days;
 
 
@@ -212,7 +216,7 @@ public partial class lib_ui_Phoi_ChamCongCalendar_View : System.Web.UI.UserContr
         if(!loaiBieuDo.KhoanTuyen) // Nếu biểu đồ là biểu đồ cách ngày
         {
             // lấy tất cả các ngày cách còn lại trong biểu đồ (không kể ngày chấm công cuối cùng)
-            for (var d = ngayChamCongCuoiCung; d < currentDate; d = d.AddDays(loaiBieuDo.CachNgay))
+            for (var d = currentDate; d > ngayChamCongCuoiCung; d = d.AddDays(-loaiBieuDo.CachNgay))
             {
                 if(d==ngayChamCongCuoiCung || d==currentDate) continue;
                 list.Add(new LichItem() { Day = d, Clickactive = true, KieuChamCong = 4, SoChuyen = 1 });

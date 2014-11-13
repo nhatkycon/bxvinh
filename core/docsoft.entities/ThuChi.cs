@@ -46,6 +46,7 @@ namespace docsoft.entities
             get { return Lib.FormatMa(STTALL); }
         }
 
+        public XeVaoBen XeVaoBen { get; set; }
         public Phoi Phoi { get; set; }
         public Int64 XE_ID { get; set; }
         public string XE_BienSo { get; set; }

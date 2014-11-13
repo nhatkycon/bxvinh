@@ -143,7 +143,6 @@
             this.lblTongSo.Name = "lblTongSo";
             this.lblTongSo.Size = new System.Drawing.Size(300, 24);
             this.lblTongSo.TabIndex = 0;
-            this.lblTongSo.Text = "259";
             this.lblTongSo.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // timer1
@@ -198,7 +197,7 @@
             this.button1.Location = new System.Drawing.Point(676, 665);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(328, 57);
-            this.button1.TabIndex = 16;
+            this.button1.TabIndex = 7;
             this.button1.Text = "Thoát";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
@@ -209,7 +208,7 @@
             this.txtTien.Location = new System.Drawing.Point(785, 335);
             this.txtTien.Name = "txtTien";
             this.txtTien.Size = new System.Drawing.Size(219, 29);
-            this.txtTien.TabIndex = 17;
+            this.txtTien.TabIndex = 3;
             this.txtTien.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // lblTien
@@ -229,7 +228,7 @@
             this.btnCapLenh.Location = new System.Drawing.Point(676, 385);
             this.btnCapLenh.Name = "btnCapLenh";
             this.btnCapLenh.Size = new System.Drawing.Size(99, 70);
-            this.btnCapLenh.TabIndex = 19;
+            this.btnCapLenh.TabIndex = 4;
             this.btnCapLenh.Text = "Cấp lệnh (F8)";
             this.btnCapLenh.UseVisualStyleBackColor = true;
             this.btnCapLenh.Click += new System.EventHandler(this.btnCapLenh_Click);
@@ -241,7 +240,7 @@
             this.btnTraKhach.Location = new System.Drawing.Point(791, 385);
             this.btnTraKhach.Name = "btnTraKhach";
             this.btnTraKhach.Size = new System.Drawing.Size(99, 70);
-            this.btnTraKhach.TabIndex = 20;
+            this.btnTraKhach.TabIndex = 5;
             this.btnTraKhach.Text = "Trả khách (F9)";
             this.btnTraKhach.UseVisualStyleBackColor = true;
             this.btnTraKhach.Click += new System.EventHandler(this.btnTraKhach_Click);
@@ -253,7 +252,7 @@
             this.btnVangLLai.Location = new System.Drawing.Point(905, 385);
             this.btnVangLLai.Name = "btnVangLLai";
             this.btnVangLLai.Size = new System.Drawing.Size(99, 70);
-            this.btnVangLLai.TabIndex = 21;
+            this.btnVangLLai.TabIndex = 6;
             this.btnVangLLai.Text = "Vãng lai (F10)";
             this.btnVangLLai.UseVisualStyleBackColor = true;
             this.btnVangLLai.Click += new System.EventHandler(this.btnVangLLai_Click);

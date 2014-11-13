@@ -1,7 +1,14 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="ChamCongCalendar_View.ascx.cs" Inherits="lib_ui_Phoi_ChamCongCalendar_View" %>
 
 
-
+<p>
+    <strong class="BIEUDO_Ten">
+        <%=LoaiBieuDo.Ten %> 
+        
+        <%=SoChuyenNo==0 ? "" : string.Format(": Còn nợ <a href=\"/lib/pages/ThuNo/Add.aspx?XE_ID={1}\">{0}</a> chuyến",SoChuyenNo, Item.XE_ID) %>
+    </strong>
+</p>
+<hr/>
 <% foreach (var listThang in Thangs)
    {%>
     <table class="table table-striped table-bordered table-hover">

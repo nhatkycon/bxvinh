@@ -1,5 +1,6 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="Add.ascx.cs" Inherits="lib_ui_Xe_Add" %>
 <%@ Import Namespace="docsoft" %>
+<%@ Import Namespace="linh.common" %>
 
 <link href="/lib/css/web/bootstrap-timepicker.min.css" rel="stylesheet" />
 <div class="panel panel-default Normal-Pnl-Add" 
@@ -17,6 +18,7 @@
         <%if (!string.IsNullOrEmpty(Id))
             {%>
             <a href="javascript:;" data-ret="<%=Ret %>" class="btn btn-primary savebtn">Lưu</a>
+            <a href="/lib/pages/Xe/Add.aspx" class="btn btn-success">Thêm</a>
             <%if (Item.Username == Security.Username)
               { %>
                 <a href="javascript:;" data-id="<%=Item.ID %>" class="btn btn-warning xoaBtn">Xóa</a>
@@ -211,7 +213,7 @@
             
             <div class="form-group">
                 <label for="XeVangLai" class="col-sm-2 control-label">Vãng lai:</label>
-                <div class="col-sm-2">
+                <div class="col-sm-1">
                     <%if (Item.XeVangLai)
                     {%>
                         <input class="XeVangLai input-sm" id="XeVangLai" checked="checked" name="XeVangLai" type="checkbox"/>
@@ -221,8 +223,8 @@
                         <input class="XeVangLai input-sm" id="Checkbox1" name="XeVangLai" type="checkbox"/>
                     <% } %>
                 </div>
-                <label for="ChuaDangKy" class="col-sm-2 control-label">Đã đăng ký:</label>
-                <div class="col-sm-2">
+                <label for="ChuaDangKy" class="col-sm-1 control-label">Đã đăng ký:</label>
+                <div class="col-sm-1">
                     <%if (!Item.ChuaDangKy)
                     {%>
                         <input class="ChuaDangKy input-sm" id="ChuaDangKy" checked="checked" name="ChuaDangKy" type="checkbox"/>
@@ -231,6 +233,33 @@
                     {%>
                         <input class="ChuaDangKy input-sm" id="ChuaDangKy" name="ChuaDangKy" type="checkbox"/>
                     <% } %>
+                </div>
+                <label for="ChuaDangKy" class="col-sm-1 control-label">Ký gửi vé:</label>
+                <div class="col-sm-2">
+                    <%if (Item.KyGuiBanVe)
+                    {%>
+                        <input class="KyGuiBanVe " id="KyGuiBanVe" checked="checked" name="KyGuiBanVe" type="checkbox"/>
+                    <%}
+                    else
+                    {%>
+                        <input class="KyGuiBanVe " id="Checkbox2" name="KyGuiBanVe" type="checkbox"/>
+                    <% } %>
+                </div>                    
+                <label for="KyGuiBanVe" class="col-sm-2 control-label">Ngày ký gửi:</label>
+                <div class="col-sm-2">
+                    <div class="input-append datepicker-input date input-group">
+                        <input 
+                            value="<%=Item.NgayKyGuiBanVe.NgayVn()%>"
+                            data-format="dd/MM/yyyy" 
+                            class="form-control NgayKyGuiBanVe" 
+                            id="NgayKyGuiBanVe" 
+                            name="NgayKyGuiBanVe" 
+                            type="text"/>
+                        <span class="add-on input-group-addon">
+                            <i data-time-icon="icon-time" data-date-icon="icon-calendar" class="glyphicon glyphicon-calendar">
+                            </i>
+                        </span>
+                    </div>
                 </div>
             </div>
             <%if (!string.IsNullOrEmpty(Id)){ %>
@@ -261,7 +290,7 @@
         <%if (!string.IsNullOrEmpty(Id))
             {%>
             <a href="javascript:;" data-ret="<%=Ret %>" class="btn btn-primary savebtn">Lưu</a>
-           
+            <a href="/lib/pages/Xe/Add.aspx" class="btn btn-success">Thêm</a>
             <%if(Item.Username == Security.Username){ %>
                 <a href="javascript:;" data-id="<%=Item.ID %>" class="btn btn-warning xoaBtn">Xóa</a>
             <%} %>

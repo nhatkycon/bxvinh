@@ -9,7 +9,5 @@ public partial class lib_pages_Tuyen_Add : System.Web.UI.Page
         var id = Request["ID"];
         Item = string.IsNullOrEmpty(id) ? new Tuyen() : TuyenDal.SelectById(Convert.ToInt32(id));
         Add.Item = Item;
-        var diaDiem = DanhMucDal.SelectByLDMMa("BenXe");
-        Add.DiaDiem = diaDiem;
     }
 }

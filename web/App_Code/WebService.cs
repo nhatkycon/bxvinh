@@ -109,7 +109,26 @@ public class WebService : System.Web.Services.WebService {
         }
         return 0;
     }
-    #endregion
+
+    [WebMethod]
+    public List<XeVaoBen> XeVaoBenGetXeRaCong(int CqId)
+    {
+        return XeVaoBenDal.ListXeRaCongByCqId(DAL.con(), CqId);
+    }
+    [WebMethod]
+    public bool XeVaoBenUpdateRaCong(long Id)
+    {
+        var xvb = XeVaoBenDal.SelectById(Id);
+        xvb.DaRa = true;
+        xvb.NgayRa = DateTime.Now;
+        if(xvb.Loai==200)
+        {
+            xvb.TrangThai = 900;
+        }
+        XeVaoBenDal.Update(xvb);
+        return true;
+    }
+     #endregion
 
     #region Login
     [WebMethod]
