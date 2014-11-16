@@ -50,6 +50,9 @@ public partial class lib_ajax_ChamCong_Default : basePage
                     ChamCongCalendar_View.ListChamCongCurrent = chamCongListCurrent;
                     ChamCongCalendar_View.LoaiBieuDo = loaiBieuDo;
                     ChamCongCalendar_View.Visible = true;
+                    ChamCongCalendar_View.TuNgay = tuNgay;
+                    ChamCongCalendar_View.DenNgay = DateTime.Now;
+
                 }
                 break;
                 #endregion

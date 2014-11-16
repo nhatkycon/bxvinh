@@ -178,6 +178,7 @@ var bxVinhFn = {
                 });
             });
 
+            $('[data-toggle="tooltip"]').tooltip();
 
             bxVinhFn.normalFormFn.add();
             bxVinhFn.normalFormFn.headerFn();

@@ -75,7 +75,7 @@
                                             <i class="glyphicon glyphicon-search"></i>
                                         </button>
                                     </span>
-                                    <input type="text" placeholder="Nhập biển số xe" 
+                                    <input  data-toggle="tooltip" title="Gõ biển số xe" type="text" placeholder="Nhập biển số xe" 
                                         data-src="/lib/ajax/Xe/Default.aspx" data-refId="XE_ID" 
                                         class="form-control form-autocomplete-input-Phoi-ChonXe XE_BienSo" name="XE_BienSo" id="XE_BienSo" value="<%=Item.Xe.BienSo_Chu %> <%=Item.Xe.BienSo_So %>"/>
                                     
@@ -256,7 +256,7 @@
                                                 </button>
                                             </span>
                                             <input type="text" name="ChuyenTruyThu" placeholder="Số chuyến truy thu" disabled id="ChuyenTruyThu" value="<%=Item.ChuyenTruyThu %>" class="form-control ChuyenTruyThu money-input">
-                                            <span class="input-group-addon" title="Tick nếu chỉ truy thu phí bến bãi">
+                                            <span data-toggle="tooltip" title="Tick chọn nếu chỉ truy thu bến bãi. Bỏ tick nếu truy thu bến bãi + khách." class="input-group-addon" title="Tick nếu chỉ truy thu phí bến bãi">
                                                 <%if (Item.PHI_ChiThuBenBai)
                                                 {%>
                                                     <input class="PHI_ChiThuBenBai" form-control-hasDefalltValue id="PHI_ChiThuBenBai" checked="checked" name="PHI_ChiThuBenBai" type="checkbox"/>
@@ -292,7 +292,7 @@
                                 <div class="col-sm-3">
                                     <input type="text" name="PHI_Tong" id="PHI_Tong" disabled value="<%=Item.PHI_Tong %>" class="form-control PHI_Tong ThuPhi-Input-Sum money-input input-lg">
                                 </div>        
-                                <div class="">
+                                <div class="hidden">
                                     <label for="PHI_Nop" class="col-sm-2 control-label">Thu:</label>
                                     <div class="col-sm-2">
                                         <input type="text" name="PHI_Nop" id="PHI_Nop" value="<%=Item.PHI_Nop %>" class="form-control PHI_Nop money-input">
@@ -336,16 +336,11 @@
                 <%if (!string.IsNullOrEmpty(Id))
                     {%>
                     <div class="panel-footer-insert" style="display: none;">
-                            <button class="btn saveBtn btn-lg btn-primary">Phơi-F8</button>
-                            <button class="btn truyThuBtn btn-lg btn-default">Truy thu-F9</button>
-                            <button class="btn restoreBtn btn-lg btn-default">Đóng-F10</button>    
+                            <button class="btn saveBtn btn-lg btn-primary" data-toggle="tooltip" title="Cấp phơi ngày hôm nay + truy thu">Phơi-F8</button>
+                            <button class="btn truyThuBtn btn-lg btn-default" data-toggle="tooltip" title="Truy thu (không cấp phơi ngày hôm nay)">Truy thu-F9</button>
+                            <button class="btn restoreBtn btn-lg btn-default" data-toggle="tooltip" title="Đóng lại">Đóng-F10</button>    
                     </div>
                     <div class="panel-footer-saved">
-                        <%if (Item.TruyThuItem.TrangThai == 2 && Request["act"] == "approvedTruyThu")
-                          { %>
-                            <button  class="btn chapNhanTruyThuBtn btn-lg btn-primary">Chấp nhận truy thu</button>
-                            <button  class="btn kienNghiTruyThuBtn btn-lg btn-default">Kiến nghị</button>
-                        <% } %>
                         <a href="/lib/pages/Phoi/In/Phoi-NgoaiTinh.aspx?ID=<%=Item.ID %>" data-id="" data-url="/lib/pages/Phoi/In/Phoi-NgoaiTinh.aspx" target="_blank" class="btn printBtn btn-lg btn-primary">In</a>                        
                         <button  class="btn newBtn btn-lg btn-success">Thêm-F6</button>
                         <a href="/lib/pages/Phoi/Add.aspx?ID=<%=Item.ID %>" data-url="/lib/pages/Phoi/Add.aspx" data-id="" class="btn editBtn btn-lg btn-default">Sửa</a>
@@ -358,14 +353,14 @@
                 else
                 {%>
                     <div class="panel-footer-insert">
-                        <button class="btn saveBtn btn-lg btn-primary">Phơi-F8</button>
-                        <button class="btn truyThuBtn btn-lg btn-default">Truy thu-F9</button>
-                        <button class="btn restoreBtn btn-lg btn-default">Đóng-F10</button>    
+                        <button class="btn saveBtn btn-lg btn-primary" data-toggle="tooltip" title="Cấp phơi ngày hôm nay + truy thu">Phơi-F8</button>
+                        <button class="btn truyThuBtn btn-lg btn-default" data-toggle="tooltip" title="Truy thu (không cấp phơi ngày hôm nay)">Truy thu-F9</button>
+                        <button class="btn restoreBtn btn-lg btn-default" data-toggle="tooltip" title="Đóng lại">Đóng-F10</button>    
                     </div>
                     <div class="panel-footer-saved">
                         
                         <a  data-id="" data-url="/lib/pages/Phoi/In/Phoi-NgoaiTinh.aspx" target="_blank" class="btn printBtn btn-lg btn-primary">In</a>
-                        <button  class="btn newBtn btn-lg btn-success">Thêm-F6</button>
+                        <button  class="btn newBtn btn-lg btn-success" data-toggle="tooltip" title="Thêm mới">Thêm-F6</button>
                         <a data-url="/lib/pages/Phoi/Add.aspx" data-id="" class="btn editBtn btn-lg btn-default">Sửa</a>
                         <a href="javascript:;" data-id="" class="btn btn-warning btn-lg xoaBtn">Xóa</a>
                     </div>

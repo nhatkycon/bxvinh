@@ -183,6 +183,10 @@ namespace CongRaApp
             txtGioVao.Text = "";
             XvbId = 0;
             Tien = 0;
+            if(!backgroundWorker1.IsBusy)
+            {
+                backgroundWorker1.RunWorkerAsync();
+            }
             backgroundWorker2.Dispose();
         }
 

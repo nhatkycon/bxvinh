@@ -35,7 +35,10 @@ public partial class lib_ui_Phoi_ChamCongCalendar_TuNgayDenNgay : System.Web.UI.
     /// Danh sách tháng
     /// </summary>
     public List<ListThang> Thangs { get; set; }
-
+    /// <summary>
+    /// Số chuyến chấm công còn nợ
+    /// </summary>
+    public int SoChuyenNo { get; set; }
     public int PrevMonthLabel { get; set; }
     public int CurrentMonthLabel { get; set; }
 
@@ -59,8 +62,9 @@ public partial class lib_ui_Phoi_ChamCongCalendar_TuNgayDenNgay : System.Web.UI.
                     ? DateTime.Now
                     : Convert.ToDateTime(NgayXuatBen, new CultureInfo("Vi-vn"));
 
-        TuNgay=new DateTime(2014,7,13);
-        DenNgay = new DateTime(2014, 11, 10);
+        SoChuyenNo = ListChamCong.Count(x => x.TrangThaiNo == 1);
+        //TuNgay=new DateTime(2014,7,13);
+        //DenNgay = new DateTime(2014, 11, 10);
 
         var TuNgayDauThang = new DateTime(TuNgay.Year, TuNgay.Month, 1);
         var TuNgayCuoiThang = new DateTime(TuNgay.Year, TuNgay.Month, 1).AddMonths(1).AddDays(-1);
@@ -96,7 +100,8 @@ public partial class lib_ui_Phoi_ChamCongCalendar_TuNgayDenNgay : System.Web.UI.
                     item.List.AddRange(chamCongs);
                     item.KieuChamCong = kieuChamCong;
                     item.SoChuyen = chamCongs.Count;
-                    item.GhiChu = chamCongs.FirstOrDefault().GhiChu;
+                    item.GhiChu = chamCongs[0].GhiChu;
+                    item.TangCuong = chamCongs[0].TangCuong;
                 }
 
                 var chamCongsCurrent = ListChamCongCurrent.Where(x => x.Ngay == d).ToList();
@@ -107,6 +112,7 @@ public partial class lib_ui_Phoi_ChamCongCalendar_TuNgayDenNgay : System.Web.UI.
                     item.SoChuyen += chamCongsCurrent.Count;
                     item.TRUYTHU_ID = chamCongsCurrent[0].TRUYTHU_ID;
                     item.PHOI_ID = chamCongsCurrent[0].PHOI_ID;
+                    item.TangCuong = chamCongsCurrent[0].TangCuong;
                     item.Clickactive = true;
                 }
 

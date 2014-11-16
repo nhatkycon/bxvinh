@@ -322,6 +322,8 @@ namespace docsoft.entities
     {
         public DateTime Day { get; set; }
         public int SoChuyen { get; set; }
+        public bool TangCuong { get; set; }
+
         /// <summary>
         /// Có 5 kiểu: 
         /// 1- Chấm công bình thường. 
@@ -640,7 +642,9 @@ namespace docsoft.entities
     public class ChamCong : BaseEntity
     {
         #region Properties
+        public Boolean TangCuong { get; set; }
         public Int64 ID { get; set; }
+        public Int32 CQ_ID { get; set; }
         public Int64 XE_ID { get; set; }
         public DateTime Ngay { get; set; }
         public Int64 TRUYTHU_ID { get; set; }
@@ -696,52 +700,54 @@ namespace docsoft.entities
         public static ChamCong Insert(ChamCong item)
         {
             var Item = new ChamCong();
-            var obj = new SqlParameter[15];
-            obj[1] = new SqlParameter("CONG_XE_ID", item.XE_ID);
-            obj[2] = new SqlParameter("CONG_Ngay", item.Ngay);
+            var obj = new SqlParameter[17];
+            obj[1] = new SqlParameter("CONG_CQ_ID", item.CQ_ID);
+            obj[2] = new SqlParameter("CONG_TangCuong", item.TangCuong);
+            obj[3] = new SqlParameter("CONG_XE_ID", item.XE_ID);
+            obj[4] = new SqlParameter("CONG_Ngay", item.Ngay);
             if (item.Ngay > DateTime.MinValue)
             {
-                obj[2] = new SqlParameter("CONG_Ngay", item.Ngay);
+                obj[4] = new SqlParameter("CONG_Ngay", item.Ngay);
             }
             else
             {
-                obj[2] = new SqlParameter("CONG_Ngay", DBNull.Value);
+                obj[4] = new SqlParameter("CONG_Ngay", DBNull.Value);
             }
-            obj[3] = new SqlParameter("CONG_TRUYTHU_ID", item.TRUYTHU_ID);
-            obj[4] = new SqlParameter("CONG_PHOI_ID", item.PHOI_ID);
-            obj[5] = new SqlParameter("CONG_Loai", item.Loai);
-            obj[6] = new SqlParameter("CONG_Duyet", item.Duyet);
-            obj[7] = new SqlParameter("CONG_Username", item.Username);
-            obj[8] = new SqlParameter("CONG_NgayTao", item.NgayTao);
+            obj[5] = new SqlParameter("CONG_TRUYTHU_ID", item.TRUYTHU_ID);
+            obj[6] = new SqlParameter("CONG_PHOI_ID", item.PHOI_ID);
+            obj[7] = new SqlParameter("CONG_Loai", item.Loai);
+            obj[8] = new SqlParameter("CONG_Duyet", item.Duyet);
+            obj[9] = new SqlParameter("CONG_Username", item.Username);
+            obj[10] = new SqlParameter("CONG_NgayTao", item.NgayTao);
             if (item.NgayTao > DateTime.MinValue)
             {
-                obj[8] = new SqlParameter("CONG_NgayTao", item.NgayTao);
+                obj[10] = new SqlParameter("CONG_NgayTao", item.NgayTao);
             }
             else
             {
-                obj[8] = new SqlParameter("CONG_NgayTao", DBNull.Value);
+                obj[10] = new SqlParameter("CONG_NgayTao", DBNull.Value);
             }
-            obj[9] = new SqlParameter("CONG_NgayCapNhat", item.NgayCapNhat);
+            obj[11] = new SqlParameter("CONG_NgayCapNhat", item.NgayCapNhat);
             if (item.NgayCapNhat > DateTime.MinValue)
             {
-                obj[9] = new SqlParameter("CONG_NgayCapNhat", item.NgayCapNhat);
+                obj[11] = new SqlParameter("CONG_NgayCapNhat", item.NgayCapNhat);
             }
             else
             {
-                obj[9] = new SqlParameter("CONG_NgayCapNhat", DBNull.Value);
+                obj[11] = new SqlParameter("CONG_NgayCapNhat", DBNull.Value);
             }
-            obj[10] = new SqlParameter("CONG_RowId", item.RowId);
-            obj[11] = new SqlParameter("CONG_Tien", item.Tien);
-            obj[12] = new SqlParameter("CONG_TrangThaiNo", item.TrangThaiNo);
-            obj[13] = new SqlParameter("CONG_GhiChu", item.GhiChu);
-            obj[14] = new SqlParameter("CONG_NgayThanhToan", item.NgayThanhToan);
+            obj[12] = new SqlParameter("CONG_RowId", item.RowId);
+            obj[13] = new SqlParameter("CONG_Tien", item.Tien);
+            obj[14] = new SqlParameter("CONG_TrangThaiNo", item.TrangThaiNo);
+            obj[15] = new SqlParameter("CONG_GhiChu", item.GhiChu);
+            obj[16] = new SqlParameter("CONG_NgayThanhToan", item.NgayThanhToan);
             if (item.NgayThanhToan > DateTime.MinValue)
             {
-                obj[14] = new SqlParameter("CONG_NgayThanhToan", item.NgayThanhToan);
+                obj[16] = new SqlParameter("CONG_NgayThanhToan", item.NgayThanhToan);
             }
             else
             {
-                obj[14] = new SqlParameter("CONG_NgayThanhToan", DBNull.Value);
+                obj[16] = new SqlParameter("CONG_NgayThanhToan", DBNull.Value);
             }
 
             using (IDataReader rd = SqlHelper.ExecuteReader(DAL.con(), CommandType.StoredProcedure, "sp_tblBx_ChamCong_Insert_InsertNormal_linhnx", obj))
@@ -757,49 +763,51 @@ namespace docsoft.entities
         public static ChamCong Update(ChamCong item)
         {
             var Item = new ChamCong();
-            var obj = new SqlParameter[15];
+            var obj = new SqlParameter[17];
             obj[0] = new SqlParameter("CONG_ID", item.ID);
-            obj[1] = new SqlParameter("CONG_XE_ID", item.XE_ID);
+            obj[1] = new SqlParameter("CONG_CQ_ID", item.CQ_ID);
+            obj[2] = new SqlParameter("CONG_TangCuong", item.TangCuong);
+            obj[3] = new SqlParameter("CONG_XE_ID", item.XE_ID);
             if (item.Ngay > DateTime.MinValue)
             {
-                obj[2] = new SqlParameter("CONG_Ngay", item.Ngay);
+                obj[4] = new SqlParameter("CONG_Ngay", item.Ngay);
             }
             else
             {
-                obj[2] = new SqlParameter("CONG_Ngay", DBNull.Value);
+                obj[4] = new SqlParameter("CONG_Ngay", DBNull.Value);
             }
-            obj[3] = new SqlParameter("CONG_TRUYTHU_ID", item.TRUYTHU_ID);
-            obj[4] = new SqlParameter("CONG_PHOI_ID", item.PHOI_ID);
-            obj[5] = new SqlParameter("CONG_Loai", item.Loai);
-            obj[6] = new SqlParameter("CONG_Duyet", item.Duyet);
-            obj[7] = new SqlParameter("CONG_Username", item.Username);
+            obj[5] = new SqlParameter("CONG_TRUYTHU_ID", item.TRUYTHU_ID);
+            obj[6] = new SqlParameter("CONG_PHOI_ID", item.PHOI_ID);
+            obj[7] = new SqlParameter("CONG_Loai", item.Loai);
+            obj[8] = new SqlParameter("CONG_Duyet", item.Duyet);
+            obj[9] = new SqlParameter("CONG_Username", item.Username);
             if (item.NgayTao > DateTime.MinValue)
             {
-                obj[8] = new SqlParameter("CONG_NgayTao", item.NgayTao);
+                obj[10] = new SqlParameter("CONG_NgayTao", item.NgayTao);
             }
             else
             {
-                obj[8] = new SqlParameter("CONG_NgayTao", DBNull.Value);
+                obj[10] = new SqlParameter("CONG_NgayTao", DBNull.Value);
             }
             if (item.NgayCapNhat > DateTime.MinValue)
             {
-                obj[9] = new SqlParameter("CONG_NgayCapNhat", item.NgayCapNhat);
+                obj[11] = new SqlParameter("CONG_NgayCapNhat", item.NgayCapNhat);
             }
             else
             {
-                obj[9] = new SqlParameter("CONG_NgayCapNhat", DBNull.Value);
+                obj[11] = new SqlParameter("CONG_NgayCapNhat", DBNull.Value);
             }
-            obj[10] = new SqlParameter("CONG_RowId", item.RowId);
-            obj[11] = new SqlParameter("CONG_Tien", item.Tien);
-            obj[12] = new SqlParameter("CONG_TrangThaiNo", item.TrangThaiNo);
-            obj[13] = new SqlParameter("CONG_GhiChu", item.GhiChu);
+            obj[12] = new SqlParameter("CONG_RowId", item.RowId);
+            obj[13] = new SqlParameter("CONG_Tien", item.Tien);
+            obj[14] = new SqlParameter("CONG_TrangThaiNo", item.TrangThaiNo);
+            obj[15] = new SqlParameter("CONG_GhiChu", item.GhiChu);
             if (item.NgayThanhToan > DateTime.MinValue)
             {
-                obj[14] = new SqlParameter("CONG_NgayThanhToan", item.NgayThanhToan);
+                obj[16] = new SqlParameter("CONG_NgayThanhToan", item.NgayThanhToan);
             }
             else
             {
-                obj[14] = new SqlParameter("CONG_NgayThanhToan", DBNull.Value);
+                obj[16] = new SqlParameter("CONG_NgayThanhToan", DBNull.Value);
             }
 
             using (IDataReader rd = SqlHelper.ExecuteReader(DAL.con(), CommandType.StoredProcedure, "sp_tblBx_ChamCong_Update_UpdateNormal_linhnx", obj))
@@ -864,6 +872,14 @@ namespace docsoft.entities
             if (rd.FieldExists("CONG_ID"))
             {
                 Item.ID = (Int64)(rd["CONG_ID"]);
+            }
+            if (rd.FieldExists("CONG_CQ_ID"))
+            {
+                Item.CQ_ID = (Int32)(rd["CONG_CQ_ID"]);
+            }
+            if (rd.FieldExists("CONG_TangCuong"))
+            {
+                Item.TangCuong = (Boolean)(rd["CONG_TangCuong"]);
             }
             if (rd.FieldExists("CONG_XE_ID"))
             {
