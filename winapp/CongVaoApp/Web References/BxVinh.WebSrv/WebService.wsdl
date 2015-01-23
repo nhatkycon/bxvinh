@@ -54,6 +54,9 @@
               <s:element minOccurs="1" maxOccurs="1" name="Khoa" type="s:boolean" />
               <s:element minOccurs="1" maxOccurs="1" name="BIEUDO_ID" type="s:int" />
               <s:element minOccurs="1" maxOccurs="1" name="BaoHiem" type="s:dateTime" />
+              <s:element minOccurs="1" maxOccurs="1" name="KyGuiBanVe" type="s:boolean" />
+              <s:element minOccurs="1" maxOccurs="1" name="NgayKyGuiBanVe" type="s:dateTime" />
+              <s:element minOccurs="1" maxOccurs="1" name="ChapThuanTuyen_SoChuyen" type="s:short" />
               <s:element minOccurs="0" maxOccurs="1" name="BienSo" type="s:string" />
               <s:element minOccurs="0" maxOccurs="1" name="Tuyen" type="tns:Tuyen" />
               <s:element minOccurs="0" maxOccurs="1" name="LOAIXE_Ten" type="s:string" />
@@ -63,11 +66,42 @@
               <s:element minOccurs="0" maxOccurs="1" name="LoaiBieuDo" type="tns:LoaiBieuDo" />
               <s:element minOccurs="0" maxOccurs="1" name="LaiXe" type="tns:LaiXe" />
               <s:element minOccurs="1" maxOccurs="1" name="HopLeAll" type="s:boolean" />
+              <s:element minOccurs="1" maxOccurs="1" name="TrangThai" type="s:short" />
+              <s:element minOccurs="0" maxOccurs="1" name="ListLichItem" type="tns:ArrayOfLichItem" />
+              <s:element minOccurs="0" maxOccurs="1" name="ListChamCong" type="tns:ArrayOfChamCong" />
+              <s:element minOccurs="1" maxOccurs="1" name="STT" type="s:int" />
             </s:sequence>
           </s:extension>
         </s:complexContent>
       </s:complexType>
       <s:complexType name="BaseEntity" abstract="true" />
+      <s:complexType name="ChamCong">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:BaseEntity">
+            <s:sequence>
+              <s:element minOccurs="1" maxOccurs="1" name="TangCuong" type="s:boolean" />
+              <s:element minOccurs="1" maxOccurs="1" name="ID" type="s:long" />
+              <s:element minOccurs="1" maxOccurs="1" name="CQ_ID" type="s:int" />
+              <s:element minOccurs="1" maxOccurs="1" name="XE_ID" type="s:long" />
+              <s:element minOccurs="1" maxOccurs="1" name="Ngay" type="s:dateTime" />
+              <s:element minOccurs="1" maxOccurs="1" name="TRUYTHU_ID" type="s:long" />
+              <s:element minOccurs="1" maxOccurs="1" name="PHOI_ID" type="s:long" />
+              <s:element minOccurs="1" maxOccurs="1" name="Loai" type="s:short" />
+              <s:element minOccurs="1" maxOccurs="1" name="Duyet" type="s:boolean" />
+              <s:element minOccurs="0" maxOccurs="1" name="Username" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="NgayTao" type="s:dateTime" />
+              <s:element minOccurs="1" maxOccurs="1" name="NgayCapNhat" type="s:dateTime" />
+              <s:element minOccurs="1" maxOccurs="1" name="RowId" type="s1:guid" />
+              <s:element minOccurs="1" maxOccurs="1" name="Tien" type="s:double" />
+              <s:element minOccurs="1" maxOccurs="1" name="TrangThaiNo" type="s:short" />
+              <s:element minOccurs="0" maxOccurs="1" name="GhiChu" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="NgayThanhToan" type="s:dateTime" />
+              <s:element minOccurs="1" maxOccurs="1" name="DaThuNo" type="s:boolean" />
+              <s:element minOccurs="1" maxOccurs="1" name="Draff" type="s:boolean" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
       <s:complexType name="LaiXe">
         <s:complexContent mixed="false">
           <s:extension base="tns:BaseEntity">
@@ -132,6 +166,31 @@
             </s:sequence>
           </s:extension>
         </s:complexContent>
+      </s:complexType>
+      <s:complexType name="ArrayOfLichItem">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="LichItem" nillable="true" type="tns:LichItem" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="LichItem">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="Day" type="s:dateTime" />
+          <s:element minOccurs="1" maxOccurs="1" name="SoChuyen" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="TangCuong" type="s:boolean" />
+          <s:element minOccurs="1" maxOccurs="1" name="KieuChamCong" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="Clickable" type="s:boolean" />
+          <s:element minOccurs="1" maxOccurs="1" name="Clickactive" type="s:boolean" />
+          <s:element minOccurs="1" maxOccurs="1" name="TRUYTHU_ID" type="s:long" />
+          <s:element minOccurs="1" maxOccurs="1" name="PHOI_ID" type="s:long" />
+          <s:element minOccurs="0" maxOccurs="1" name="List" type="tns:ArrayOfChamCong" />
+          <s:element minOccurs="0" maxOccurs="1" name="Item" type="tns:ChamCong" />
+          <s:element minOccurs="0" maxOccurs="1" name="GhiChu" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfChamCong">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="ChamCong" nillable="true" type="tns:ChamCong" />
+        </s:sequence>
       </s:complexType>
       <s:element name="XeGetBienSo">
         <s:complexType />
@@ -253,12 +312,15 @@
               <s:element minOccurs="1" maxOccurs="1" name="RowId" type="s1:guid" />
               <s:element minOccurs="1" maxOccurs="1" name="PHOI_ID" type="s:long" />
               <s:element minOccurs="1" maxOccurs="1" name="TC_ID" type="s:long" />
+              <s:element minOccurs="1" maxOccurs="1" name="THUNO_ID" type="s:long" />
               <s:element minOccurs="1" maxOccurs="1" name="TRUYTHU_ID" type="s:long" />
               <s:element minOccurs="0" maxOccurs="1" name="Username" type="s:string" />
               <s:element minOccurs="1" maxOccurs="1" name="Loai" type="s:short" />
               <s:element minOccurs="1" maxOccurs="1" name="PHOI_STTBX" type="s:long" />
               <s:element minOccurs="0" maxOccurs="1" name="BienSo" type="s:string" />
               <s:element minOccurs="1" maxOccurs="1" name="LOAIXE_ID" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="NguoiDuyetPhoi_Ten" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="NguoiXuLyThanhToan_Ten" type="s:string" />
             </s:sequence>
           </s:extension>
         </s:complexContent>
@@ -455,6 +517,35 @@
           </s:extension>
         </s:complexContent>
       </s:complexType>
+      <s:element name="LuuBienSo">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="docbinaryarray" type="s:base64Binary" />
+            <s:element minOccurs="0" maxOccurs="1" name="docname" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="LuuBienSoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="LuuBienSoResult" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetBienSoAnh">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="docname" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetBienSoAnhResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetBienSoAnhResult" type="s:base64Binary" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
     </s:schema>
     <s:schema elementFormDefault="qualified" targetNamespace="http://microsoft.com/wsdl/types/">
       <s:simpleType name="guid">
@@ -512,6 +603,18 @@
   <wsdl:message name="MemberGetByUsernameSoapOut">
     <wsdl:part name="parameters" element="tns:MemberGetByUsernameResponse" />
   </wsdl:message>
+  <wsdl:message name="LuuBienSoSoapIn">
+    <wsdl:part name="parameters" element="tns:LuuBienSo" />
+  </wsdl:message>
+  <wsdl:message name="LuuBienSoSoapOut">
+    <wsdl:part name="parameters" element="tns:LuuBienSoResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetBienSoAnhSoapIn">
+    <wsdl:part name="parameters" element="tns:GetBienSoAnh" />
+  </wsdl:message>
+  <wsdl:message name="GetBienSoAnhSoapOut">
+    <wsdl:part name="parameters" element="tns:GetBienSoAnhResponse" />
+  </wsdl:message>
   <wsdl:portType name="WebServiceSoap">
     <wsdl:operation name="XeGetAll">
       <wsdl:input message="tns:XeGetAllSoapIn" />
@@ -544,6 +647,14 @@
     <wsdl:operation name="MemberGetByUsername">
       <wsdl:input message="tns:MemberGetByUsernameSoapIn" />
       <wsdl:output message="tns:MemberGetByUsernameSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="LuuBienSo">
+      <wsdl:input message="tns:LuuBienSoSoapIn" />
+      <wsdl:output message="tns:LuuBienSoSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetBienSoAnh">
+      <wsdl:input message="tns:GetBienSoAnhSoapIn" />
+      <wsdl:output message="tns:GetBienSoAnhSoapOut" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="WebServiceSoap" type="tns:WebServiceSoap">
@@ -620,6 +731,24 @@
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="LuuBienSo">
+      <soap:operation soapAction="http://tempuri.org/LuuBienSo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetBienSoAnh">
+      <soap:operation soapAction="http://tempuri.org/GetBienSoAnh" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
   </wsdl:binding>
   <wsdl:binding name="WebServiceSoap12" type="tns:WebServiceSoap">
     <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
@@ -688,6 +817,24 @@
     </wsdl:operation>
     <wsdl:operation name="MemberGetByUsername">
       <soap12:operation soapAction="http://tempuri.org/MemberGetByUsername" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="LuuBienSo">
+      <soap12:operation soapAction="http://tempuri.org/LuuBienSo" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetBienSoAnh">
+      <soap12:operation soapAction="http://tempuri.org/GetBienSoAnh" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

@@ -32,9 +32,6 @@
     <div class="panel-body">
         <div class="form-horizontal" role="form">
             <input id="Id" style="display: none;" value="<%=Item.ID == 0 ? string.Empty  : Item.ID.ToString() %>" name="Id" type="text" />
-            
-            
-
             <div class="form-group">
                 <label for="BienSo_Chu" class="col-sm-2 col-xs-4 control-label">Biển số:</label>
                 <div class="col-sm-5 col-xs-4">
@@ -163,7 +160,7 @@
                 <label for="GioXuatBen" class="col-sm-2 control-label">Giờ xuất bến:</label>
                 <div class="col-sm-2">
                     <div class="input-group bootstrap-timepicker">
-                        <input type="text" name="GioXuatBen" id="GioXuatBen" value="<%=Item.GioXuatBen %>" class="form-control GioXuatBen timePicker-input">
+                        <input type="text" name="GioXuatBen" id="GioXuatBen" value="<%=Item.GioXuatBen %>" class="form-control GioXuatBen timePicker-input"/>
                         <span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
                     </div>
                 </div>
@@ -186,6 +183,10 @@
                 <div class="col-sm-2">
                     <input type="text" name="NamSanXuat" id="NamSanXuat" value="<%=Item.NamSanXuat %>" class="form-control NamSanXuat">
                 </div>
+                <label for="ChapThuanTuyen_SoChuyen" class="col-sm-2 control-label">Chấp thuận tuyến:</label>
+                <div class="col-sm-2">
+                    <input type="text" name="ChapThuanTuyen_SoChuyen" id="ChapThuanTuyen_SoChuyen" value="<%=Item.ChapThuanTuyen_SoChuyen %>" class="form-control ChapThuanTuyen_SoChuyen"/>
+                </div>
                 <label for="XeTai" class="col-sm-2 control-label">Xe tải:</label>
                 <div class="col-sm-2">
                     <%if (Item.XeTai)
@@ -197,17 +198,7 @@
                         <input class="XeTai input-sm" id="XeTai" name="XeTai" type="checkbox"/>
                     <% } %>
                 </div>
-                <label for="Khoa" class="col-sm-2 control-label">Khóa:</label>
-                <div class="col-sm-2">
-                    <%if (Item.Khoa)
-                    {%>
-                        <input class="Khoa input-sm" id="Khoa" checked="checked" name="Khoa" type="checkbox"/>
-                    <%}
-                    else
-                    {%>
-                        <input class="Khoa input-sm" id="Khoa" name="Khoa" type="checkbox"/>
-                    <% } %>
-                </div>
+                
             </div>
             
             
@@ -235,7 +226,7 @@
                     <% } %>
                 </div>
                 <label for="ChuaDangKy" class="col-sm-1 control-label">Ký gửi vé:</label>
-                <div class="col-sm-2">
+                <div class="col-sm-1">
                     <%if (Item.KyGuiBanVe)
                     {%>
                         <input class="KyGuiBanVe " id="KyGuiBanVe" checked="checked" name="KyGuiBanVe" type="checkbox"/>
@@ -244,8 +235,19 @@
                     {%>
                         <input class="KyGuiBanVe " id="Checkbox2" name="KyGuiBanVe" type="checkbox"/>
                     <% } %>
-                </div>                    
-                <label for="KyGuiBanVe" class="col-sm-2 control-label">Ngày ký gửi:</label>
+                </div>
+                <label for="Khoa" class="col-sm-1 control-label">Khóa:</label>
+                <div class="col-sm-1">
+                    <%if (Item.Khoa)
+                    {%>
+                        <input class="Khoa input-sm" id="Khoa" checked="checked" name="Khoa" type="checkbox"/>
+                    <%}
+                    else
+                    {%>
+                        <input class="Khoa input-sm" id="Checkbox3" name="Khoa" type="checkbox"/>
+                    <% } %>
+                </div>               
+                <label for="KyGuiBanVe" class="col-sm-1 control-label">Ngày ký gửi:</label>
                 <div class="col-sm-2">
                     <div class="input-append datepicker-input date input-group">
                         <input 

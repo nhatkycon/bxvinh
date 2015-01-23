@@ -43,6 +43,7 @@ public partial class lib_ajax_Xe_Default : basePage
 
         var NgayKyGuiBanVe = Request["NgayKyGuiBanVe"];
         var KyGuiBanVe = Request["KyGuiBanVe"];
+        var ChapThuanTuyen_SoChuyen = Request["ChapThuanTuyen_SoChuyen"];
 
         var q = Request["q"];
 
@@ -101,6 +102,10 @@ public partial class lib_ajax_Xe_Default : basePage
                     {
                         Item.NgayKyGuiBanVe = Convert.ToDateTime(NgayKyGuiBanVe, new CultureInfo("vi-vn"));
                     }
+                    if (!string.IsNullOrEmpty(ChapThuanTuyen_SoChuyen))
+                    {
+                        Item.ChapThuanTuyen_SoChuyen = Convert.ToInt16(ChapThuanTuyen_SoChuyen);
+                    }
                     Item.Ghe = Convert.ToInt16(Ghe);
                     Item.SoKhach = Convert.ToInt16(SoKhach);
                     Item.MucPhi = Convert.ToDouble(MucPhi);
@@ -125,12 +130,12 @@ public partial class lib_ajax_Xe_Default : basePage
                         Item.Username = Security.Username;
                         Item.NgayTao = DateTime.Now;
                         Item.RowId = Guid.NewGuid();
-                        SearchManager.Add(string.Format("{0} {1}", Item.BienSo_Chu, Item.BienSo_So)
-                            , string.Format("{0} {1} {2} {3} {4}", Item.BienSo_Chu, Item.BienSo_So, DONVI_Ten, TUYEN_Ten, LOAIXE_Ten)
-                            , string.Format("{0} {1}", Item.BienSo_Chu, Item.BienSo_So)
-                            , Item.RowId.ToString()
-                            , Item.Url
-                            , typeof(Xe).Name);
+                        //SearchManager.Add(string.Format("{0} {1}", Item.BienSo_Chu, Item.BienSo_So)
+                        //    , string.Format("{0} {1} {2} {3} {4}", Item.BienSo_Chu, Item.BienSo_So, DONVI_Ten, TUYEN_Ten, LOAIXE_Ten)
+                        //    , string.Format("{0} {1}", Item.BienSo_Chu, Item.BienSo_So)
+                        //    , Item.RowId.ToString()
+                        //    , Item.Url
+                        //    , typeof(Xe).Name);
                     }
 
                     Item.NgayCapNhat = DateTime.Now;

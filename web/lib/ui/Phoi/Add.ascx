@@ -19,15 +19,18 @@
             <div id="Phoi-HangDoi-XeYeuCauXuLy-Body" class="list-group Phoi-HangDoi-XeYeuCauXuLy-Body collapse in"></div>    
         </div>
     </div>
-    <div class="col-md-10">
-        <div data-id="<%=Item.ID==0 ? "" : Item.ID.ToString() %>" class="panel panel-default Normal-Pnl-Add Phoi-ThongTinXe-Pnl" 
+    <div class="col-md-10" >
+        <div data-id="<%=Item.ID==0 ? "" : Item.ID.ToString() %>" 
+            data-draff="<%=Item.Draff.ToString().ToLower() %>"
+            class="panel panel-default Normal-Pnl-Add Phoi-ThongTinXe-Pnl" 
             data-url="/lib/ajax/Phoi/default.aspx"
             data-success="/lib/pages/Phoi/Add.aspx?ID="
             data-list="/lib/pages/Phoi/"
             >    
             <div class="panel-body">
                 <div class="form-horizontal" role="form">
-                    <input id="Id" style="display: none;" value="<%=Item.ID == 0 ? string.Empty  : Item.ID.ToString() %>" name="Id" type="text" />
+                    <input id="Id" class="ID" form-control-hasDefalltValue style="display: none;" value="<%=Item.ID == 0 ? string.Empty  : Item.ID.ToString() %>" name="Id" type="text" />
+                    <input id="Draff" form-control-hasDefalltValue class="draff" style="display: none;" value="<%=Item.Draff.ToString().ToLower() %>" name="Draff" type="text" />
                     <input id="CQ_ID" style="display: none;" value="<%=Item.CQ_ID == 0 ? string.Empty  : Item.CQ_ID.ToString() %>" name="CQ_ID" type="text" />
                     <input id="XVB_ID" class="XVB_ID" style="display: none;" value="<%=Item.XeVaoBen.ID==0 ? "" : Item.XeVaoBen.ID.ToString() %>" name="XVB_ID" type="text" />
                     <div class="Phoi-Xe-Pnl">
@@ -189,8 +192,27 @@
                         <div class="Phoi-TruyThuPnl-ChamCongPnl">
                             <uc1:ChamCongCalendar_View runat="server" ID="ChamCongCalendar_View" />                    
                         </div>
-                    </div>  
-            
+                    </div>
+                   <hr/> 
+                        <div class="Phoi-TruyThuNgayChamCongPnl">
+                        <p>
+                            <span class="pull-right" data-toggle="tooltip"  title="Click để đề nghị truy thu" >
+                                <button data-toggle="modal" data-target="#TruyThuModal" class="btn btn-default btn-sm" type="button">
+                                    <i class="glyphicon glyphicon-paperclip"></i>
+                                </button>
+                            </span>
+                            <strong>Truy thu chi tiết</strong>
+                            <button class="btn btn-link btn-sm" data-toggle="collapse" data-target="#Phoi-TruyThuNgayChamCongPnl-Body">
+                                    <i class="glyphicon glyphicon-plus"></i>
+                            </button>
+                        </p>
+                            <hr/>
+                        <div class="collapse" id="Phoi-TruyThuNgayChamCongPnl-Body">
+                            <div class="Phoi-TruyThuNgayChamCongPnl-Body row">
+                            </div>
+                            <hr/>
+                        </div>
+                    </div>
                     <div class="">
                         <div class="Phoi-ThuPhi-Pnl">
                             <p>                                
@@ -249,12 +271,7 @@
                                 <div class="form-group">
                                     <label for="ChuyenTruyThu"  class="col-sm-1 control-label">Truy thu:</label>
                                     <div class="col-sm-3">
-                                        <div class="input-group">
-                                            <span class="input-group-btn" title="Click để đề nghị truy thu">
-                                                <button data-toggle="modal" data-target="#TruyThuModal" class="btn btn-default" type="button">
-                                                    <i class="glyphicon glyphicon-paperclip"></i>
-                                                </button>
-                                            </span>
+                                        <div class="input-group">                                            
                                             <input type="text" name="ChuyenTruyThu" placeholder="Số chuyến truy thu" disabled id="ChuyenTruyThu" value="<%=Item.ChuyenTruyThu %>" class="form-control ChuyenTruyThu money-input">
                                             <span data-toggle="tooltip" title="Tick chọn nếu chỉ truy thu bến bãi. Bỏ tick nếu truy thu bến bãi + khách." class="input-group-addon" title="Tick nếu chỉ truy thu phí bến bãi">
                                                 <%if (Item.PHI_ChiThuBenBai)

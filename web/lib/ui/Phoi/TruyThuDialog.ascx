@@ -60,6 +60,14 @@
                             <textarea id="DeNghiCuaNhaXe" name="DeNghiCuaNhaXe" type="text" rows="3" class="form-control"><%=Item.DeNghiCuaNhaXe %></textarea>
                         </div>              
                    </div>
+              <div class="form-group">
+                        <label for="DeNghiCuaNhaXe" class="col-sm-4 control-label">
+                            Nhận xét của quản lý:
+                        </label>
+                        <div class="col-sm-8">
+                            <textarea id="YKienQuanLy" name="YKienQuanLy" type="text" rows="3" class="form-control"><%=Item.YKienQuanLy %></textarea>
+                        </div>              
+                   </div>
           </div>                      
       </div>
       <div class="modal-footer">

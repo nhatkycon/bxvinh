@@ -10,7 +10,7 @@
                 <span class="icon-bar"></span>
             </button>
             <a class="navbar-brand" href="/lib/pages/">
-                <span class="logo">BxVinh</span>
+                <span class="glyphicon glyphicon-home"></span>
             </a>            
         </div>
         <div class="navbar-collapse collapse">
@@ -51,8 +51,10 @@
                   
               </li>
             <%if(Security.IsAuthenticated()){ %>
+            <li class="dropdown GiaoCa-Label">
+            </li>
               <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><%=Security.Username %> <b class="caret"></b></a>
+                <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown"><%=Security.Username %> <b class="caret"></b></a>
                 <ul class="dropdown-menu">
                     <li>
                         <a href="mailto:linh_net@yahoo.com">

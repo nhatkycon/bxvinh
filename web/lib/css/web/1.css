@@ -150,3 +150,12 @@ ul,li, ol {
 .panel-footer-insert, .panel-footer-saved {
     display: none;
 }
+.list-group-item {
+    cursor: pointer;
+}
+.ChamCongTd-Item-UnClickable {
+    cursor: not-allowed;
+}
+.ChamCongTd-Item-Clickable {
+    cursor: pointer;
+}

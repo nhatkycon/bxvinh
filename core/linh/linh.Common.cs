@@ -1121,6 +1121,12 @@ namespace linh.common
             return date.ToString("dd/MM/yyyy");
         }
 
+        public static string NgayVnFull(this DateTime date)
+        {
+            if (date == DateTime.MinValue) return string.Empty;
+            return date.ToString("HH:mm dd/MM/yyyy");
+        }
+
         /// <summary>
         /// Hiển thị số chuyến sang ký tự X
         /// </summary>

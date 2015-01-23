@@ -109,6 +109,14 @@
                         <textarea id="DeNghiCuaNhaXe" rows="3" class="form-control"><%=Item.DeNghiCuaNhaXe %></textarea>
                     </div>              
                 </div>
+            <div class="form-group">
+                    <label for="DeNghiCuaNhaXe" class="col-sm-2 control-label">
+                        Nhận xét của quản lý:
+                    </label>
+                    <div class="col-sm-10">
+                        <textarea id="YKienQuanLy" rows="3" class="form-control"><%=Item.YKienQuanLy %></textarea>
+                    </div>              
+                </div>
                 <hr/>
                 <div class="form-group">
                     <label for="SoChuyenDuocDuyet" class="col-sm-2 control-label">

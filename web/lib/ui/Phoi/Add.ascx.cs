@@ -31,7 +31,7 @@ public partial class lib_ui_Phoi_Add : System.Web.UI.UserControl
         {
             ChamCongCalendar_View.ListChamCong = Item.ChamCongList;
             ChamCongCalendar_View.ListChamCongCurrent = Item.ChamCongListCurrent;
-            ChamCongCalendar_View.LoaiBieuDo = Item.Xe.LoaiBieuDo;            
+            ChamCongCalendar_View.LoaiBieuDo = Item.Xe.LoaiBieuDo;     
         }
 
        

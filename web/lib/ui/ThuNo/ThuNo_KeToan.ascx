@@ -2,8 +2,8 @@
 <%@ Register TagPrefix="uc1" TagName="ThuNoList" Src="~/lib/ui/ChamCong/ThuNo-List.ascx" %>
 <%@ Import Namespace="docsoft" %>
 <%@ Import Namespace="linh.common" %>
-<div class="panel panel-default ThuNo-Pnl-Add" 
-    data-url="/lib/ajax/ThuNo/default.aspx"
+<div class="panel panel-default ThuNo-KeToanPnl-Add Normal-Pnl-Add" 
+    data-url="/lib/ajax/ThuNo/KeToan.aspx"
     data-success="/lib/pages/ThuNo/Add.aspx?ID="
     data-list="/lib/pages/ThuNo/"
     >
@@ -14,7 +14,7 @@
             <a href="javascript:;" data-ret="<%=Ret %>" class="btn btn-primary savebtn">Thanh toán</a>
         <%} %>
         <a href="/lib/pages/ThuNo/In/PhieuThuNo.aspx?ID=<%=Item.ID %>" 
-            target="_blank" class="btn printBtn btn-lg btn-primary">In</a>             
+            target="_blank" class="btn printBtn btn-primary">In</a>             
     </div>
     <div class="panel-body">
         <div class="form-horizontal" role="form">
@@ -68,6 +68,6 @@
             <a href="javascript:;" data-ret="<%=Ret %>" class="btn btn-primary savebtn">Thanh toán</a>
         <%} %>
         <a href="/lib/pages/ThuNo/In/PhieuThuNo.aspx?ID=<%=Item.ID %>" 
-            target="_blank" class="btn printBtn btn-lg btn-primary">In</a>
+            target="_blank" class="btn printBtn btn-primary">In</a>
     </div>
 </div>

@@ -16,19 +16,27 @@ public partial class lib_pages_ThuNo_Add : System.Web.UI.Page
         
         using (var con = DAL.con())
         {
-            if (!string.IsNullOrEmpty(id))
+            if (!idNull)
             {
                 var thuNo = ThuNoDal.SelectById(con, Convert.ToInt64(id));
                 chamCongs = ChamCongDal.NoByXeTuNgay(con, null, id, thuNo.XE_ID);
-                ThuNoItem.XE_ID = thuNo.XE_ID.ToString();
+                Item = ThuNoDal.SelectById(Convert.ToInt64(id));
+                var xe = XeDal.SelectById(con, Convert.ToInt64(Item.XE_ID));
+                Item.XE_BienSo = xe.BienSoStr;
+                Item.XE_ID = xe.ID;
             }
             else
             {
-                chamCongs = ChamCongDal.NoByXeTuNgay(con, null, null, Convert.ToInt64(xeId));
-                ThuNoItem.XE_ID = xeId;
+                Item= ThuNoDal.SelectByLastest(con, Security.CqId);
+                if(!string.IsNullOrEmpty(xeId))
+                {
+                    chamCongs = ChamCongDal.NoByXeTuNgay(con, null, null, Convert.ToInt64(xeId));
+                    var xe = XeDal.SelectById(con, Convert.ToInt64(xeId));
+                    Item.XE_BienSo = xe.BienSoStr;
+                    Item.XE_ID = xe.ID;
+                }
             }
             ThuNoItem.ChamCongs = chamCongs;
-            Item = idNull ? ThuNoDal.SelectByLastest(con, Security.CqId) : ThuNoDal.SelectById(Convert.ToInt64(id));
             ThuNoItem.Item = Item;
         }
     }

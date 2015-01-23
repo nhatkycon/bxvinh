@@ -14,9 +14,9 @@
             </td>
             <td>
                 <center>
-                    <h1>
+                    <h2>
                         BẢNG KÊ GIÁ DỊCH VỤ BẾN XE
-                    </h1>
+                    </h2>
                     <p>
                         <i>
                             (Liên 2 - giao khách hàng)
@@ -42,8 +42,6 @@
             <td>
                 <%=Item.Xe.DONVI_Ten %>
             </td>
-        </tr>
-        <tr>
             <td style="width: 100px; text-align: right;">
                 Biển số:
             </td>
@@ -51,8 +49,6 @@
                 <%=Item.Xe.BienSoStr %>
             </td>
         </tr>
-    </table>
-    <table width="100%" cellpadding="5" cellspacing="0">
         <tr>
             <td style="width: 100px; text-align: right;">
                 Bến đi:
@@ -69,10 +65,10 @@
         </tr>
         <tr>
             <td style="width: 100px; text-align: right;">
-                <%--Xuất bến:--%>
+                Xuất bến:
             </td>
             <td>
-                <%--<%=Item.Xe.GioXuatBen %>--%>
+                <%=Item.Xe.GioXuatBen %>
             </td>
             <td style="width: 100px; text-align: right;">
                 Ngày:
@@ -341,6 +337,15 @@
                     <p>
                         Ban quản lý
                     </p>
+                    <p>
+                        &nbsp;
+                    </p>
+                    <p>
+                        &nbsp;
+                    </p>
+                    <p>
+                        <%=Item.XeVaoBen.NguoiDuyetPhoi_Ten %>
+                    </p>
                 </center>
             </td>
             <td style="width: 33%;" valign="top">
@@ -365,6 +370,15 @@
                 <center>
                     <p>
                         Bán vé
+                    </p>
+                    <p>
+                        &nbsp;
+                    </p>
+                    <p>
+                        &nbsp;
+                    </p>
+                    <p>
+                        <%=Item.XeVaoBen.NguoiXuLyThanhToan_Ten %>
                     </p>
                 </center>
             </td>

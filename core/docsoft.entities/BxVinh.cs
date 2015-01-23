@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using linh.common;
 using linh.controls;
@@ -310,6 +311,7 @@ namespace docsoft.entities
     {
         public int Thang { get; set; }
         public List<LichItem> Ngay { get; set; }
+        public List<LichItem> NgayTangCuong { get; set; }
         public int Tong { get; set; }
         public int TongBieuDo { get; set; }
         public ListThang()
@@ -331,6 +333,7 @@ namespace docsoft.entities
         /// 3- Chấm công + đề nghị truy thu lãnh đạo đã duyệt. 
         /// 4 - Báo ngày cần truy thu
         /// 5 - Châm công + đề nghị truy thu chưa duyệt
+        /// 6- Nợ tiền
         /// </summary>
         public int KieuChamCong { get; set; }
         public string KieuChamCongStr
@@ -349,10 +352,16 @@ namespace docsoft.entities
                         return "3.Truy thu lãnh đạo bến đã duyệt";
                         break;
                     case 4:
-                        return "4.Ngày cần truy thu";
+                        return "4. Truy thu lãnh đạo bỏ thu tiền";
                         break;
                     case 5:
                         return "5.Truy thu lãnh đạo bến chưa duyệt";
+                        break;
+                    case 6:
+                        return "6.Nợ";
+                        break;
+                    case 7:
+                        return "4.Ngày cần truy thu";
                         break;
                     default:
                         return "";
@@ -376,10 +385,16 @@ namespace docsoft.entities
                         return "danger";
                         break;
                     case 4:
-                        return "info";
+                        return "danger";
                         break;
                     case 5:
                         return "danger";
+                        break;
+                    case 6:
+                        return "";
+                        break;
+                    case 7:
+                        return "info";
                         break;
                     default:
                         return "";
@@ -388,18 +403,27 @@ namespace docsoft.entities
             }
         }
 
-        public bool Clickable
+        public string Txt
         {
-            get { return Day < DateTime.Now.AddDays(-1); }
+            get
+            {
+                if (KieuChamCong == 6) return "Nợ";
+                if(!string.IsNullOrEmpty(GhiChu)) return GhiChu;
+                return SoChuyen.ChamCongHienThiStr();
+            }
         }
+
+        public bool Clickable { get; set; }
         public bool Clickactive { get; set; }
         public Int64 TRUYTHU_ID { get; set; }
         public Int64 PHOI_ID { get; set; }
         public List<ChamCong> List { get; set; }
+        public ChamCong Item { get; set; }
         public string GhiChu { get; set; }
         public LichItem()
         {
             List = new List<ChamCong>();
+            Item=new ChamCong();
         }
     }
 
@@ -650,7 +674,7 @@ namespace docsoft.entities
         public Int64 TRUYTHU_ID { get; set; }
         public Int64 PHOI_ID { get; set; }
         /// <summary>
-        /// 1: Chấm công hợp lệ dựa trên phơi. 2: Chấm công truy thu do quản lý điều độ làm. 3: Chấm công truy thu do lãnh đạo duyệt.
+        /// 1: Chấm công hợp lệ dựa trên phơi. 2: Chấm công truy thu do quản lý điều độ làm. 3: Chấm công truy thu do lãnh đạo duyệt. 4: Chấm công được lãnh đạo duyệt không thu tiền.
         /// </summary>
         public Int16 Loai { get; set; }
         public Boolean Duyet { get; set; }
@@ -668,6 +692,7 @@ namespace docsoft.entities
         public DateTime NgayThanhToan { get; set; }
 
         public bool DaThuNo { get; set; }
+        public Boolean Draff { get; set; }
         #endregion
         #region Contructor
         public ChamCong()
@@ -700,7 +725,7 @@ namespace docsoft.entities
         public static ChamCong Insert(ChamCong item)
         {
             var Item = new ChamCong();
-            var obj = new SqlParameter[17];
+            var obj = new SqlParameter[18];
             obj[1] = new SqlParameter("CONG_CQ_ID", item.CQ_ID);
             obj[2] = new SqlParameter("CONG_TangCuong", item.TangCuong);
             obj[3] = new SqlParameter("CONG_XE_ID", item.XE_ID);
@@ -749,6 +774,7 @@ namespace docsoft.entities
             {
                 obj[16] = new SqlParameter("CONG_NgayThanhToan", DBNull.Value);
             }
+            obj[17] = new SqlParameter("CONG_Draff", item.Draff);
 
             using (IDataReader rd = SqlHelper.ExecuteReader(DAL.con(), CommandType.StoredProcedure, "sp_tblBx_ChamCong_Insert_InsertNormal_linhnx", obj))
             {
@@ -763,7 +789,7 @@ namespace docsoft.entities
         public static ChamCong Update(ChamCong item)
         {
             var Item = new ChamCong();
-            var obj = new SqlParameter[17];
+            var obj = new SqlParameter[18];
             obj[0] = new SqlParameter("CONG_ID", item.ID);
             obj[1] = new SqlParameter("CONG_CQ_ID", item.CQ_ID);
             obj[2] = new SqlParameter("CONG_TangCuong", item.TangCuong);
@@ -809,6 +835,7 @@ namespace docsoft.entities
             {
                 obj[16] = new SqlParameter("CONG_NgayThanhToan", DBNull.Value);
             }
+            obj[17] = new SqlParameter("CONG_Draff", item.Draff);
 
             using (IDataReader rd = SqlHelper.ExecuteReader(DAL.con(), CommandType.StoredProcedure, "sp_tblBx_ChamCong_Update_UpdateNormal_linhnx", obj))
             {
@@ -941,6 +968,10 @@ namespace docsoft.entities
             {
                 Item.DaThuNo = (bool)(rd["DaThuNo"]);
             }
+            if (rd.FieldExists("CONG_Draff"))
+            {
+                Item.Draff = (Boolean)(rd["CONG_Draff"]);
+            }
             return Item;
         }
         #endregion
@@ -982,6 +1013,10 @@ namespace docsoft.entities
         }
         public static ChamCongCollection SelectByXeTuNgay(string PHOI_ID, string TuNgay, long XE_ID)
         {
+            return SelectByXeTuNgay(DAL.con(), PHOI_ID, TuNgay, XE_ID);
+        }
+        public static ChamCongCollection SelectByXeTuNgay(SqlConnection con, string PHOI_ID, string TuNgay, long XE_ID)
+        {
             var List = new ChamCongCollection();
             var obj = new SqlParameter[3];
             obj[0] = new SqlParameter("XE_ID", XE_ID);
@@ -1001,7 +1036,45 @@ namespace docsoft.entities
             {
                 obj[2] = new SqlParameter("PHOI_ID", DBNull.Value);
             }
-            using (IDataReader rd = SqlHelper.ExecuteReader(DAL.con(), CommandType.StoredProcedure, "sp_tblBx_ChamCong_Select_SelectByXeTuNgay_linhnx", obj))
+            using (IDataReader rd = SqlHelper.ExecuteReader(con, CommandType.StoredProcedure, "sp_tblBx_ChamCong_Select_SelectByXeTuNgay_linhnx", obj))
+            {
+                while (rd.Read())
+                {
+                    List.Add(getFromReader(rd));
+                }
+            }
+            return List;
+        }
+        public static ChamCongCollection SelectByXeTuNgayCqId(SqlConnection con, int CqId, string TuNgay, string DenNgay, long XE_ID)
+        {
+            var List = new ChamCongCollection();
+            var obj = new SqlParameter[4];
+            obj[0] = new SqlParameter("XE_ID", XE_ID);
+            if (!string.IsNullOrEmpty(TuNgay))
+            {
+                obj[1] = new SqlParameter("TuNgay", TuNgay);
+            }
+            else
+            {
+                obj[1] = new SqlParameter("TuNgay", DBNull.Value);
+            }
+            if (CqId>0)
+            {
+                obj[2] = new SqlParameter("CqId", CqId);
+            }
+            else
+            {
+                obj[2] = new SqlParameter("CqId", DBNull.Value);
+            }
+            if (!string.IsNullOrEmpty(DenNgay))
+            {
+                obj[3] = new SqlParameter("DenNgay", DenNgay);
+            }
+            else
+            {
+                obj[3] = new SqlParameter("DenNgay", DBNull.Value);
+            }
+            using (IDataReader rd = SqlHelper.ExecuteReader(con, CommandType.StoredProcedure, "sp_tblBx_ChamCong_Select_SelectByXeTuNgayCqId_linhnx", obj))
             {
                 while (rd.Read())
                 {
@@ -1029,7 +1102,24 @@ namespace docsoft.entities
             }
             return List;
         }
-
+        public static ChamCongCollection SelectByPhoiId(long ID)
+        {
+            return SelectByPhoiId(DAL.con(), ID);
+        }
+        public static ChamCongCollection SelectByPhoiId(SqlConnection con, long ID)
+        {
+            var List = new ChamCongCollection();
+            var obj = new SqlParameter[1];
+            obj[0] = new SqlParameter("ID", ID);
+            using (IDataReader rd = SqlHelper.ExecuteReader(con, CommandType.StoredProcedure, "sp_tblBx_ChamCong_Select_SelectByPhoiId_linhnx", obj))
+            {
+                while (rd.Read())
+                {
+                    List.Add(getFromReader(rd));
+                }
+            }
+            return List;
+        }
         public static void DeleteByTruyThuId(Int64 TRUYTHU_ID)
         {
             var obj = new SqlParameter[1];
@@ -1977,6 +2067,7 @@ namespace docsoft.entities
         public Int16 HanhKhach { get; set; }
         public Int16 Ve { get; set; }
         public Int16 ChuyenTruyThu { get; set; }
+        public Double PhiMotChuyenTruyThu { get; set; }
         public Int16 KhachTruyThu { get; set; }
         public Boolean TruyThu { get; set; }
         public Boolean HopLe { get; set; }
@@ -1991,6 +2082,7 @@ namespace docsoft.entities
         public String Username { get; set; }
         public Double GiaVe { get; set; }
         public Boolean PHI_ChiThuBenBai { get; set; }
+        public Boolean Draff { get; set; }
         #endregion
         #region Contructor
         public Phoi()
@@ -2052,163 +2144,159 @@ namespace docsoft.entities
         }
 
         public static Phoi Insert(Phoi item)
-        {
-            var Item = new Phoi();
-            var obj = new SqlParameter[40];
-            obj[1] = new SqlParameter("PHOI_GIAOCA_ID", item.GIAOCA_ID);
-            obj[2] = new SqlParameter("PHOI_XE_ID", item.XE_ID);
-            obj[3] = new SqlParameter("PHOI_DONVI_ID", item.DONVI_ID);
-            obj[4] = new SqlParameter("PHOI_CQ_ID", item.CQ_ID);
-            obj[5] = new SqlParameter("PHOI_LAIXE_ID", item.LAIXE_ID);
-            obj[6] = new SqlParameter("PHOI_STTBX", item.STTBX);
-            obj[7] = new SqlParameter("PHOI_STTALL", item.STTALL);
-            obj[8] = new SqlParameter("PHOI_NgayXuatBen", item.NgayXuatBen);
-            if (item.NgayXuatBen > DateTime.MinValue)
-            {
-                obj[8] = new SqlParameter("PHOI_NgayXuatBen", item.NgayXuatBen);
-            }
-            else
-            {
-                obj[8] = new SqlParameter("PHOI_NgayXuatBen", DBNull.Value);
-            }
-            obj[9] = new SqlParameter("PHOI_NgayXuatThucTe", item.NgayXuatThucTe);
-            if (item.NgayXuatThucTe > DateTime.MinValue)
-            {
-                obj[9] = new SqlParameter("PHOI_NgayXuatThucTe", item.NgayXuatThucTe);
-            }
-            else
-            {
-                obj[9] = new SqlParameter("PHOI_NgayXuatThucTe", DBNull.Value);
-            }
-            obj[10] = new SqlParameter("PHOI_PHI_BenBai", item.PHI_BenBai);
-            obj[11] = new SqlParameter("PHOI_PHI_XeDauDem", item.PHI_XeDauDem);
-            obj[12] = new SqlParameter("PHOI_PHI_VeSinhBenBai", item.PHI_VeSinhBenBai);
-            obj[13] = new SqlParameter("PHOI_PHI_XeLuuBen", item.PHI_XeLuuBen);
-            obj[14] = new SqlParameter("PHOI_PHI_HoaHongBanVe", item.PHI_HoaHongBanVe);
-            obj[15] = new SqlParameter("PHOI_PHI_ChuyenTruyThu", item.PHI_ChuyenTruyThu);
-            obj[16] = new SqlParameter("PHOI_PHI_KhachTruyThu", item.PHI_KhachTruyThu);
-            obj[17] = new SqlParameter("PHOI_PHI_TruyThuGiam", item.PHI_TruyThuGiam);
-            obj[18] = new SqlParameter("PHOI_PHI_Khac", item.PHI_Khac);
-            obj[19] = new SqlParameter("PHOI_PHI_Tong", item.PHI_Tong);
-            obj[20] = new SqlParameter("PHOI_PHI_Nop", item.PHI_Nop);
-            obj[21] = new SqlParameter("PHOI_PHI_ConNo", item.PHI_ConNo);
-            obj[22] = new SqlParameter("PHOI_HanhKhach", item.HanhKhach);
-            obj[23] = new SqlParameter("PHOI_Ve", item.Ve);
-            obj[24] = new SqlParameter("PHOI_GiaVe", item.GiaVe);
-            obj[25] = new SqlParameter("PHOI_PHI_ChiThuBenBai", item.PHI_ChiThuBenBai);
-            obj[26] = new SqlParameter("PHOI_ChuyenTruyThu", item.ChuyenTruyThu);
-            obj[27] = new SqlParameter("PHOI_KhachTruyThu", item.KhachTruyThu);
-            obj[28] = new SqlParameter("PHOI_TruyThu", item.TruyThu);
-            obj[29] = new SqlParameter("PHOI_TruyThu_Id", item.TruyThu_Id);
-            obj[30] = new SqlParameter("PHOI_HopLe", item.HopLe);
-            obj[31] = new SqlParameter("PHOI_ChoDuyet", item.ChoDuyet);
-            obj[32] = new SqlParameter("PHOI_TrangThai", item.TrangThai);
-            obj[33] = new SqlParameter("PHOI_XeThayThe", item.XeThayThe);
-            obj[34] = new SqlParameter("PHOI_XeThayThe_ID", item.XeThayThe_ID);
-            obj[35] = new SqlParameter("PHOI_XeTangCuong", item.XeTangCuong);
-            obj[36] = new SqlParameter("PHOI_RowId", item.RowId);
-            obj[37] = new SqlParameter("PHOI_NgayTao", item.NgayTao);
-            if (item.NgayTao > DateTime.MinValue)
-            {
-                obj[37] = new SqlParameter("PHOI_NgayTao", item.NgayTao);
-            }
-            else
-            {
-                obj[37] = new SqlParameter("PHOI_NgayTao", DBNull.Value);
-            }
-            obj[38] = new SqlParameter("PHOI_NgayCapNhat", item.NgayCapNhat);
-            if (item.NgayCapNhat > DateTime.MinValue)
-            {
-                obj[38] = new SqlParameter("PHOI_NgayCapNhat", item.NgayCapNhat);
-            }
-            else
-            {
-                obj[38] = new SqlParameter("PHOI_NgayCapNhat", DBNull.Value);
-            }
-            obj[39] = new SqlParameter("PHOI_Username", item.Username);
-
-            using (IDataReader rd = SqlHelper.ExecuteReader(DAL.con(), CommandType.StoredProcedure, "sp_tblBx_Phoi_Insert_InsertNormal_linhnx", obj))
-            {
-                while (rd.Read())
                 {
-                    Item = getFromReader(rd);
-                }
-            }
-            return Item;
-        }
+                    var Item = new Phoi();
+                    var obj = new SqlParameter[42];
+                    				obj[1] = new SqlParameter("PHOI_GIAOCA_ID", item.GIAOCA_ID);
+				obj[2] = new SqlParameter("PHOI_XE_ID", item.XE_ID);
+				obj[3] = new SqlParameter("PHOI_DONVI_ID", item.DONVI_ID);
+				obj[4] = new SqlParameter("PHOI_CQ_ID", item.CQ_ID);
+				obj[5] = new SqlParameter("PHOI_LAIXE_ID", item.LAIXE_ID);
+				obj[6] = new SqlParameter("PHOI_STTBX", item.STTBX);
+				obj[7] = new SqlParameter("PHOI_STTALL", item.STTALL);
+				obj[8] = new SqlParameter("PHOI_NgayXuatBen", item.NgayXuatBen);
+					if(item.NgayXuatBen > DateTime.MinValue)
+					{
+				obj[8] = new SqlParameter("PHOI_NgayXuatBen", item.NgayXuatBen);
+					}
+					else{
+						obj[8] = new SqlParameter("PHOI_NgayXuatBen", DBNull.Value);
+					}
+				obj[9] = new SqlParameter("PHOI_NgayXuatThucTe", item.NgayXuatThucTe);
+					if(item.NgayXuatThucTe > DateTime.MinValue)
+					{
+				obj[9] = new SqlParameter("PHOI_NgayXuatThucTe", item.NgayXuatThucTe);
+					}
+					else{
+						obj[9] = new SqlParameter("PHOI_NgayXuatThucTe", DBNull.Value);
+					}
+				obj[10] = new SqlParameter("PHOI_PHI_BenBai", item.PHI_BenBai);
+				obj[11] = new SqlParameter("PHOI_PHI_XeDauDem", item.PHI_XeDauDem);
+				obj[12] = new SqlParameter("PHOI_PHI_VeSinhBenBai", item.PHI_VeSinhBenBai);
+				obj[13] = new SqlParameter("PHOI_PHI_XeLuuBen", item.PHI_XeLuuBen);
+				obj[14] = new SqlParameter("PHOI_PHI_HoaHongBanVe", item.PHI_HoaHongBanVe);
+				obj[15] = new SqlParameter("PHOI_PHI_ChuyenTruyThu", item.PHI_ChuyenTruyThu);
+				obj[16] = new SqlParameter("PHOI_PHI_KhachTruyThu", item.PHI_KhachTruyThu);
+				obj[17] = new SqlParameter("PHOI_PHI_TruyThuGiam", item.PHI_TruyThuGiam);
+				obj[18] = new SqlParameter("PHOI_PHI_Khac", item.PHI_Khac);
+				obj[19] = new SqlParameter("PHOI_PHI_Tong", item.PHI_Tong);
+				obj[20] = new SqlParameter("PHOI_PHI_Nop", item.PHI_Nop);
+				obj[21] = new SqlParameter("PHOI_PHI_ConNo", item.PHI_ConNo);
+				obj[22] = new SqlParameter("PHOI_HanhKhach", item.HanhKhach);
+				obj[23] = new SqlParameter("PHOI_Ve", item.Ve);
+				obj[24] = new SqlParameter("PHOI_GiaVe", item.GiaVe);
+				obj[25] = new SqlParameter("PHOI_PHI_ChiThuBenBai", item.PHI_ChiThuBenBai);
+				obj[26] = new SqlParameter("PHOI_ChuyenTruyThu", item.ChuyenTruyThu);
+				obj[27] = new SqlParameter("PHOI_PhiMotChuyenTruyThu", item.PhiMotChuyenTruyThu);
+				obj[28] = new SqlParameter("PHOI_KhachTruyThu", item.KhachTruyThu);
+				obj[29] = new SqlParameter("PHOI_TruyThu", item.TruyThu);
+				obj[30] = new SqlParameter("PHOI_TruyThu_Id", item.TruyThu_Id);
+				obj[31] = new SqlParameter("PHOI_HopLe", item.HopLe);
+				obj[32] = new SqlParameter("PHOI_ChoDuyet", item.ChoDuyet);
+				obj[33] = new SqlParameter("PHOI_TrangThai", item.TrangThai);
+				obj[34] = new SqlParameter("PHOI_XeThayThe", item.XeThayThe);
+				obj[35] = new SqlParameter("PHOI_XeThayThe_ID", item.XeThayThe_ID);
+				obj[36] = new SqlParameter("PHOI_XeTangCuong", item.XeTangCuong);
+				obj[37] = new SqlParameter("PHOI_RowId", item.RowId);
+				obj[38] = new SqlParameter("PHOI_NgayTao", item.NgayTao);
+					if(item.NgayTao > DateTime.MinValue)
+					{
+				obj[38] = new SqlParameter("PHOI_NgayTao", item.NgayTao);
+					}
+					else{
+						obj[38] = new SqlParameter("PHOI_NgayTao", DBNull.Value);
+					}
+				obj[39] = new SqlParameter("PHOI_NgayCapNhat", item.NgayCapNhat);
+					if(item.NgayCapNhat > DateTime.MinValue)
+					{
+				obj[39] = new SqlParameter("PHOI_NgayCapNhat", item.NgayCapNhat);
+					}
+					else{
+						obj[39] = new SqlParameter("PHOI_NgayCapNhat", DBNull.Value);
+					}
+				obj[40] = new SqlParameter("PHOI_Username", item.Username);
+				obj[41] = new SqlParameter("PHOI_Draff", item.Draff);
 
+                    using (IDataReader rd = SqlHelper.ExecuteReader(DAL.con(), CommandType.StoredProcedure, "sp_tblBx_Phoi_Insert_InsertNormal_linhnx", obj))
+                    {
+                        while (rd.Read())
+                        {
+                            Item = getFromReader(rd);
+                        }
+                    }
+                    return Item;
+                }
+                
         public static Phoi Update(Phoi item)
         {
             var Item = new Phoi();
-            var obj = new SqlParameter[40];
-            obj[0] = new SqlParameter("PHOI_ID", item.ID);
-            obj[1] = new SqlParameter("PHOI_GIAOCA_ID", item.GIAOCA_ID);
-            obj[2] = new SqlParameter("PHOI_XE_ID", item.XE_ID);
-            obj[3] = new SqlParameter("PHOI_DONVI_ID", item.DONVI_ID);
-            obj[4] = new SqlParameter("PHOI_CQ_ID", item.CQ_ID);
-            obj[5] = new SqlParameter("PHOI_LAIXE_ID", item.LAIXE_ID);
-            obj[6] = new SqlParameter("PHOI_STTBX", item.STTBX);
-            obj[7] = new SqlParameter("PHOI_STTALL", item.STTALL);
-            if (item.NgayXuatBen > DateTime.MinValue)
-            {
-                obj[8] = new SqlParameter("PHOI_NgayXuatBen", item.NgayXuatBen);
-            }
-            else
-            {
-                obj[8] = new SqlParameter("PHOI_NgayXuatBen", DBNull.Value);
-            }
-            if (item.NgayXuatThucTe > DateTime.MinValue)
-            {
-                obj[9] = new SqlParameter("PHOI_NgayXuatThucTe", item.NgayXuatThucTe);
-            }
-            else
-            {
-                obj[9] = new SqlParameter("PHOI_NgayXuatThucTe", DBNull.Value);
-            }
-            obj[10] = new SqlParameter("PHOI_PHI_BenBai", item.PHI_BenBai);
-            obj[11] = new SqlParameter("PHOI_PHI_XeDauDem", item.PHI_XeDauDem);
-            obj[12] = new SqlParameter("PHOI_PHI_VeSinhBenBai", item.PHI_VeSinhBenBai);
-            obj[13] = new SqlParameter("PHOI_PHI_XeLuuBen", item.PHI_XeLuuBen);
-            obj[14] = new SqlParameter("PHOI_PHI_HoaHongBanVe", item.PHI_HoaHongBanVe);
-            obj[15] = new SqlParameter("PHOI_PHI_ChuyenTruyThu", item.PHI_ChuyenTruyThu);
-            obj[16] = new SqlParameter("PHOI_PHI_KhachTruyThu", item.PHI_KhachTruyThu);
-            obj[17] = new SqlParameter("PHOI_PHI_TruyThuGiam", item.PHI_TruyThuGiam);
-            obj[18] = new SqlParameter("PHOI_PHI_Khac", item.PHI_Khac);
-            obj[19] = new SqlParameter("PHOI_PHI_Tong", item.PHI_Tong);
-            obj[20] = new SqlParameter("PHOI_PHI_Nop", item.PHI_Nop);
-            obj[21] = new SqlParameter("PHOI_PHI_ConNo", item.PHI_ConNo);
-            obj[22] = new SqlParameter("PHOI_HanhKhach", item.HanhKhach);
-            obj[23] = new SqlParameter("PHOI_Ve", item.Ve);
-            obj[24] = new SqlParameter("PHOI_GiaVe", item.GiaVe);
-            obj[25] = new SqlParameter("PHOI_PHI_ChiThuBenBai", item.PHI_ChiThuBenBai);
-            obj[26] = new SqlParameter("PHOI_ChuyenTruyThu", item.ChuyenTruyThu);
-            obj[27] = new SqlParameter("PHOI_KhachTruyThu", item.KhachTruyThu);
-            obj[28] = new SqlParameter("PHOI_TruyThu", item.TruyThu);
-            obj[29] = new SqlParameter("PHOI_TruyThu_Id", item.TruyThu_Id);
-            obj[30] = new SqlParameter("PHOI_HopLe", item.HopLe);
-            obj[31] = new SqlParameter("PHOI_ChoDuyet", item.ChoDuyet);
-            obj[32] = new SqlParameter("PHOI_TrangThai", item.TrangThai);
-            obj[33] = new SqlParameter("PHOI_XeThayThe", item.XeThayThe);
-            obj[34] = new SqlParameter("PHOI_XeThayThe_ID", item.XeThayThe_ID);
-            obj[35] = new SqlParameter("PHOI_XeTangCuong", item.XeTangCuong);
-            obj[36] = new SqlParameter("PHOI_RowId", item.RowId);
-            if (item.NgayTao > DateTime.MinValue)
-            {
-                obj[37] = new SqlParameter("PHOI_NgayTao", item.NgayTao);
-            }
-            else
-            {
-                obj[37] = new SqlParameter("PHOI_NgayTao", DBNull.Value);
-            }
-            if (item.NgayCapNhat > DateTime.MinValue)
-            {
-                obj[38] = new SqlParameter("PHOI_NgayCapNhat", item.NgayCapNhat);
-            }
-            else
-            {
-                obj[38] = new SqlParameter("PHOI_NgayCapNhat", DBNull.Value);
-            }
-            obj[39] = new SqlParameter("PHOI_Username", item.Username);
+            var obj = new SqlParameter[42];
+                    		obj[0] = new SqlParameter("PHOI_ID", item.ID);
+		obj[1] = new SqlParameter("PHOI_GIAOCA_ID", item.GIAOCA_ID);
+		obj[2] = new SqlParameter("PHOI_XE_ID", item.XE_ID);
+		obj[3] = new SqlParameter("PHOI_DONVI_ID", item.DONVI_ID);
+		obj[4] = new SqlParameter("PHOI_CQ_ID", item.CQ_ID);
+		obj[5] = new SqlParameter("PHOI_LAIXE_ID", item.LAIXE_ID);
+		obj[6] = new SqlParameter("PHOI_STTBX", item.STTBX);
+		obj[7] = new SqlParameter("PHOI_STTALL", item.STTALL);
+			if(item.NgayXuatBen > DateTime.MinValue)
+			{
+		obj[8] = new SqlParameter("PHOI_NgayXuatBen", item.NgayXuatBen);
+			}
+			else{
+				obj[8] = new SqlParameter("PHOI_NgayXuatBen", DBNull.Value);
+			}
+			if(item.NgayXuatThucTe > DateTime.MinValue)
+			{
+		obj[9] = new SqlParameter("PHOI_NgayXuatThucTe", item.NgayXuatThucTe);
+			}
+			else{
+				obj[9] = new SqlParameter("PHOI_NgayXuatThucTe", DBNull.Value);
+			}
+		obj[10] = new SqlParameter("PHOI_PHI_BenBai", item.PHI_BenBai);
+		obj[11] = new SqlParameter("PHOI_PHI_XeDauDem", item.PHI_XeDauDem);
+		obj[12] = new SqlParameter("PHOI_PHI_VeSinhBenBai", item.PHI_VeSinhBenBai);
+		obj[13] = new SqlParameter("PHOI_PHI_XeLuuBen", item.PHI_XeLuuBen);
+		obj[14] = new SqlParameter("PHOI_PHI_HoaHongBanVe", item.PHI_HoaHongBanVe);
+		obj[15] = new SqlParameter("PHOI_PHI_ChuyenTruyThu", item.PHI_ChuyenTruyThu);
+		obj[16] = new SqlParameter("PHOI_PHI_KhachTruyThu", item.PHI_KhachTruyThu);
+		obj[17] = new SqlParameter("PHOI_PHI_TruyThuGiam", item.PHI_TruyThuGiam);
+		obj[18] = new SqlParameter("PHOI_PHI_Khac", item.PHI_Khac);
+		obj[19] = new SqlParameter("PHOI_PHI_Tong", item.PHI_Tong);
+		obj[20] = new SqlParameter("PHOI_PHI_Nop", item.PHI_Nop);
+		obj[21] = new SqlParameter("PHOI_PHI_ConNo", item.PHI_ConNo);
+		obj[22] = new SqlParameter("PHOI_HanhKhach", item.HanhKhach);
+		obj[23] = new SqlParameter("PHOI_Ve", item.Ve);
+		obj[24] = new SqlParameter("PHOI_GiaVe", item.GiaVe);
+		obj[25] = new SqlParameter("PHOI_PHI_ChiThuBenBai", item.PHI_ChiThuBenBai);
+		obj[26] = new SqlParameter("PHOI_ChuyenTruyThu", item.ChuyenTruyThu);
+		obj[27] = new SqlParameter("PHOI_PhiMotChuyenTruyThu", item.PhiMotChuyenTruyThu);
+		obj[28] = new SqlParameter("PHOI_KhachTruyThu", item.KhachTruyThu);
+		obj[29] = new SqlParameter("PHOI_TruyThu", item.TruyThu);
+		obj[30] = new SqlParameter("PHOI_TruyThu_Id", item.TruyThu_Id);
+		obj[31] = new SqlParameter("PHOI_HopLe", item.HopLe);
+		obj[32] = new SqlParameter("PHOI_ChoDuyet", item.ChoDuyet);
+		obj[33] = new SqlParameter("PHOI_TrangThai", item.TrangThai);
+		obj[34] = new SqlParameter("PHOI_XeThayThe", item.XeThayThe);
+		obj[35] = new SqlParameter("PHOI_XeThayThe_ID", item.XeThayThe_ID);
+		obj[36] = new SqlParameter("PHOI_XeTangCuong", item.XeTangCuong);
+		obj[37] = new SqlParameter("PHOI_RowId", item.RowId);
+			if(item.NgayTao > DateTime.MinValue)
+			{
+		obj[38] = new SqlParameter("PHOI_NgayTao", item.NgayTao);
+			}
+			else{
+				obj[38] = new SqlParameter("PHOI_NgayTao", DBNull.Value);
+			}
+			if(item.NgayCapNhat > DateTime.MinValue)
+			{
+		obj[39] = new SqlParameter("PHOI_NgayCapNhat", item.NgayCapNhat);
+			}
+			else{
+				obj[39] = new SqlParameter("PHOI_NgayCapNhat", DBNull.Value);
+			}
+		obj[40] = new SqlParameter("PHOI_Username", item.Username);
+		obj[41] = new SqlParameter("PHOI_Draff", item.Draff);
 
             using (IDataReader rd = SqlHelper.ExecuteReader(DAL.con(), CommandType.StoredProcedure, "sp_tblBx_Phoi_Update_UpdateNormal_linhnx", obj))
             {
@@ -2240,12 +2328,16 @@ namespace docsoft.entities
             }
             return Item;
         }
-
         public static Phoi SelectLastest(string CQ_ID)
         {
+            return SelectLastest(CQ_ID, false);
+        }
+        public static Phoi SelectLastest(string CQ_ID, bool DoNotInsert)
+        {
             var Item = new Phoi();
-            var obj = new SqlParameter[1];
+            var obj = new SqlParameter[2];
             obj[0] = new SqlParameter("CQ_ID", CQ_ID);
+            obj[1] = new SqlParameter("DoNotInsert", DoNotInsert);
             using (IDataReader rd = SqlHelper.ExecuteReader(DAL.con(), CommandType.StoredProcedure, "sp_tblBx_Phoi_Select_SelectLastest_linhnx", obj))
             {
                 while (rd.Read())
@@ -2359,6 +2451,9 @@ namespace docsoft.entities
             {
                 Item.PHI_ChuyenTruyThu = (Double)(rd["PHOI_PHI_ChuyenTruyThu"]);
             }
+            if(rd.FieldExists("PHOI_PhiMotChuyenTruyThu")){
+			    Item.PhiMotChuyenTruyThu = (Double)(rd["PHOI_PhiMotChuyenTruyThu"]);
+			}
             if (rd.FieldExists("PHOI_PHI_KhachTruyThu"))
             {
                 Item.PHI_KhachTruyThu = (Double)(rd["PHOI_PHI_KhachTruyThu"]);
@@ -2456,7 +2551,10 @@ namespace docsoft.entities
             {
                 Item.LAIXE_Ten = (String)(rd["LAIXE_Ten"]);
             }
-            
+            if (rd.FieldExists("PHOI_Draff"))
+            {
+                Item.Draff = (Boolean)(rd["PHOI_Draff"]);
+            }
             if (rd.FieldExists("PHOI_GiaVe"))
             {
                 Item.GiaVe = (Double)(rd["PHOI_GiaVe"]);
@@ -2565,6 +2663,37 @@ namespace docsoft.entities
             var pg = new Pager<Phoi>(con, "sp_tblBx_Phoi_Pager_PagerByUser_linhnx", "page", size, 10, rewrite, url, obj);
             return pg;
         }
+
+        public static List<Phoi> SelectByGiaoCa(SqlConnection con, Int32 giaoCa_Id, string ngay)
+        {
+            var obj = new SqlParameter[2];
+            if (giaoCa_Id>0)
+            {
+                obj[1] = new SqlParameter("giaoCa_Id", giaoCa_Id);
+            }
+            else
+            {
+                obj[1] = new SqlParameter("giaoCa_Id", DBNull.Value);
+            }
+            if (!string.IsNullOrEmpty(ngay))
+            {
+                obj[0] = new SqlParameter("ngay", ngay);
+            }
+            else
+            {
+                obj[0] = new SqlParameter("ngay", DBNull.Value);
+            }
+
+            var list = new PhoiCollection();
+            using (IDataReader rd = SqlHelper.ExecuteReader(con, CommandType.StoredProcedure, "sp_tblBx_Phoi_Select_SelectByGiaoCa_linhnx", obj))
+            {
+                while (rd.Read())
+                {
+                    list.Add(getFromReader(rd));
+                }
+            }
+            return list;
+        }
         #endregion
     }
     #endregion
@@ -2609,6 +2738,10 @@ namespace docsoft.entities
         /// 0: Truy thu thường. 1: Đề nghị truy thu chưa duyệt. 2: Đề nghị truy thu đã duyệt-chờ ý kiến chủ xe. 3: Chủ xe không đồng ý với truy thu. 4: Chủ xe đồng ý với ý kiến. 5: Truy thu đã hủy để tạm thời xử lý
         /// </summary>
         public Int16 TrangThai { get; set; }
+        public Boolean Draff { get; set; }
+
+        public  String YKienQuanLy{get;set;}
+        public  String KienNghi{get;set;}
         #endregion
         #region Contructor
         public TruyThu()
@@ -2643,168 +2776,164 @@ namespace docsoft.entities
         }
 
         public static TruyThu Insert(TruyThu item)
-        {
-            var Item = new TruyThu();
-            var obj = new SqlParameter[30];
-            obj[1] = new SqlParameter("TRUYTHU_CQ_ID", item.CQ_ID);
-            obj[2] = new SqlParameter("TRUYTHU_STTBX", item.STTBX);
-            obj[3] = new SqlParameter("TRUYTHU_STTALL", item.STTALL);
-            obj[4] = new SqlParameter("TRUYTHU_PHOI_ID", item.PHOI_ID);
-            obj[5] = new SqlParameter("TRUYTHU_XE_ID", item.XE_ID);
-            obj[6] = new SqlParameter("TRUYTHU_NguoiLap", item.NguoiLap);
-            obj[7] = new SqlParameter("TRUYTHU_ThoiGianNghi_TuNgay", item.ThoiGianNghi_TuNgay);
-            if (item.ThoiGianNghi_TuNgay > DateTime.MinValue)
-            {
-                obj[7] = new SqlParameter("TRUYTHU_ThoiGianNghi_TuNgay", item.ThoiGianNghi_TuNgay);
-            }
-            else
-            {
-                obj[7] = new SqlParameter("TRUYTHU_ThoiGianNghi_TuNgay", DBNull.Value);
-            }
-            obj[8] = new SqlParameter("TRUYTHU_ThoiGianNghi_DenNgay", item.ThoiGianNghi_DenNgay);
-            if (item.ThoiGianNghi_DenNgay > DateTime.MinValue)
-            {
-                obj[8] = new SqlParameter("TRUYTHU_ThoiGianNghi_DenNgay", item.ThoiGianNghi_DenNgay);
-            }
-            else
-            {
-                obj[8] = new SqlParameter("TRUYTHU_ThoiGianNghi_DenNgay", DBNull.Value);
-            }
-            obj[9] = new SqlParameter("TRUYTHU_SoChuyenThucHien", item.SoChuyenThucHien);
-            obj[10] = new SqlParameter("TRUYTHU_SoChuyenBieuDo", item.SoChuyenBieuDo);
-            obj[11] = new SqlParameter("TRUYTHU_SoChuyenThieu", item.SoChuyenThieu);
-            obj[12] = new SqlParameter("TRUYTHU_SoChuyenDeNghi", item.SoChuyenDeNghi);
-            obj[13] = new SqlParameter("TRUYTHU_GiaTienDichVuTrongHopDong", item.GiaTienDichVuTrongHopDong);
-            obj[14] = new SqlParameter("TRUYTHU_TongTruyThu", item.TongTruyThu);
-            obj[15] = new SqlParameter("TRUYTHU_GiamTru", item.GiamTru);
-            obj[16] = new SqlParameter("TRUYTHU_NOIDUNG_ID", item.NOIDUNG_ID);
-            obj[17] = new SqlParameter("TRUYTHU_DANHGIA_ID", item.DANHGIA_ID);
-            obj[18] = new SqlParameter("TRUYTHU_DeNghiCuaNhaXe", item.DeNghiCuaNhaXe);
-            obj[19] = new SqlParameter("TRUYTHU_YKienChiDao", item.YKienChiDao);
-            obj[20] = new SqlParameter("TRUYTHU_SoChuyenDuocDuyet", item.SoChuyenDuocDuyet);
-            obj[21] = new SqlParameter("TRUYTHU_NgayDuyet", item.NgayDuyet);
-            if (item.NgayDuyet > DateTime.MinValue)
-            {
-                obj[21] = new SqlParameter("TRUYTHU_NgayDuyet", item.NgayDuyet);
-            }
-            else
-            {
-                obj[21] = new SqlParameter("TRUYTHU_NgayDuyet", DBNull.Value);
-            }
-            obj[22] = new SqlParameter("TRUYTHU_LanhDaoDuyet", item.LanhDaoDuyet);
-            obj[23] = new SqlParameter("TRUYTHU_Duyet", item.Duyet);
-            obj[24] = new SqlParameter("TRUYTHU_DeNghi", item.DeNghi);
-            obj[25] = new SqlParameter("TRUYTHU_NgayTao", item.NgayTao);
-            if (item.NgayTao > DateTime.MinValue)
-            {
-                obj[25] = new SqlParameter("TRUYTHU_NgayTao", item.NgayTao);
-            }
-            else
-            {
-                obj[25] = new SqlParameter("TRUYTHU_NgayTao", DBNull.Value);
-            }
-            obj[26] = new SqlParameter("TRUYTHU_NgayCapNhat", item.NgayCapNhat);
-            if (item.NgayCapNhat > DateTime.MinValue)
-            {
-                obj[26] = new SqlParameter("TRUYTHU_NgayCapNhat", item.NgayCapNhat);
-            }
-            else
-            {
-                obj[26] = new SqlParameter("TRUYTHU_NgayCapNhat", DBNull.Value);
-            }
-            obj[27] = new SqlParameter("TRUYTHU_RowId", item.RowId);
-            obj[28] = new SqlParameter("TRUYTHU_Username", item.Username);
-            obj[29] = new SqlParameter("TRUYTHU_TrangThai", item.TrangThai);
-
-            using (IDataReader rd = SqlHelper.ExecuteReader(DAL.con(), CommandType.StoredProcedure, "sp_tblBx_TruyThu_Insert_InsertNormal_linhnx", obj))
-            {
-                while (rd.Read())
                 {
-                    Item = getFromReader(rd);
+                    var Item = new TruyThu();
+                    var obj = new SqlParameter[33];
+                    				obj[1] = new SqlParameter("TRUYTHU_CQ_ID", item.CQ_ID);
+				obj[2] = new SqlParameter("TRUYTHU_STTBX", item.STTBX);
+				obj[3] = new SqlParameter("TRUYTHU_STTALL", item.STTALL);
+				obj[4] = new SqlParameter("TRUYTHU_PHOI_ID", item.PHOI_ID);
+				obj[5] = new SqlParameter("TRUYTHU_XE_ID", item.XE_ID);
+				obj[6] = new SqlParameter("TRUYTHU_NguoiLap", item.NguoiLap);
+				obj[7] = new SqlParameter("TRUYTHU_ThoiGianNghi_TuNgay", item.ThoiGianNghi_TuNgay);
+					if(item.ThoiGianNghi_TuNgay > DateTime.MinValue)
+					{
+				obj[7] = new SqlParameter("TRUYTHU_ThoiGianNghi_TuNgay", item.ThoiGianNghi_TuNgay);
+					}
+					else{
+						obj[7] = new SqlParameter("TRUYTHU_ThoiGianNghi_TuNgay", DBNull.Value);
+					}
+				obj[8] = new SqlParameter("TRUYTHU_ThoiGianNghi_DenNgay", item.ThoiGianNghi_DenNgay);
+					if(item.ThoiGianNghi_DenNgay > DateTime.MinValue)
+					{
+				obj[8] = new SqlParameter("TRUYTHU_ThoiGianNghi_DenNgay", item.ThoiGianNghi_DenNgay);
+					}
+					else{
+						obj[8] = new SqlParameter("TRUYTHU_ThoiGianNghi_DenNgay", DBNull.Value);
+					}
+				obj[9] = new SqlParameter("TRUYTHU_SoChuyenThucHien", item.SoChuyenThucHien);
+				obj[10] = new SqlParameter("TRUYTHU_SoChuyenBieuDo", item.SoChuyenBieuDo);
+				obj[11] = new SqlParameter("TRUYTHU_SoChuyenThieu", item.SoChuyenThieu);
+				obj[12] = new SqlParameter("TRUYTHU_SoChuyenDeNghi", item.SoChuyenDeNghi);
+				obj[13] = new SqlParameter("TRUYTHU_GiaTienDichVuTrongHopDong", item.GiaTienDichVuTrongHopDong);
+				obj[14] = new SqlParameter("TRUYTHU_TongTruyThu", item.TongTruyThu);
+				obj[15] = new SqlParameter("TRUYTHU_GiamTru", item.GiamTru);
+				obj[16] = new SqlParameter("TRUYTHU_NOIDUNG_ID", item.NOIDUNG_ID);
+				obj[17] = new SqlParameter("TRUYTHU_DANHGIA_ID", item.DANHGIA_ID);
+				obj[18] = new SqlParameter("TRUYTHU_DeNghiCuaNhaXe", item.DeNghiCuaNhaXe);
+				obj[19] = new SqlParameter("TRUYTHU_YKienQuanLy", item.YKienQuanLy);
+				obj[20] = new SqlParameter("TRUYTHU_YKienChiDao", item.YKienChiDao);
+				obj[21] = new SqlParameter("TRUYTHU_SoChuyenDuocDuyet", item.SoChuyenDuocDuyet);
+				obj[22] = new SqlParameter("TRUYTHU_NgayDuyet", item.NgayDuyet);
+					if(item.NgayDuyet > DateTime.MinValue)
+					{
+				obj[22] = new SqlParameter("TRUYTHU_NgayDuyet", item.NgayDuyet);
+					}
+					else{
+						obj[22] = new SqlParameter("TRUYTHU_NgayDuyet", DBNull.Value);
+					}
+				obj[23] = new SqlParameter("TRUYTHU_LanhDaoDuyet", item.LanhDaoDuyet);
+				obj[24] = new SqlParameter("TRUYTHU_Duyet", item.Duyet);
+				obj[25] = new SqlParameter("TRUYTHU_DeNghi", item.DeNghi);
+				obj[26] = new SqlParameter("TRUYTHU_NgayTao", item.NgayTao);
+					if(item.NgayTao > DateTime.MinValue)
+					{
+				obj[26] = new SqlParameter("TRUYTHU_NgayTao", item.NgayTao);
+					}
+					else{
+						obj[26] = new SqlParameter("TRUYTHU_NgayTao", DBNull.Value);
+					}
+				obj[27] = new SqlParameter("TRUYTHU_NgayCapNhat", item.NgayCapNhat);
+					if(item.NgayCapNhat > DateTime.MinValue)
+					{
+				obj[27] = new SqlParameter("TRUYTHU_NgayCapNhat", item.NgayCapNhat);
+					}
+					else{
+						obj[27] = new SqlParameter("TRUYTHU_NgayCapNhat", DBNull.Value);
+					}
+				obj[28] = new SqlParameter("TRUYTHU_RowId", item.RowId);
+				obj[29] = new SqlParameter("TRUYTHU_Username", item.Username);
+				obj[30] = new SqlParameter("TRUYTHU_TrangThai", item.TrangThai);
+				obj[31] = new SqlParameter("TRUYTHU_KienNghi", item.KienNghi);
+				obj[32] = new SqlParameter("TRUYTHU_Draff", item.Draff);
+
+                    using (IDataReader rd = SqlHelper.ExecuteReader(DAL.con(), CommandType.StoredProcedure, "sp_tblBx_TruyThu_Insert_InsertNormal_linhnx", obj))
+                    {
+                        while (rd.Read())
+                        {
+                            Item = getFromReader(rd);
+                        }
+                    }
+                    return Item;
                 }
-            }
-            return Item;
-        }
-
-        public static TruyThu Update(TruyThu item)
-        {
-            var Item = new TruyThu();
-            var obj = new SqlParameter[30];
-            obj[0] = new SqlParameter("TRUYTHU_ID", item.ID);
-            obj[1] = new SqlParameter("TRUYTHU_CQ_ID", item.CQ_ID);
-            obj[2] = new SqlParameter("TRUYTHU_STTBX", item.STTBX);
-            obj[3] = new SqlParameter("TRUYTHU_STTALL", item.STTALL);
-            obj[4] = new SqlParameter("TRUYTHU_PHOI_ID", item.PHOI_ID);
-            obj[5] = new SqlParameter("TRUYTHU_XE_ID", item.XE_ID);
-            obj[6] = new SqlParameter("TRUYTHU_NguoiLap", item.NguoiLap);
-            if (item.ThoiGianNghi_TuNgay > DateTime.MinValue)
-            {
-                obj[7] = new SqlParameter("TRUYTHU_ThoiGianNghi_TuNgay", item.ThoiGianNghi_TuNgay);
-            }
-            else
-            {
-                obj[7] = new SqlParameter("TRUYTHU_ThoiGianNghi_TuNgay", DBNull.Value);
-            }
-            if (item.ThoiGianNghi_DenNgay > DateTime.MinValue)
-            {
-                obj[8] = new SqlParameter("TRUYTHU_ThoiGianNghi_DenNgay", item.ThoiGianNghi_DenNgay);
-            }
-            else
-            {
-                obj[8] = new SqlParameter("TRUYTHU_ThoiGianNghi_DenNgay", DBNull.Value);
-            }
-            obj[9] = new SqlParameter("TRUYTHU_SoChuyenThucHien", item.SoChuyenThucHien);
-            obj[10] = new SqlParameter("TRUYTHU_SoChuyenBieuDo", item.SoChuyenBieuDo);
-            obj[11] = new SqlParameter("TRUYTHU_SoChuyenThieu", item.SoChuyenThieu);
-            obj[12] = new SqlParameter("TRUYTHU_SoChuyenDeNghi", item.SoChuyenDeNghi);
-            obj[13] = new SqlParameter("TRUYTHU_GiaTienDichVuTrongHopDong", item.GiaTienDichVuTrongHopDong);
-            obj[14] = new SqlParameter("TRUYTHU_TongTruyThu", item.TongTruyThu);
-            obj[15] = new SqlParameter("TRUYTHU_GiamTru", item.GiamTru);
-            obj[16] = new SqlParameter("TRUYTHU_NOIDUNG_ID", item.NOIDUNG_ID);
-            obj[17] = new SqlParameter("TRUYTHU_DANHGIA_ID", item.DANHGIA_ID);
-            obj[18] = new SqlParameter("TRUYTHU_DeNghiCuaNhaXe", item.DeNghiCuaNhaXe);
-            obj[19] = new SqlParameter("TRUYTHU_YKienChiDao", item.YKienChiDao);
-            obj[20] = new SqlParameter("TRUYTHU_SoChuyenDuocDuyet", item.SoChuyenDuocDuyet);
-            if (item.NgayDuyet > DateTime.MinValue)
-            {
-                obj[21] = new SqlParameter("TRUYTHU_NgayDuyet", item.NgayDuyet);
-            }
-            else
-            {
-                obj[21] = new SqlParameter("TRUYTHU_NgayDuyet", DBNull.Value);
-            }
-            obj[22] = new SqlParameter("TRUYTHU_LanhDaoDuyet", item.LanhDaoDuyet);
-            obj[23] = new SqlParameter("TRUYTHU_Duyet", item.Duyet);
-            obj[24] = new SqlParameter("TRUYTHU_DeNghi", item.DeNghi);
-            if (item.NgayTao > DateTime.MinValue)
-            {
-                obj[25] = new SqlParameter("TRUYTHU_NgayTao", item.NgayTao);
-            }
-            else
-            {
-                obj[25] = new SqlParameter("TRUYTHU_NgayTao", DBNull.Value);
-            }
-            if (item.NgayCapNhat > DateTime.MinValue)
-            {
-                obj[26] = new SqlParameter("TRUYTHU_NgayCapNhat", item.NgayCapNhat);
-            }
-            else
-            {
-                obj[26] = new SqlParameter("TRUYTHU_NgayCapNhat", DBNull.Value);
-            }
-            obj[27] = new SqlParameter("TRUYTHU_RowId", item.RowId);
-            obj[28] = new SqlParameter("TRUYTHU_Username", item.Username);
-            obj[29] = new SqlParameter("TRUYTHU_TrangThai", item.TrangThai);
-
-            using (IDataReader rd = SqlHelper.ExecuteReader(DAL.con(), CommandType.StoredProcedure, "sp_tblBx_TruyThu_Update_UpdateNormal_linhnx", obj))
-            {
-                while (rd.Read())
+                
+                public static TruyThu Update(TruyThu item)
                 {
-                    Item = getFromReader(rd);
+                    var Item = new TruyThu();
+                    var obj = new SqlParameter[33];
+                    				obj[0] = new SqlParameter("TRUYTHU_ID", item.ID);
+				obj[1] = new SqlParameter("TRUYTHU_CQ_ID", item.CQ_ID);
+				obj[2] = new SqlParameter("TRUYTHU_STTBX", item.STTBX);
+				obj[3] = new SqlParameter("TRUYTHU_STTALL", item.STTALL);
+				obj[4] = new SqlParameter("TRUYTHU_PHOI_ID", item.PHOI_ID);
+				obj[5] = new SqlParameter("TRUYTHU_XE_ID", item.XE_ID);
+				obj[6] = new SqlParameter("TRUYTHU_NguoiLap", item.NguoiLap);
+					if(item.ThoiGianNghi_TuNgay > DateTime.MinValue)
+					{
+				obj[7] = new SqlParameter("TRUYTHU_ThoiGianNghi_TuNgay", item.ThoiGianNghi_TuNgay);
+					}
+					else{
+						obj[7] = new SqlParameter("TRUYTHU_ThoiGianNghi_TuNgay", DBNull.Value);
+					}
+					if(item.ThoiGianNghi_DenNgay > DateTime.MinValue)
+					{
+				obj[8] = new SqlParameter("TRUYTHU_ThoiGianNghi_DenNgay", item.ThoiGianNghi_DenNgay);
+					}
+					else{
+						obj[8] = new SqlParameter("TRUYTHU_ThoiGianNghi_DenNgay", DBNull.Value);
+					}
+				obj[9] = new SqlParameter("TRUYTHU_SoChuyenThucHien", item.SoChuyenThucHien);
+				obj[10] = new SqlParameter("TRUYTHU_SoChuyenBieuDo", item.SoChuyenBieuDo);
+				obj[11] = new SqlParameter("TRUYTHU_SoChuyenThieu", item.SoChuyenThieu);
+				obj[12] = new SqlParameter("TRUYTHU_SoChuyenDeNghi", item.SoChuyenDeNghi);
+				obj[13] = new SqlParameter("TRUYTHU_GiaTienDichVuTrongHopDong", item.GiaTienDichVuTrongHopDong);
+				obj[14] = new SqlParameter("TRUYTHU_TongTruyThu", item.TongTruyThu);
+				obj[15] = new SqlParameter("TRUYTHU_GiamTru", item.GiamTru);
+				obj[16] = new SqlParameter("TRUYTHU_NOIDUNG_ID", item.NOIDUNG_ID);
+				obj[17] = new SqlParameter("TRUYTHU_DANHGIA_ID", item.DANHGIA_ID);
+				obj[18] = new SqlParameter("TRUYTHU_DeNghiCuaNhaXe", item.DeNghiCuaNhaXe);
+				obj[19] = new SqlParameter("TRUYTHU_YKienQuanLy", item.YKienQuanLy);
+				obj[20] = new SqlParameter("TRUYTHU_YKienChiDao", item.YKienChiDao);
+				obj[21] = new SqlParameter("TRUYTHU_SoChuyenDuocDuyet", item.SoChuyenDuocDuyet);
+					if(item.NgayDuyet > DateTime.MinValue)
+					{
+				obj[22] = new SqlParameter("TRUYTHU_NgayDuyet", item.NgayDuyet);
+					}
+					else{
+						obj[22] = new SqlParameter("TRUYTHU_NgayDuyet", DBNull.Value);
+					}
+				obj[23] = new SqlParameter("TRUYTHU_LanhDaoDuyet", item.LanhDaoDuyet);
+				obj[24] = new SqlParameter("TRUYTHU_Duyet", item.Duyet);
+				obj[25] = new SqlParameter("TRUYTHU_DeNghi", item.DeNghi);
+					if(item.NgayTao > DateTime.MinValue)
+					{
+				obj[26] = new SqlParameter("TRUYTHU_NgayTao", item.NgayTao);
+					}
+					else{
+						obj[26] = new SqlParameter("TRUYTHU_NgayTao", DBNull.Value);
+					}
+					if(item.NgayCapNhat > DateTime.MinValue)
+					{
+				obj[27] = new SqlParameter("TRUYTHU_NgayCapNhat", item.NgayCapNhat);
+					}
+					else{
+						obj[27] = new SqlParameter("TRUYTHU_NgayCapNhat", DBNull.Value);
+					}
+				obj[28] = new SqlParameter("TRUYTHU_RowId", item.RowId);
+				obj[29] = new SqlParameter("TRUYTHU_Username", item.Username);
+				obj[30] = new SqlParameter("TRUYTHU_TrangThai", item.TrangThai);
+				obj[31] = new SqlParameter("TRUYTHU_KienNghi", item.KienNghi);
+				obj[32] = new SqlParameter("TRUYTHU_Draff", item.Draff);
+
+                    using (IDataReader rd = SqlHelper.ExecuteReader(DAL.con(), CommandType.StoredProcedure, "sp_tblBx_TruyThu_Update_UpdateNormal_linhnx", obj))
+                    {
+                        while (rd.Read())
+                        {
+                            Item = getFromReader(rd);
+                        }
+                    }
+                    return Item;
                 }
-            }
-            return Item;
-        }
 
         public static TruyThu SelectById(Int64 TRUYTHU_ID)
         {
@@ -2917,6 +3046,9 @@ namespace docsoft.entities
             {
                 Item.DeNghiCuaNhaXe = (String)(rd["TRUYTHU_DeNghiCuaNhaXe"]);
             }
+            if(rd.FieldExists("TRUYTHU_YKienQuanLy")){
+					Item.YKienQuanLy = (String)(rd["TRUYTHU_YKienQuanLy"]);
+					}
             if (rd.FieldExists("TRUYTHU_YKienChiDao"))
             {
                 Item.YKienChiDao = (String)(rd["TRUYTHU_YKienChiDao"]);
@@ -2965,7 +3097,10 @@ namespace docsoft.entities
             {
                 Item.TrangThai = (Int16)(rd["TRUYTHU_TrangThai"]);
             }
-
+            if (rd.FieldExists("TRUYTHU_Draff"))
+            {
+                Item.Draff = (Boolean)(rd["TRUYTHU_Draff"]);
+            }
             //Extended
             if (rd.FieldExists("NOIDUNG_Ten"))
             {
@@ -2975,6 +3110,9 @@ namespace docsoft.entities
             {
                 Item.DANHGIA_Ten = (String)(rd["DANHGIA_Ten"]);
             }
+            if(rd.FieldExists("TRUYTHU_KienNghi")){
+					Item.KienNghi = (String)(rd["TRUYTHU_KienNghi"]);
+					}
             return Item;
         }
         #endregion
@@ -3372,6 +3510,7 @@ namespace docsoft.entities
         public DateTime BaoHiem { get; set; }
         public Boolean KyGuiBanVe { get; set; }
         public DateTime NgayKyGuiBanVe { get; set; }
+        public Int16 ChapThuanTuyen_SoChuyen { get; set; }
         #endregion
         #region Contructor
         public Xe()
@@ -3459,6 +3598,10 @@ namespace docsoft.entities
 
         public bool HopLeAll { get; set; }
         public Int16 TrangThai { get; set; }
+
+        public List<LichItem> ListLichItem { get; set; }
+        public List<ChamCong> ListChamCong { get; set; }
+        public Int32 STT { get; set; }
         #endregion
         public override BaseEntity getFromReader(IDataReader rd)
         {
@@ -3555,7 +3698,7 @@ namespace docsoft.entities
         public static Xe Insert(Xe item)
         {
             var Item = new Xe();
-            var obj = new SqlParameter[29];
+            var obj = new SqlParameter[30];
             obj[1] = new SqlParameter("XE_TUYEN_ID", item.TUYEN_ID);
             obj[2] = new SqlParameter("XE_DONVI_ID", item.DONVI_ID);
             obj[3] = new SqlParameter("XE_LOAIXE_ID", item.LOAIXE_ID);
@@ -3632,6 +3775,7 @@ namespace docsoft.entities
             {
                 obj[28] = new SqlParameter("XE_NgayKyGuiBanVe", DBNull.Value);
             }
+            obj[29] = new SqlParameter("XE_ChapThuanTuyen_SoChuyen", item.ChapThuanTuyen_SoChuyen);
 
             using (IDataReader rd = SqlHelper.ExecuteReader(DAL.con(), CommandType.StoredProcedure, "sp_tblBx_Xe_Insert_InsertNormal_linhnx", obj))
             {
@@ -3646,7 +3790,7 @@ namespace docsoft.entities
         public static Xe Update(Xe item)
         {
             var Item = new Xe();
-            var obj = new SqlParameter[29];
+            var obj = new SqlParameter[30];
             obj[0] = new SqlParameter("XE_ID", item.ID);
             obj[1] = new SqlParameter("XE_TUYEN_ID", item.TUYEN_ID);
             obj[2] = new SqlParameter("XE_DONVI_ID", item.DONVI_ID);
@@ -3718,6 +3862,7 @@ namespace docsoft.entities
             {
                 obj[28] = new SqlParameter("XE_NgayKyGuiBanVe", DBNull.Value);
             }
+            obj[29] = new SqlParameter("XE_ChapThuanTuyen_SoChuyen", item.ChapThuanTuyen_SoChuyen);
 
             using (IDataReader rd = SqlHelper.ExecuteReader(DAL.con(), CommandType.StoredProcedure, "sp_tblBx_Xe_Update_UpdateNormal_linhnx", obj))
             {
@@ -3759,6 +3904,22 @@ namespace docsoft.entities
             }
             return List;
         }
+
+        public static XeCollection SelectByTuyenId(Int32 tuyenId)
+        {
+            var List = new XeCollection();
+            var obj = new SqlParameter[1];
+            obj[0] = new SqlParameter("tuyenId", tuyenId);
+            using (IDataReader rd = SqlHelper.ExecuteReader(DAL.con(), CommandType.StoredProcedure, "sp_tblBx_Xe_Select_SelectByTuyenId_linhnx", obj))
+            {
+                while (rd.Read())
+                {
+                    List.Add(getFromReader(rd));
+                }
+            }
+            return List;
+        }
+
         public static Pager<Xe> pagerNormal(string url, bool rewrite, string sort, string q, int size
             , string TUYEN_ID, string DONVI_ID, string LOAIXE_ID, string Ghe, string LuuHanh, string TuyenCoDinh, string XeVangLai, string ChuaDangKy)
         {
@@ -3858,6 +4019,7 @@ namespace docsoft.entities
             {
                 Item.TUYEN_ID = (Int32)(rd["XE_TUYEN_ID"]);
             }
+            
             if (rd.FieldExists("XE_DONVI_ID"))
             {
                 Item.DONVI_ID = (Int32)(rd["XE_DONVI_ID"]);
@@ -3977,7 +4139,10 @@ namespace docsoft.entities
             {
                 Item.BIEUDO_Ten = (String)(rd["BIEUDO_Ten"]);
             }
-
+            if (rd.FieldExists("XE_ChapThuanTuyen_SoChuyen"))
+            {
+                Item.ChapThuanTuyen_SoChuyen = (Int16)(rd["XE_ChapThuanTuyen_SoChuyen"]);
+            }
             if (rd.FieldExists("XE_KyGuiBanVe"))
             {
                 Item.KyGuiBanVe = (Boolean)(rd["XE_KyGuiBanVe"]);
@@ -3989,6 +4154,10 @@ namespace docsoft.entities
             if (rd.FieldExists("XVB_TrangThai"))
             {
                 Item.TrangThai = (Int16)(rd["XVB_TrangThai"]);
+            }
+            if (rd.FieldExists("XSTT"))
+            {
+                Item.STT = (Int32)(rd["XSTT"]);
             }
             return Item;
         }
@@ -4088,9 +4257,9 @@ namespace docsoft.entities
             return List;
         }
 
-        public static XeCollection ListByTuyen(SqlConnection con, int Cqid, int TuyenId, int top)
+        public static XeCollection ListByTuyen(SqlConnection con,int TuyenId)
         {
-            var List = new XeCollection();
+            var list = new XeCollection();
             var obj = new SqlParameter[3];
             if (TuyenId>0)
             {
@@ -4100,17 +4269,39 @@ namespace docsoft.entities
             {
                 obj[0] = new SqlParameter("TuyenId", DBNull.Value);
             }
-            obj[1] = new SqlParameter("top", top);
-            obj[2] = new SqlParameter("Cqid", Cqid);
+            
 
             using (IDataReader rd = SqlHelper.ExecuteReader(con, CommandType.StoredProcedure, "sp_tblBx_Xe_Select_ListByTuyen_linhnx", obj))
             {
                 while (rd.Read())
                 {
-                    List.Add(getFromReader(rd));
+                    list.Add(getFromReader(rd));
                 }
             }
-            return List;
+            return list;
+        }
+        public static XeCollection SelectByTuyenId(SqlConnection con, int TuyenId)
+        {
+            var list = new XeCollection();
+            var obj = new SqlParameter[3];
+            if (TuyenId > 0)
+            {
+                obj[0] = new SqlParameter("TuyenId", TuyenId);
+            }
+            else
+            {
+                obj[0] = new SqlParameter("TuyenId", DBNull.Value);
+            }
+
+
+            using (IDataReader rd = SqlHelper.ExecuteReader(con, CommandType.StoredProcedure, "sp_tblBx_Xe_Select_SelectByTuyenId_linhnx", obj))
+            {
+                while (rd.Read())
+                {
+                    list.Add(getFromReader(rd));
+                }
+            }
+            return list;
         }
         #endregion
     }
@@ -4215,6 +4406,22 @@ namespace docsoft.entities
         }
         public string BienSo { get; set; }
         public int LOAIXE_ID { get; set; }
+        public string NguoiDuyetPhoi_Ten { get; set;}
+        public string NguoiXuLyThanhToan_Ten { get; set; }
+        public string XE_GioXuatBen { get; set; }
+        public int XE_GioXuatBenCountDown
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(XE_GioXuatBen)) return 0;
+                var d = DateTime.Now;
+                var arrays = XE_GioXuatBen.Split(new char[] {':'});
+
+                var gioXuatBen = new DateTime(d.Year, d.Month, d.Day, Convert.ToInt32(arrays[0]),
+                                              Convert.ToInt32(arrays[1]), 0);
+                //return Math.Floor(Convert.ToDecimal((d - gioXuatBen).TotalMinutes));
+            }
+        }
         #endregion
         public override BaseEntity getFromReader(IDataReader rd)
         {
@@ -4615,6 +4822,7 @@ namespace docsoft.entities
             {
                 Item.NgayDuyetPhoi = (DateTime)(rd["XVB_NgayDuyetPhoi"]);
             }
+          
             if (rd.FieldExists("XVB_NguoiDuyetPhoi"))
             {
                 Item.NguoiDuyetPhoi = (String)(rd["XVB_NguoiDuyetPhoi"]);
@@ -4712,6 +4920,19 @@ namespace docsoft.entities
             if (rd.FieldExists("XE_LOAIXE_ID"))
             {
                 Item.LOAIXE_ID = (Int32)(rd["XE_LOAIXE_ID"]);
+            }
+
+            if (rd.FieldExists("NguoiDuyetPhoi_Ten"))
+            {
+                Item.NguoiDuyetPhoi_Ten = (String)(rd["NguoiDuyetPhoi_Ten"]);
+            }
+            if (rd.FieldExists("NguoiXuLyThanhToan_Ten"))
+            {
+                Item.NguoiXuLyThanhToan_Ten = (String)(rd["NguoiXuLyThanhToan_Ten"]);
+            }
+            if (rd.FieldExists("XE_GioXuatBen"))
+            {
+                Item.XE_GioXuatBen = (String)(rd["XE_GioXuatBen"]);
             }
             return Item;
         }
@@ -5609,6 +5830,20 @@ namespace docsoft.entities
             var obj = new SqlParameter[1];
             obj[0] = new SqlParameter("ThuNoId", ThuNoId);
             SqlHelper.ExecuteNonQuery(DAL.con(), CommandType.StoredProcedure, "sp_tblBx_ThuNoChiTiet_Delete_DeleteByThuNoId_linhnx", obj);
+        }
+        public static ThuNoChiTietCollection SelectByThuNoId(Int64 ThuNoId)
+        {
+            var List = new ThuNoChiTietCollection();
+            var obj = new SqlParameter[1];
+            obj[0] = new SqlParameter("ThuNoId", ThuNoId);
+            using (IDataReader rd = SqlHelper.ExecuteReader(DAL.con(), CommandType.StoredProcedure, "sp_tblBx_ThuNoChiTiet_Select_SelectByThuNoId_linhnx", obj))
+            {
+                while (rd.Read())
+                {
+                    List.Add(getFromReader(rd));
+                }
+            }
+            return List;
         }
         #endregion
     }

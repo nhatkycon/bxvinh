@@ -13,6 +13,9 @@ public partial class lib_ajax_TruyThu_Default : basePage
         var Id = Request["Id"];
         var soChuyenDuocDuyet = Request["SoChuyenDuocDuyet"];
         var yKienChiDao = Request["YKienChiDao"];
+        var KienNghi = Request["KienNghi"];
+        var PHI_ConNo = Request["PHI_ConNo"];
+        var PHI_Nop = Request["PHI_Nop"];
         switch (subAct)
         {
             case "duyet":
@@ -30,9 +33,9 @@ public partial class lib_ajax_TruyThu_Default : basePage
                         item.TrangThai = 2;
                         item = TruyThuDal.Update(item);
 
-                        var phoi = PhoiDal.SelectById(con,item.PHOI_ID);
-                        phoi.PHI_TruyThuGiam = phoi.PHI_BenBai * (phoi.ChuyenTruyThu - Convert.ToInt16(soChuyenDuocDuyet));
-                        phoi.PHI_Tong = phoi.PHI_Tong - phoi.PHI_TruyThuGiam;
+                        var phoi = PhoiDal.SelectById(con,item.PHOI_ID);                        
+                        phoi.PHI_TruyThuGiam = phoi.PhiMotChuyenTruyThu * (phoi.ChuyenTruyThu - Convert.ToInt16(soChuyenDuocDuyet));
+                        //phoi.PHI_Tong = phoi.PHI_Tong - phoi.PHI_TruyThuGiam;
                         phoi.NgayCapNhat = item.NgayDuyet;
                         
                         PhoiDal.Update(phoi);
@@ -59,7 +62,18 @@ public partial class lib_ajax_TruyThu_Default : basePage
                         item = TruyThuDal.Update(item);
                         // Duyệt toàn bộ chấm công
                         ChamCongDal.UpdateDuyetByTruyThuId(con, item.ID);
-                        
+
+                        var phoi = PhoiDal.SelectById(con, item.PHOI_ID);
+                        if (!string.IsNullOrEmpty(PHI_ConNo))
+                        {
+                            phoi.PHI_ConNo = Convert.ToDouble(PHI_ConNo);
+                        }
+                        if (!string.IsNullOrEmpty(PHI_Nop))
+                        {
+                            phoi.PHI_Nop = Convert.ToDouble(PHI_Nop);
+                        }
+                        phoi.NgayCapNhat = DateTime.Now;
+                        PhoiDal.Update(phoi);
 
 
                         var xvb = XeVaoBenDal.SelectByPhoiId(con, item.PHOI_ID);
@@ -111,7 +125,13 @@ public partial class lib_ajax_TruyThu_Default : basePage
                         item.NgayCapNhat = DateTime.Now;
                         item.TrangThai = 3;
                         item.Duyet = false;
+                        item.KienNghi = KienNghi;
                         item = TruyThuDal.Update(item);
+
+                        var phoi = PhoiDal.SelectById(item.PHOI_ID);
+                        phoi.PHI_TruyThuGiam = 0;
+                        phoi.NgayCapNhat = DateTime.Now;
+                        PhoiDal.Update(phoi);
 
                         var xvb = XeVaoBenDal.SelectByPhoiId(con, item.PHOI_ID);
                         xvb.TrangThai = 500;
@@ -134,7 +154,7 @@ public partial class lib_ajax_TruyThu_Default : basePage
                         item = TruyThuDal.Update(item);
                         // Xóa bỏ hết chấm công
                         ChamCongDal.DeleteByTruyThuId(item.ID);
-
+                        PhoiDal.DeleteById(item.PHOI_ID);
 
                         var xvb = XeVaoBenDal.SelectByPhoiId(con, item.PHOI_ID);
                         xvb.TrangThai = 200;

@@ -3,9 +3,6 @@ using System.Globalization;
 using System.Linq;
 using docsoft;
 using docsoft.entities;
-using linh.common;
-using linh.core.dal;
-using linh.json;
 
 public partial class lib_ajax_ThuNo_Default : basePage
 {
@@ -92,6 +89,7 @@ public partial class lib_ajax_ThuNo_Default : basePage
                     {
                         ThuNoChiTietDal.Insert(thuNoChiTiet);
                     }
+                    rendertext(item.ID.ToString());
                 }
                 rendertext("0");
                 break;

@@ -1,0 +1,1 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="KeToan.aspx.cs" Inherits="lib_ajax_ThuNo_KeToan" %>

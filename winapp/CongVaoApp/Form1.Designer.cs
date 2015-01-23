@@ -32,7 +32,6 @@
             this.imageBox1 = new Emgu.CV.UI.ImageBox();
             this.lblThoiGian = new System.Windows.Forms.Label();
             this.txtThoiGian = new System.Windows.Forms.TextBox();
-            this.imageBox2 = new Emgu.CV.UI.ImageBox();
             this.lblBienSo = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.cbxLoaiXe = new System.Windows.Forms.ComboBox();
@@ -51,11 +50,15 @@
             this.btnCapLenh = new System.Windows.Forms.Button();
             this.btnTraKhach = new System.Windows.Forms.Button();
             this.btnVangLLai = new System.Windows.Forms.Button();
+            this.picBienSo = new System.Windows.Forms.PictureBox();
+            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.timer2 = new System.Windows.Forms.Timer(this.components);
+            this.backgroundWorker4 = new System.ComponentModel.BackgroundWorker();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.imageBox2)).BeginInit();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox4)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox3)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picBienSo)).BeginInit();
             this.SuspendLayout();
             // 
             // imageBox1
@@ -86,15 +89,6 @@
             this.txtThoiGian.TabIndex = 0;
             this.txtThoiGian.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
-            // imageBox2
-            // 
-            this.imageBox2.BackColor = System.Drawing.Color.DarkGray;
-            this.imageBox2.Location = new System.Drawing.Point(676, 173);
-            this.imageBox2.Name = "imageBox2";
-            this.imageBox2.Size = new System.Drawing.Size(328, 93);
-            this.imageBox2.TabIndex = 2;
-            this.imageBox2.TabStop = false;
-            // 
             // lblBienSo
             // 
             this.lblBienSo.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
@@ -108,7 +102,7 @@
             // label1
             // 
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
-            this.label1.Location = new System.Drawing.Point(672, 279);
+            this.label1.Location = new System.Drawing.Point(672, 312);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(103, 27);
             this.label1.TabIndex = 10;
@@ -119,7 +113,7 @@
             // 
             this.cbxLoaiXe.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
             this.cbxLoaiXe.FormattingEnabled = true;
-            this.cbxLoaiXe.Location = new System.Drawing.Point(785, 279);
+            this.cbxLoaiXe.Location = new System.Drawing.Point(785, 312);
             this.cbxLoaiXe.Name = "cbxLoaiXe";
             this.cbxLoaiXe.Size = new System.Drawing.Size(219, 32);
             this.cbxLoaiXe.TabIndex = 2;
@@ -205,7 +199,7 @@
             // txtTien
             // 
             this.txtTien.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
-            this.txtTien.Location = new System.Drawing.Point(785, 335);
+            this.txtTien.Location = new System.Drawing.Point(785, 368);
             this.txtTien.Name = "txtTien";
             this.txtTien.Size = new System.Drawing.Size(219, 29);
             this.txtTien.TabIndex = 3;
@@ -214,7 +208,7 @@
             // lblTien
             // 
             this.lblTien.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
-            this.lblTien.Location = new System.Drawing.Point(672, 335);
+            this.lblTien.Location = new System.Drawing.Point(672, 368);
             this.lblTien.Name = "lblTien";
             this.lblTien.Size = new System.Drawing.Size(103, 27);
             this.lblTien.TabIndex = 18;
@@ -225,7 +219,7 @@
             // 
             this.btnCapLenh.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
             this.btnCapLenh.ForeColor = System.Drawing.Color.Black;
-            this.btnCapLenh.Location = new System.Drawing.Point(676, 385);
+            this.btnCapLenh.Location = new System.Drawing.Point(676, 418);
             this.btnCapLenh.Name = "btnCapLenh";
             this.btnCapLenh.Size = new System.Drawing.Size(99, 70);
             this.btnCapLenh.TabIndex = 4;
@@ -237,7 +231,7 @@
             // 
             this.btnTraKhach.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
             this.btnTraKhach.ForeColor = System.Drawing.Color.Black;
-            this.btnTraKhach.Location = new System.Drawing.Point(791, 385);
+            this.btnTraKhach.Location = new System.Drawing.Point(791, 418);
             this.btnTraKhach.Name = "btnTraKhach";
             this.btnTraKhach.Size = new System.Drawing.Size(99, 70);
             this.btnTraKhach.TabIndex = 5;
@@ -249,13 +243,37 @@
             // 
             this.btnVangLLai.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
             this.btnVangLLai.ForeColor = System.Drawing.Color.Black;
-            this.btnVangLLai.Location = new System.Drawing.Point(905, 385);
+            this.btnVangLLai.Location = new System.Drawing.Point(905, 418);
             this.btnVangLLai.Name = "btnVangLLai";
             this.btnVangLLai.Size = new System.Drawing.Size(99, 70);
             this.btnVangLLai.TabIndex = 6;
             this.btnVangLLai.Text = "Vãng lai (F10)";
             this.btnVangLLai.UseVisualStyleBackColor = true;
             this.btnVangLLai.Click += new System.EventHandler(this.btnVangLLai_Click);
+            // 
+            // picBienSo
+            // 
+            this.picBienSo.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.picBienSo.Location = new System.Drawing.Point(676, 175);
+            this.picBienSo.Name = "picBienSo";
+            this.picBienSo.Size = new System.Drawing.Size(328, 127);
+            this.picBienSo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.picBienSo.TabIndex = 19;
+            this.picBienSo.TabStop = false;
+            // 
+            // openFileDialog1
+            // 
+            this.openFileDialog1.FileName = "openFileDialog1";
+            // 
+            // timer2
+            // 
+            this.timer2.Interval = 1000;
+            this.timer2.Tick += new System.EventHandler(this.timer2_Tick);
+            // 
+            // backgroundWorker4
+            // 
+            this.backgroundWorker4.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker4_DoWork);
+            this.backgroundWorker4.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker4_RunWorkerCompleted);
             // 
             // Form1
             // 
@@ -264,6 +282,7 @@
             this.AutoSize = true;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(1016, 741);
+            this.Controls.Add(this.picBienSo);
             this.Controls.Add(this.btnVangLLai);
             this.Controls.Add(this.btnTraKhach);
             this.Controls.Add(this.btnCapLenh);
@@ -277,7 +296,6 @@
             this.Controls.Add(this.cbxLoaiXe);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.lblBienSo);
-            this.Controls.Add(this.imageBox2);
             this.Controls.Add(this.txtThoiGian);
             this.Controls.Add(this.lblThoiGian);
             this.Controls.Add(this.imageBox1);
@@ -286,10 +304,10 @@
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.imageBox1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.imageBox2)).EndInit();
             this.panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.imageBox4)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox3)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picBienSo)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -300,7 +318,6 @@
         private Emgu.CV.UI.ImageBox imageBox1;
         private System.Windows.Forms.Label lblThoiGian;
         private System.Windows.Forms.TextBox txtThoiGian;
-        private Emgu.CV.UI.ImageBox imageBox2;
         private System.Windows.Forms.Label lblBienSo;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox cbxLoaiXe;
@@ -319,6 +336,10 @@
         private System.Windows.Forms.Button btnCapLenh;
         private System.Windows.Forms.Button btnTraKhach;
         private System.Windows.Forms.Button btnVangLLai;
+        private System.Windows.Forms.PictureBox picBienSo;
+        private System.Windows.Forms.OpenFileDialog openFileDialog1;
+        private System.Windows.Forms.Timer timer2;
+        private System.ComponentModel.BackgroundWorker backgroundWorker4;
     }
 }
 

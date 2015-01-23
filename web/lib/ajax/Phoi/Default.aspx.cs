@@ -64,6 +64,8 @@ public partial class lib_ajax_Phoi_Default : basePage
         var PHI_ChiThuBenBai = Request["PHI_ChiThuBenBai"];
         var saveType = Request["saveType"];
         var hopLe = Request["hopLe"];
+        var Draff = Request["Draff"];
+        var YKienQuanLy = Request["YKienQuanLy"];
 
         XeTangCuong = !string.IsNullOrEmpty(XeTangCuong)
                       ? "true"
@@ -82,7 +84,8 @@ public partial class lib_ajax_Phoi_Default : basePage
 
         #endregion
 
-        var Inserted = string.IsNullOrEmpty(Id);
+        var Inserted = Convert.ToBoolean(Draff);
+        if (string.IsNullOrEmpty(saveType)) saveType = "";
 
         switch (subAct)
         {
@@ -94,8 +97,14 @@ public partial class lib_ajax_Phoi_Default : basePage
                 ////////////////////////////////////////
                 if (!loggedIn || !string.IsNullOrEmpty(STTBX) || !string.IsNullOrEmpty(XE_BienSo))
                 {
-                    var Item = Inserted ? PhoiDal.SelectLastest(Security.CqId.ToString()) : PhoiDal.SelectById(Convert.ToInt64(Id));
-                   
+                    var Item = Inserted
+                                   ? PhoiDal.SelectLastest(Security.CqId.ToString(), true)
+                                   : PhoiDal.SelectById(Convert.ToInt64(Id));
+
+                    if (Inserted && !string.IsNullOrEmpty(Id))
+                    {
+                        Item.ID = Convert.ToInt64(Id);
+                    }
                     if (!string.IsNullOrEmpty(NgayXuatBen))
                     {
                         Item.NgayXuatBen = Convert.ToDateTime(NgayXuatBen, new CultureInfo("vi-vn"));
@@ -169,23 +178,39 @@ public partial class lib_ajax_Phoi_Default : basePage
                     {
                         Item.PHI_Khac = Convert.ToDouble(PHI_Khac);
                     }
-                    if (!string.IsNullOrEmpty(PHI_Tong))
-                    {
-                        Item.PHI_Tong = Convert.ToDouble(PHI_Tong);
-                    }
-                    if (!string.IsNullOrEmpty(PHI_Nop))
-                    {
-                        Item.PHI_Nop = Convert.ToDouble(PHI_Nop);
-                    }
-                    if (!string.IsNullOrEmpty(PHI_ConNo))
-                    {
-                        Item.PHI_ConNo = Convert.ToDouble(PHI_ConNo);
-                    }
+                    
                     Item.PHI_ChiThuBenBai = Convert.ToBoolean(PHI_ChiThuBenBai);
                     Item.XeThayThe = Convert.ToBoolean(XeThayThe);
                     Item.XeTangCuong = Convert.ToBoolean(XeTangCuong);
                     Item.CQ_ID = Security.CqId;
-                    
+
+                    Item.PhiMotChuyenTruyThu = Item.PHI_ChiThuBenBai
+                                            ? Item.PHI_BenBai
+                                            : (Item.PHI_HoaHongBanVe + Item.PHI_BenBai);
+
+                    Item.NgayCapNhat = DateTime.Now;
+
+                    if (!string.IsNullOrEmpty(PHI_Tong))
+                    {
+                        Item.PHI_Tong = Convert.ToDouble(PHI_Tong);
+                    }
+                    // !imporant giả định là cứ cấp phơi mặc định nộp đủ
+                    if (!string.IsNullOrEmpty(PHI_Tong))
+                    {
+                        Item.PHI_Nop = Item.PHI_Tong;
+                    }
+                    //if (!string.IsNullOrEmpty(PHI_ConNo))
+                    //{
+                    //    Item.PHI_ConNo = Convert.ToDouble(PHI_ConNo);
+                    //}
+
+                    // Trong trường hợp chỉ tiến hành Truy thu
+                    if (saveType.ToLower().Contains("truythu"))
+                    {
+                        Item.PHI_Tong = Item.PhiMotChuyenTruyThu * Item.ChuyenTruyThu;
+                        Item.PHI_Nop = Item.PHI_Tong;
+                    }
+                    Item.Draff = false;
 
                     if (Inserted)
                     {
@@ -194,22 +219,23 @@ public partial class lib_ajax_Phoi_Default : basePage
                         Item.RowId = Guid.NewGuid();
                         //Update Ca làm việc
                         var giaoCa = GiaoCaDal.Current(Security.CqId, Security.Username);
-                        Item.GIAOCA_ID = giaoCa.ID;                        
+                        Item.GIAOCA_ID = giaoCa.ID;
                         giaoCa.TongSoPhoi += 1;
                         giaoCa.DoanhThu += Item.PHI_Tong;
                         giaoCa.NgayCapNhat = DateTime.Now;
                         GiaoCaDal.Update(giaoCa);
 
                     }
+                    Item = PhoiDal.Update(Item);
 
-                    Item.NgayCapNhat = DateTime.Now;
-                    Item = Inserted ? PhoiDal.Insert(Item) : PhoiDal.Update(Item);
+                   
+
+                    
 
                     var chamCong = new ChamCong();
 
                     if (Inserted)
                     {
-                        if (string.IsNullOrEmpty(saveType)) saveType = "";
                         if (!saveType.ToLower().Contains("truythu")) // Trong trường hợp không truy thu
                         {
                             // Thêm chấm công mới
@@ -220,184 +246,80 @@ public partial class lib_ajax_Phoi_Default : basePage
                             chamCong.Ngay = new DateTime(Item.NgayXuatBen.Year, Item.NgayXuatBen.Month, Item.NgayXuatBen.Day);
                             chamCong.PHOI_ID = Item.ID;
                             chamCong.XE_ID = Item.XE_ID;
-
+                            chamCong.CQ_ID = Security.CqId;
                             chamCong.TrangThaiNo = 0;                            
                             chamCong.NgayCapNhat = DateTime.Now;
                             chamCong.Username = Security.Username;
                             chamCong.NgayTao = DateTime.Now;
                             chamCong.RowId = Guid.NewGuid();
-                            chamCong = ChamCongDal.Insert(chamCong);
+                            chamCong.Draff = false;
+                            ChamCongDal.Insert(chamCong);
                         }
                     }
-                    var truyThu = new TruyThu();
                     var idTruyThuNull = string.IsNullOrEmpty(TRUYTHU_ID);
-
-                    if (idTruyThuNull)
+                    var truyThu = idTruyThuNull ? TruyThuDal.SelectLastest(Security.CqId) : TruyThuDal.SelectById(Convert.ToInt64(TRUYTHU_ID));
+                    if (!string.IsNullOrEmpty(DANHGIA_ID))
                     {
-                        #region tạo mới truy thu
-                        if (!string.IsNullOrEmpty(NgayChamCong))
-                        {
-                            truyThu = TruyThuDal.SelectLastest(Security.CqId);
-                            if (!string.IsNullOrEmpty(DANHGIA_ID))
-                            {
-                                truyThu.DANHGIA_ID = new Guid(DANHGIA_ID);
-                            }
-                            if (!string.IsNullOrEmpty(NOIDUNG_ID))
-                            {
-                                truyThu.NOIDUNG_ID = new Guid(NOIDUNG_ID);
-                            }
-                            if (!string.IsNullOrEmpty(SoChuyenDeNghi))
-                            {
-                                truyThu.SoChuyenDeNghi = Convert.ToInt16(SoChuyenDeNghi);
-                            }
+                        truyThu.DANHGIA_ID = new Guid(DANHGIA_ID);
+                    }
+                    if (!string.IsNullOrEmpty(NOIDUNG_ID))
+                    {
+                        truyThu.NOIDUNG_ID = new Guid(NOIDUNG_ID);
+                    }
+                    if (!string.IsNullOrEmpty(SoChuyenDeNghi))
+                    {
+                        truyThu.SoChuyenDeNghi = Convert.ToInt16(SoChuyenDeNghi);
+                    }
 
-
-                            truyThu.SoChuyenThieu = Item.ChuyenTruyThu;
-                            truyThu.TongTruyThu = Item.PHI_ChuyenTruyThu;
-                            truyThu.Duyet = truyThu.SoChuyenDeNghi == 0;                                
-                            truyThu.CQ_ID = Security.CqId;
-                            truyThu.PHOI_ID = Item.ID;
-                            truyThu.DeNghiCuaNhaXe = DeNghiCuaNhaXe;
-                            truyThu.PHOI_ID = Item.ID;
-                            truyThu.XE_ID = Item.XE_ID;
-                            truyThu.DeNghi = truyThu.SoChuyenDeNghi != 0;
-                            if (truyThu.DeNghi)
-                            {
-                                truyThu.TrangThai = 1;
-                            }
-                            else
-                            {
-                                truyThu.TrangThai = 0;
-                            }
-                            truyThu.NgayCapNhat = DateTime.Now;
-                            truyThu.Username = Security.Username;
-                            truyThu.NgayTao = DateTime.Now;
-                            truyThu.RowId = Guid.NewGuid();
-                            truyThu.NguoiLap = Security.Username;
-                            truyThu = TruyThuDal.Insert(truyThu);
-
-                            var ngayChamCongArray = NgayChamCong.Split(new char[] { ',' });
-                            foreach (var NgayDuyetTruyThuDate in from NgayDuyetTruyThu in ngayChamCongArray
-                                                                 where NgayDuyetTruyThu.Length > 2
-                                                                 select Convert.ToDateTime(NgayDuyetTruyThu,
-                                                                                           new CultureInfo("Vi-vn")))
-                            {
-                                chamCong = new ChamCong();
-                                if (truyThu.DeNghi)
-                                {
-                                    chamCong.Loai = 3;
-                                    chamCong.Duyet = false;
-                                    chamCong.TrangThaiNo = 1;
-                                }
-                                else
-                                {
-                                    chamCong.Loai = 2;
-                                    chamCong.Duyet = true;
-                                    chamCong.TrangThaiNo = 0;
-                                }
-
-                                chamCong.Tien = Item.PHI_ChiThuBenBai
-                                                    ? Item.PHI_BenBai
-                                                    : (Item.PHI_HoaHongBanVe + Item.PHI_BenBai);
-
-                                chamCong.Ngay = new DateTime(NgayDuyetTruyThuDate.Year, NgayDuyetTruyThuDate.Month, NgayDuyetTruyThuDate.Day);
-                                chamCong.PHOI_ID = Item.ID;
-                                chamCong.XE_ID = Item.XE_ID;
-                                chamCong.TRUYTHU_ID = truyThu.ID;
-
-                                chamCong.NgayCapNhat = DateTime.Now;
-                                chamCong.Username = Security.Username;
-                                chamCong.NgayTao = DateTime.Now;
-                                chamCong.RowId = Guid.NewGuid();
-                                chamCong = ChamCongDal.Insert(chamCong);
-                            }
-
-
-                        }
-                        #endregion
+                    truyThu.SoChuyenThieu = Item.ChuyenTruyThu;
+                    truyThu.TongTruyThu = Item.PHI_ChuyenTruyThu;
+                    truyThu.Duyet = truyThu.SoChuyenDeNghi == 0;
+                    truyThu.CQ_ID = Security.CqId;
+                    truyThu.PHOI_ID = Item.ID;
+                    truyThu.DeNghiCuaNhaXe = DeNghiCuaNhaXe;
+                    truyThu.PHOI_ID = Item.ID;
+                    truyThu.XE_ID = Item.XE_ID;
+                    truyThu.DeNghi = truyThu.SoChuyenDeNghi != 0;
+                    truyThu.YKienQuanLy = YKienQuanLy;
+                    if (truyThu.DeNghi)
+                    {
+                        truyThu.TrangThai = 1;
                     }
                     else
                     {
-                        #region cập nhật truy thu
-                        if (!string.IsNullOrEmpty(NgayChamCong))
-                        {
-                            truyThu = TruyThuDal.SelectById(Convert.ToInt64(TRUYTHU_ID));
-                            if (!string.IsNullOrEmpty(DANHGIA_ID))
-                            {
-                                truyThu.DANHGIA_ID = new Guid(DANHGIA_ID);
-                            }
-                            if (!string.IsNullOrEmpty(NOIDUNG_ID))
-                            {
-                                truyThu.NOIDUNG_ID = new Guid(NOIDUNG_ID);
-                            }
-                            if (!string.IsNullOrEmpty(SoChuyenDeNghi))
-                            {
-                                truyThu.SoChuyenDeNghi = Convert.ToInt16(SoChuyenDeNghi);
-                            }
-                            truyThu.SoChuyenThieu = Item.ChuyenTruyThu;
-                            truyThu.TongTruyThu = Item.PHI_ChuyenTruyThu;
-                            truyThu.DeNghiCuaNhaXe = DeNghiCuaNhaXe;
-                            truyThu.PHOI_ID = Item.ID;
-                            truyThu.XE_ID = Item.XE_ID;
-                            truyThu.DeNghi = truyThu.SoChuyenDeNghi != 0;
-                            if (truyThu.DeNghi)
-                            {
-                                truyThu.TrangThai = 1;
-                            }
-                            else
-                            {
-                                truyThu.TrangThai = 0;
-                            }
-                            truyThu.Duyet = false;
-                            truyThu.NgayCapNhat = DateTime.Now;
-                            truyThu = TruyThuDal.Update(truyThu);
-                            ChamCongDal.DeleteByTruyThuId(Convert.ToInt64(TRUYTHU_ID));
-
-                            var ngayChamCongArray = NgayChamCong.Split(new char[] { ',' });
-                            foreach (var ngayDuyetTruyThuDate in from NgayDuyetTruyThu in ngayChamCongArray
-                                                                 where NgayDuyetTruyThu.Length > 2
-                                                                 select Convert.ToDateTime(NgayDuyetTruyThu,
-                                                                                           new CultureInfo("Vi-vn")))
-                            {
-                                chamCong = new ChamCong();
-                                if (truyThu.DeNghi)
-                                {
-                                    chamCong.Loai = 3;
-                                    chamCong.Duyet = false;
-                                    chamCong.TrangThaiNo = 1;
-                                }
-                                else
-                                {
-                                    chamCong.Loai = 2;
-                                    chamCong.Duyet = true;
-                                    chamCong.TrangThaiNo = 0;
-                                }
-                                chamCong.Tien = Item.PHI_ChiThuBenBai
-                                                    ? Item.PHI_BenBai
-                                                    : (Item.PHI_HoaHongBanVe + Item.PHI_BenBai);
-                                chamCong.Duyet = false;
-                                chamCong.Ngay = new DateTime(ngayDuyetTruyThuDate.Year, ngayDuyetTruyThuDate.Month, ngayDuyetTruyThuDate.Day);
-                                chamCong.PHOI_ID = Item.ID;
-                                chamCong.XE_ID = Item.XE_ID;
-                                chamCong.TRUYTHU_ID = truyThu.ID;
-
-                                chamCong.NgayCapNhat = DateTime.Now;
-                                chamCong.Username = Security.Username;
-                                chamCong.NgayTao = DateTime.Now;
-                                chamCong.RowId = Guid.NewGuid();
-                                chamCong = ChamCongDal.Insert(chamCong);
-                            }
-                        }
-                        else
-                        {
-                            TruyThuDal.DeleteById(Convert.ToInt64(TRUYTHU_ID));
-                            ChamCongDal.DeleteByTruyThuId(Convert.ToInt64(TRUYTHU_ID));
-
-                        }
-
-                        #endregion
-                        
+                        truyThu.TrangThai = 0;
                     }
+                    truyThu.NgayCapNhat = DateTime.Now;
+                    
+
+                    if(idTruyThuNull)
+                    {
+                        truyThu.Username = Security.Username;
+                        truyThu.NgayTao = DateTime.Now;
+                        truyThu.RowId = Guid.NewGuid();
+                        truyThu.NguoiLap = Security.Username;
+                        truyThu = TruyThuDal.Insert(truyThu);
+                    }
+                    else
+                    {
+                        truyThu = TruyThuDal.Update(truyThu);
+                        ChamCongDal.DeleteByTruyThuId(Convert.ToInt64(TRUYTHU_ID));
+                    }
+
+
+                    var chamCongByPhoiId = ChamCongDal.SelectByPhoiId(Item.ID);
+                    foreach (var item in chamCongByPhoiId)
+                    {
+                        item.Tien = Item.PhiMotChuyenTruyThu;
+                        item.XE_ID = Item.XE_ID;
+                        item.TRUYTHU_ID = truyThu.ID;
+                        item.NgayCapNhat = DateTime.Now;
+                        //item.Draff = false;
+                        ChamCongDal.Update(item);
+                    }
+                    
+
+                    
                     // Xử lý phần XeVaoBen
                     if (!string.IsNullOrEmpty(XVB_ID))
                     {
@@ -407,20 +329,16 @@ public partial class lib_ajax_Phoi_Default : basePage
                         xvb.PHOI_ID = Item.ID;
                         xvb.Tien = Item.PHI_Tong;
                         xvb.TrangThai = 400;
-                        if (!string.IsNullOrEmpty(NgayChamCong)) // Có phát sinh truy thu
+                        if (truyThu.SoChuyenDeNghi > 0 && !truyThu.Duyet) // Có đề nghị truy thu và truy thu này chưa duyệt
                         {
-                            if (truyThu.SoChuyenDeNghi > 0 && !truyThu.Duyet) // Có đề nghị truy thu và truy thu này chưa duyệt
-                            {
-                                xvb.TrangThai = 500; // Chờ duyệt truy thu
-                            }
-                            xvb.TRUYTHU_ID = truyThu.ID;
+                            xvb.TrangThai = 500; // Chờ duyệt truy thu
                         }
-                        xvb = XeVaoBenDal.Update(xvb);
+                        xvb.TRUYTHU_ID = truyThu.ID;
+                        XeVaoBenDal.Update(xvb);
                     }
                     else
                     {
-                        var xvb = new XeVaoBen();
-                        xvb.TrangThai = 400;
+                        var xvb = new XeVaoBen {TrangThai = 400};
                         xvb.NgayDuyetPhoi = xvb.NgayCapNhat = DateTime.Now;
                         xvb.NguoiDuyetPhoi = Security.Username;
                         xvb.PHOI_ID = Item.ID;
@@ -430,15 +348,12 @@ public partial class lib_ajax_Phoi_Default : basePage
                         xvb.CQ_ID = Security.CqId;
                         xvb.TrangThai = 400;
                         xvb.Tien = Item.PHI_Tong;
-                        if (!string.IsNullOrEmpty(NgayChamCong)) // Có phát sinh truy thu
+                        if (truyThu.SoChuyenDeNghi > 0 && !truyThu.Duyet) // Có đề nghị truy thu và truy thu này chưa duyệt
                         {
-                            if (truyThu.SoChuyenDeNghi > 0 && !truyThu.Duyet) // Có đề nghị truy thu và truy thu này chưa duyệt
-                            {
-                                xvb.TrangThai = 500; // Chờ duyệt truy thu
-                            }
-                            xvb.TRUYTHU_ID = truyThu.ID;
+                            xvb.TrangThai = 500; // Chờ duyệt truy thu
                         }
-                        xvb = XeVaoBenDal.Insert(xvb);
+                        xvb.TRUYTHU_ID = truyThu.ID;
+                        XeVaoBenDal.Insert(xvb);
                     }
                     rendertext(Item.ID.ToString());
                 }

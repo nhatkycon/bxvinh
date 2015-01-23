@@ -29,7 +29,7 @@
             }
         }
 
-        //PrintWindow();
+        PrintWindow();
 </script>
 </body>
 </html>

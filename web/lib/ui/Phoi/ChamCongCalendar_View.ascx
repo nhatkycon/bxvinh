@@ -4,7 +4,6 @@
 <p>
     <strong class="BIEUDO_Ten">
         <%=LoaiBieuDo.Ten %> 
-        
         <%=SoChuyenNo==0 ? "" : string.Format(": Còn nợ <a href=\"/lib/pages/ThuNo/Add.aspx?XE_ID={1}\">{0}</a> chuyến",SoChuyenNo, Item.XE_ID) %>
     </strong>
 </p>

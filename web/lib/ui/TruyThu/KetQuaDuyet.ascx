@@ -117,9 +117,7 @@
                         Số chuyến được duyệt:
                     </label>
                     <div class="col-sm-4">
-                        <p class="form-control-static">
-                            <%=Item.SoChuyenDuocDuyet == 0 ? "" :Item.SoChuyenDuocDuyet.ToString() %>
-                        </p>
+                        <p class="form-control-static SoChuyenDuocDuyet"><%=Item.SoChuyenDuocDuyet == 0 ? "" :Item.SoChuyenDuocDuyet.ToString() %></p>
                     </div>              
                 </div>
                 <div class="form-group">
@@ -130,10 +128,16 @@
                         <textarea id="YKienChiDao" type="text" rows="3" class="form-control"><%=Item.YKienChiDao %></textarea>
                     </div>              
                 </div>
-                <%if(Item.TrangThai==4 && Item.Duyet){ %>
-                    <hr/>
-                    <uc1:TruyThuKetQuaDuyetList runat="server" ID="TruyThuKetQuaDuyetList" />
-                <%} %>
+                <hr/>
+                <div class="form-group">
+                    <label for="KienNghi" class="col-sm-2 control-label">
+                        Kiến nghị từ nhà xe:
+                    </label>
+                    <div class="col-sm-4">
+                        <textarea id="KienNghi" type="text" name="KienNghi" rows="3" class="form-control"><%=Item.KienNghi %></textarea>
+                    </div>              
+                </div>
+                <uc1:TruyThuKetQuaDuyetList runat="server" ID="TruyThuKetQuaDuyetList" />
             <%if(Item.Duyet){ %>
                 <div class="help-block">
                     <div class="well well-sm">

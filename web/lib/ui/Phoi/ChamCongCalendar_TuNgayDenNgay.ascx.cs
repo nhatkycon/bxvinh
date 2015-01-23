@@ -53,81 +53,120 @@ public partial class lib_ui_Phoi_ChamCongCalendar_TuNgayDenNgay : System.Web.UI.
 
     public DateTime TuNgay { get; set; }
     public DateTime DenNgay { get; set; }
-
+    /// <summary>
+    /// Hiển thị đầy đủ lịch
+    /// </summary>
+    public bool ShowFullMonth { get; set; }
     protected void Page_Load(object sender, EventArgs e)
     {
         if (ListChamCong == null || ListChamCongCurrent == null) return;
-        ListChamCong = ListChamCong.Where(x => x.TrangThaiNo != 1).ToList();
+        ListChamCong = ListChamCong;
         Today = string.IsNullOrEmpty(NgayXuatBen)
                     ? DateTime.Now
                     : Convert.ToDateTime(NgayXuatBen, new CultureInfo("Vi-vn"));
 
         SoChuyenNo = ListChamCong.Count(x => x.TrangThaiNo == 1);
-        //TuNgay=new DateTime(2014,7,13);
-        //DenNgay = new DateTime(2014, 11, 10);
+        if (ListChamCong.Any() && !ShowFullMonth)
+        {
+            TuNgay = ListChamCong.Last().Ngay;
+        }
 
-        var TuNgayDauThang = new DateTime(TuNgay.Year, TuNgay.Month, 1);
-        var TuNgayCuoiThang = new DateTime(TuNgay.Year, TuNgay.Month, 1).AddMonths(1).AddDays(-1);
-        var DenNgayCuoiThang = new DateTime(DenNgay.Year, DenNgay.Month, 1).AddMonths(1).AddDays(-1);
+        var tuNgayDauThang = new DateTime(TuNgay.Year, TuNgay.Month, 1);
+        var denNgayCuoiThang = new DateTime(DenNgay.Year, DenNgay.Month, 1).AddMonths(1).AddDays(-1);
        
+        
         
         var listCanTruyThu = ListCanTruyThu(ListChamCong, LoaiBieuDo);
         Thangs = new List<ListThang>();
         var listNgay = new List<LichItem>();
-
-        for (var xDay = TuNgayDauThang; xDay <= DenNgayCuoiThang; xDay = xDay.AddMonths(1))
+        var listNgayTangCuong = new List<LichItem>();
+        var item = new LichItem();
+        for (var xDay = tuNgayDauThang; xDay <= denNgayCuoiThang; xDay = xDay.AddMonths(1))
         {
             var xNgayCuoiThang = new DateTime(xDay.Year, xDay.Month, 1).AddMonths(1);
             listNgay=new List<LichItem>();
+            listNgayTangCuong=new List<LichItem>();
             for (var d = xDay; d < xNgayCuoiThang; d = d.AddDays(1))
             {
-                var chamCongList = ListChamCong.Where(x => x.Ngay == d);
-                var item = new LichItem { Day = d };
-                // Chỉ tính chấm công đã trả nợ 
-                var chamCongs = chamCongList as List<ChamCong> ?? chamCongList.ToList();
+                var chamCongBinhThuong = ListChamCong.FirstOrDefault(x => x.Ngay == d && !x.TangCuong);
+                var chamCongTangCuong = ListChamCong.FirstOrDefault(x => x.Ngay == d && x.TangCuong);
                 var itemCanTruyThu = listCanTruyThu.FirstOrDefault(x => x.Day == d);
+                var chamCongsCurrentBinhThuong = ListChamCongCurrent.FirstOrDefault(x => x.Ngay == d && !x.TangCuong);
+                var chamCongsCurrentTangCuong = ListChamCongCurrent.FirstOrDefault(x => x.Ngay == d && x.TangCuong);
 
+                item = new LichItem { Day = d };
+                item.Clickable = true;
+
+                // Chỉ tính chấm công đã trả nợ 
                 if (itemCanTruyThu != null)
                 {
-                    item.KieuChamCong = 4;
+                    item.KieuChamCong = 7;
                 }
 
-                if (chamCongs.Any())
+                if (chamCongBinhThuong !=null)
                 {
-                    var chamCongsItem = chamCongs[0];
                     // Xác định chấm công này đã được lãnh đạo duyệt hay chưa
-                    var kieuChamCong = chamCongsItem.Loai != 3 ? chamCongsItem.Loai : (chamCongsItem.Duyet ? 3 : 5);
-                    item.List.AddRange(chamCongs);
+                    var kieuChamCong = chamCongBinhThuong.Loai != 3 ? chamCongBinhThuong.Loai : (chamCongBinhThuong.Duyet ? 3 : 5);
+                    if(chamCongBinhThuong.TrangThaiNo==1)
+                    {
+                        kieuChamCong = 6;
+                    }
+                    item.Item = chamCongBinhThuong;
                     item.KieuChamCong = kieuChamCong;
-                    item.SoChuyen = chamCongs.Count;
-                    item.GhiChu = chamCongs[0].GhiChu;
-                    item.TangCuong = chamCongs[0].TangCuong;
+                    item.SoChuyen = 1;
+                    item.GhiChu = chamCongBinhThuong.GhiChu;
+                    item.TangCuong = chamCongBinhThuong.TangCuong;
+                    item.Clickable = false;
                 }
-
-                var chamCongsCurrent = ListChamCongCurrent.Where(x => x.Ngay == d).ToList();
-                if (chamCongsCurrent.Any())
+                if (chamCongsCurrentBinhThuong != null)
                 {
-                    item.List.AddRange(chamCongsCurrent);
-                    item.KieuChamCong = chamCongsCurrent[0].Loai;
-                    item.SoChuyen += chamCongsCurrent.Count;
-                    item.TRUYTHU_ID = chamCongsCurrent[0].TRUYTHU_ID;
-                    item.PHOI_ID = chamCongsCurrent[0].PHOI_ID;
-                    item.TangCuong = chamCongsCurrent[0].TangCuong;
+                    item.Item = chamCongsCurrentBinhThuong;
+                    item.KieuChamCong = chamCongsCurrentBinhThuong.Loai;
+                    item.SoChuyen += 1;
+                    item.TRUYTHU_ID = chamCongsCurrentBinhThuong.TRUYTHU_ID;
+                    item.PHOI_ID = chamCongsCurrentBinhThuong.PHOI_ID;
+                    item.TangCuong = chamCongsCurrentBinhThuong.TangCuong;
                     item.Clickactive = true;
                 }
-
-
                 listNgay.Add(item);
+
+                item = new LichItem() { Day = d };
+                item.Clickable = true;
+                if (chamCongTangCuong != null)
+                {
+                    // Xác định chấm công này đã được lãnh đạo duyệt hay chưa
+                    var kieuChamCong = chamCongTangCuong.Loai != 3 ? chamCongTangCuong.Loai : (chamCongTangCuong.Duyet ? 3 : 5);
+                    if (chamCongTangCuong.TrangThaiNo == 1)
+                    {
+                        kieuChamCong = 6;
+                    }
+                    item.Item = chamCongTangCuong;
+                    item.KieuChamCong = kieuChamCong;
+                    item.SoChuyen = 1;
+                    item.GhiChu = chamCongTangCuong.GhiChu;
+                    item.TangCuong = chamCongTangCuong.TangCuong;
+                    item.Clickable = false;
+                }
+                //Ngày chấm công hiện tại
+                if (chamCongsCurrentTangCuong != null)
+                {
+                    item.Item = chamCongsCurrentTangCuong;
+                    item.KieuChamCong = chamCongsCurrentTangCuong.Loai;
+                    item.SoChuyen += 1;
+                    item.TRUYTHU_ID = chamCongsCurrentTangCuong.TRUYTHU_ID;
+                    item.PHOI_ID = chamCongsCurrentTangCuong.PHOI_ID;
+                    item.TangCuong = chamCongsCurrentTangCuong.TangCuong;
+                    item.Clickactive = true;
+                }
+                listNgayTangCuong.Add(item);
             }
 
             Thangs.Add(new ListThang()
             {
-                Ngay = listNgay
-                ,
-                Thang = xDay.Month
-                ,
-                Tong = listNgay.Sum(x => x.SoChuyen)
-                ,
+                Ngay = listNgay,
+                NgayTangCuong = listNgayTangCuong,
+                Thang = xDay.Month,
+                Tong = listNgay.Sum(x => x.SoChuyen),
                 TongBieuDo = TongSoChuyeBieuDo(LoaiBieuDo, xDay.Year, xDay.Month)
             });
         }
@@ -158,7 +197,7 @@ public partial class lib_ui_Phoi_ChamCongCalendar_TuNgayDenNgay : System.Web.UI.
     /// <summary>
     /// Tính số ngày cần truy thu tính từ ngày chấm công (truy thu) cuối cùng đến ngày hôm nay
     /// </summary>
-    /// <param name="ngayChamCongCuoiCung">Ngày chấm công (truy thu) cuối cùng</param>
+    /// <param name="chamCongList"> Danh sách chấm công </param>
     /// <param name="loaiBieuDo">Loại biểu đồ</param>
     /// <returns>Danh sách ngày cần truy thu dựa vào loại biểu đồ</returns>
     public List<LichItem> ListCanTruyThu(List<ChamCong> chamCongList, LoaiBieuDo loaiBieuDo)

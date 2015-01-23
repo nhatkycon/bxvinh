@@ -45,8 +45,12 @@
             this.backgroundWorker2 = new System.ComponentModel.BackgroundWorker();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.lblTrangThai = new System.Windows.Forms.Label();
+            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.picBienSo = new System.Windows.Forms.PictureBox();
+            this.timer2 = new System.Windows.Forms.Timer(this.components);
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picBienSo)).BeginInit();
             this.SuspendLayout();
             // 
             // drlBienSo
@@ -93,7 +97,7 @@
             // txtTien
             // 
             this.txtTien.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
-            this.txtTien.Location = new System.Drawing.Point(785, 176);
+            this.txtTien.Location = new System.Drawing.Point(785, 308);
             this.txtTien.Name = "txtTien";
             this.txtTien.Size = new System.Drawing.Size(219, 29);
             this.txtTien.TabIndex = 3;
@@ -102,7 +106,7 @@
             // lblTien
             // 
             this.lblTien.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
-            this.lblTien.Location = new System.Drawing.Point(672, 176);
+            this.lblTien.Location = new System.Drawing.Point(708, 310);
             this.lblTien.Name = "lblTien";
             this.lblTien.Size = new System.Drawing.Size(103, 27);
             this.lblTien.TabIndex = 21;
@@ -123,7 +127,7 @@
             // txtGioVao
             // 
             this.txtGioVao.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
-            this.txtGioVao.Location = new System.Drawing.Point(785, 135);
+            this.txtGioVao.Location = new System.Drawing.Point(785, 267);
             this.txtGioVao.Name = "txtGioVao";
             this.txtGioVao.Size = new System.Drawing.Size(219, 29);
             this.txtGioVao.TabIndex = 2;
@@ -132,7 +136,7 @@
             // lblGioVao
             // 
             this.lblGioVao.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
-            this.lblGioVao.Location = new System.Drawing.Point(672, 135);
+            this.lblGioVao.Location = new System.Drawing.Point(672, 267);
             this.lblGioVao.Name = "lblGioVao";
             this.lblGioVao.Size = new System.Drawing.Size(103, 27);
             this.lblGioVao.TabIndex = 23;
@@ -143,7 +147,7 @@
             // 
             this.btnMoCong.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
             this.btnMoCong.ForeColor = System.Drawing.Color.Black;
-            this.btnMoCong.Location = new System.Drawing.Point(676, 227);
+            this.btnMoCong.Location = new System.Drawing.Point(676, 359);
             this.btnMoCong.Name = "btnMoCong";
             this.btnMoCong.Size = new System.Drawing.Size(328, 70);
             this.btnMoCong.TabIndex = 4;
@@ -172,19 +176,38 @@
             // 
             // lblTrangThai
             // 
-            this.lblTrangThai.AutoSize = true;
             this.lblTrangThai.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
             this.lblTrangThai.ForeColor = System.Drawing.Color.Red;
-            this.lblTrangThai.Location = new System.Drawing.Point(676, 304);
+            this.lblTrangThai.Location = new System.Drawing.Point(675, 436);
             this.lblTrangThai.Name = "lblTrangThai";
-            this.lblTrangThai.Size = new System.Drawing.Size(0, 20);
+            this.lblTrangThai.Size = new System.Drawing.Size(332, 20);
             this.lblTrangThai.TabIndex = 25;
+            // 
+            // openFileDialog1
+            // 
+            this.openFileDialog1.FileName = "openFileDialog1";
+            // 
+            // picBienSo
+            // 
+            this.picBienSo.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.picBienSo.Location = new System.Drawing.Point(676, 132);
+            this.picBienSo.Name = "picBienSo";
+            this.picBienSo.Size = new System.Drawing.Size(328, 127);
+            this.picBienSo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.picBienSo.TabIndex = 26;
+            this.picBienSo.TabStop = false;
+            // 
+            // timer2
+            // 
+            this.timer2.Interval = 1000;
+            this.timer2.Tick += new System.EventHandler(this.timer2_Tick);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1016, 741);
+            this.Controls.Add(this.picBienSo);
             this.Controls.Add(this.lblTrangThai);
             this.Controls.Add(this.imageBox1);
             this.Controls.Add(this.btnMoCong);
@@ -203,6 +226,7 @@
             this.Load += new System.EventHandler(this.Form1_Load);
             this.panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.imageBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picBienSo)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -225,6 +249,9 @@
         private System.ComponentModel.BackgroundWorker backgroundWorker2;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Label lblTrangThai;
+        private System.Windows.Forms.OpenFileDialog openFileDialog1;
+        private System.Windows.Forms.PictureBox picBienSo;
+        private System.Windows.Forms.Timer timer2;
     }
 }
 

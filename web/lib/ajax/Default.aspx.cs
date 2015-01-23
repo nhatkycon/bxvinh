@@ -16,6 +16,7 @@ public partial class lib_ajax_Default : BasedPage
             case "Logout":
                 #region logout this system
                 Security.LogOut();
+                Session["GiaoCa-Current"] = null;
                 break;
                 #endregion
             default:break;

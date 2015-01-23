@@ -63,6 +63,7 @@ public partial class lib_ajax_XeVaoBen_Default : basePage
             case "GetYeuCauThanhToan":
                 if (loggedIn)
                 {
+
                     var list = XeVaoBenDal.ListTsChoThanhToan(DAL.con(), Security.CqId, 100).OrderByDescending(x => x.TrangThai).
                             ThenByDescending(x => x.ID).ToList();
                     if (list.Any())
@@ -79,6 +80,7 @@ public partial class lib_ajax_XeVaoBen_Default : basePage
             case "ListDuyetDeNghiTruyThu":
                 if (loggedIn)
                 {
+
                     var list = XeVaoBenDal.ListTruyThu(DAL.con(), Security.CqId, 100).OrderByDescending(x => x.TrangThai).
                             ThenByDescending(x => x.ID).ToList();
                     if (list.Any())
@@ -97,7 +99,7 @@ public partial class lib_ajax_XeVaoBen_Default : basePage
                 {
                     var list =
                         XeVaoBenDal.ListTsLenPhoi(DAL.con(), Security.CqId, 100).OrderByDescending(x => x.TrangThai).
-                            ThenByDescending(x => x.ID).ToList();
+                            ThenByDescending(x => x.XE_GioXuatBen).ToList();
                     if(!list.Any())
                     {
                         rendertext("");
@@ -111,7 +113,16 @@ public partial class lib_ajax_XeVaoBen_Default : basePage
                 {
                     var item = XeVaoBenDal.SelectById(Convert.ToInt64(Id));
                     item.TrangThai = 200;
-                    item.NgayYeuCauXuLy = DateTime.Now;
+                    item.NgayYeuCauXuLy = item.NgayCapNhat = DateTime.Now;
+                    item = XeVaoBenDal.Update(item);
+                }
+                break;
+            case "YeuCauXuatBen":
+                if (!string.IsNullOrEmpty(Id))
+                {
+                    var item = XeVaoBenDal.SelectById(Convert.ToInt64(Id));
+                    item.TrangThai = 820;
+                    item.NgayCapNhat = DateTime.Now;
                     item = XeVaoBenDal.Update(item);
                 }
                 break;
@@ -174,6 +185,7 @@ public partial class lib_ajax_XeVaoBen_Default : basePage
             case "GetCurrentThuCapPhoi":
                 if (loggedIn)
                 {
+
                     var item = XeVaoBenDal.ListByCurrentThuCapPhoiByUser(DAL.con(), Security.CqId, Security.Username).FirstOrDefault();
                     if (item != null)
                     {

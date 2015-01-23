@@ -2,8 +2,8 @@
 var pmLatestLoadedTimeOut = 2000;
 var _lastXhr;
 var dangCapPhoi = false;
-var globalTimeout = 10000;
-
+var globalTimeout = 1000;
+var xeLenPhoiHolder = false;
 jQuery(function () {
     $('#__VIEWSTATE').remove();
     window.defaultOnError = window.onerror;
@@ -67,7 +67,7 @@ var bxVinhFn = {
                 return string.replace(new RegExp(escapeRegExp(find), 'g'), replace);
             }
 
-            return replaceAll(tien, ',', '');
+            return parseInt(replaceAll(tien, ',', ''));
         }
         , formatTien: function (obj) {
             // Format while typing & warn on decimals entered, no cents
@@ -163,9 +163,26 @@ var bxVinhFn = {
     ,url : {
         login: '/lib/ajax/login/default.aspx'
         , donVi: '/lib/ajax/DonVi/default.aspx'
+        , chamCong: '/lib/ajax/ChamCong/default.aspx'
+        , xeVaoBen: '/lib/ajax/XeVaoBen/default.aspx'
+        , giaoCa: '/lib/ajax/GiaoCa/default.aspx'
     }
     , normalFormFn: {
         init: function () {
+            
+            bxVinhFn.normalFormFn.commonFn();
+            bxVinhFn.normalFormFn.add();
+            bxVinhFn.normalFormFn.headerFn();
+            bxVinhFn.normalFormFn.addPhoi();
+            bxVinhFn.normalFormFn.XeVaoBenTodayList();
+            bxVinhFn.normalFormFn.XeChoThanhToanList();
+            bxVinhFn.normalFormFn.XeDaThanhToanList();
+            bxVinhFn.normalFormFn.addTruyThuFn();
+            bxVinhFn.normalFormFn.addThuCapPhoiFn();
+            bxVinhFn.normalFormFn.truyThuKetQuaView();
+            bxVinhFn.normalFormFn.addThuNoFn();
+        }
+        , commonFn:function() {
             var logout = $('.logoutbtn');
             logout.click(function () {
                 var data = { act: 'Logout' };
@@ -180,17 +197,38 @@ var bxVinhFn = {
 
             $('[data-toggle="tooltip"]').tooltip();
 
-            bxVinhFn.normalFormFn.add();
-            bxVinhFn.normalFormFn.headerFn();
-            bxVinhFn.normalFormFn.addPhoi();
-            bxVinhFn.normalFormFn.XeVaoBenTodayList();
-            bxVinhFn.normalFormFn.XeChoThanhToanList();
-            bxVinhFn.normalFormFn.ThuCapPhoiFn();
-            bxVinhFn.normalFormFn.XeDaThanhToanList();
-            bxVinhFn.normalFormFn.addTruyThuFn();
-            bxVinhFn.normalFormFn.addThuCapPhoiFn();
-            bxVinhFn.normalFormFn.truyThuKetQuaView();
-            bxVinhFn.normalFormFn.addThuNoFn();
+            var giaoCaLbl = $('.GiaoCa-Label');
+            if($(giaoCaLbl).length > 0) {
+                var timerGiaoca;
+                var ajaxGiaoCa = function () {
+                    if (xeLenPhoiHolder) {
+                        if (timerGiaoca) clearTimeout(timerGiaoca);
+                        timerGiaoca = setTimeout(function () {
+                            ajaxGiaoCa();
+                        }, globalTimeout * 5);
+                        return;
+                    }
+                    xeLenPhoiHolder = true;
+                    $.ajax({
+                        url: bxVinhFn.url.giaoCa,
+                        data: {
+                            subAct: 'Detail'
+                        },
+                        success: function (rs) {
+                            giaoCaLbl.html('');
+                            $(rs).prependTo(giaoCaLbl);
+                        }
+                        , complete: function () {
+                            xeLenPhoiHolder = false;
+                            if (timerGiaoca) clearTimeout(timerGiaoca);
+                            timerGiaoca = setTimeout(function () {
+                                ajaxGiaoCa();
+                            }, globalTimeout * 5);
+                        }
+                    });
+                };
+                ajaxGiaoCa();
+            }
         }
         , add: function () {
             /// Format các thành phần cơ bản
@@ -414,56 +452,7 @@ var bxVinhFn = {
             var thuPhiInputs = PhoiThuPhiPnl.find('.ThuPhi-Input-Item');
             var phiMotChuyenInputs = PhoiThuPhiPnl.find('.ThuPhiMotChuyen-Input-Item');
             var tong = 0;
-            var thuPhiAllInputs = PhoiThuPhiPnl.find('.money-input');
-            thuPhiAllInputs.unbind('keyup').keyup(function () {
-                var giaVe = bxVinhFn.utils.getNumberFormMoney(GiaVe.val());
-                var hoaHongBanVe = bxVinhFn.utils.getNumberFormMoney(HoaHongBanVe.val());
-
-                var phiTrenMotVe = parseInt(giaVe) * parseInt(hoaHongBanVe) / 100;
-                PhiTrenMotVe.val(bxVinhFn.utils.convertNumberToMoney(phiTrenMotVe));
-                
-                var isChiThuBenBai1 = PHI_ChiThuBenBai.is(':checked');
-
-                var ve = bxVinhFn.utils.getNumberFormMoney(Ve.val());
-                var pHI_HoaHongBanVe = parseInt(ve) * parseInt(phiTrenMotVe);
-                PHI_HoaHongBanVe.val(bxVinhFn.utils.convertNumberToMoney(pHI_HoaHongBanVe));
             
-                var chuyenTruyThu1 = bxVinhFn.utils.getNumberFormMoney(ChuyenTruyThu.val());
-                var pHI_BenBai1 = bxVinhFn.utils.getNumberFormMoney(PHI_BenBai.val());
-                
-                var phiMotChuyen1 = 0;
-                $.each(phiMotChuyenInputs, function (i1, i2) {
-                    var thuPhiItem2 = $(i2);
-                    var phi2 = bxVinhFn.utils.getNumberFormMoney(thuPhiItem2.val());
-                    phiMotChuyen1 += parseInt(phi2);
-                });
-
-                var phiBiTruyThu1 = isChiThuBenBai1 ? pHI_BenBai1 : phiMotChuyen1;
-
-                var pHI_ChuyenTruyThu1 = parseInt(chuyenTruyThu1) * parseInt(phiBiTruyThu1);
-                PHI_ChuyenTruyThu.val(bxVinhFn.utils.convertNumberToMoney(pHI_ChuyenTruyThu1));
-
-
-                var khachTruyThu = bxVinhFn.utils.getNumberFormMoney(KhachTruyThu.val());
-                var pHI_KhachTruyThu = parseInt(khachTruyThu) * parseInt(phiTrenMotVe);
-                PHI_KhachTruyThu.val(bxVinhFn.utils.convertNumberToMoney(pHI_KhachTruyThu));
-
-                var tong1 = 0;
-                $.each(thuPhiInputs, function (i3, i4) {
-                    var thuPhiItem1 = $(i4);
-                    var phi1 = bxVinhFn.utils.getNumberFormMoney(thuPhiItem1.val());
-                    tong1 += parseInt(phi1);
-                });
-                var pHI_TruyThuGiam1 = bxVinhFn.utils.getNumberFormMoney(PHI_TruyThuGiam.val());
-                var tongSauTru1 = parseInt(tong1) - parseInt(pHI_TruyThuGiam1);
-
-                PHI_Tong.val(bxVinhFn.utils.convertNumberToMoney(tongSauTru1));
-
-                var pHI_Nop = bxVinhFn.utils.getNumberFormMoney(PHI_Nop.val());
-                var pHI_ConNo = parseInt(tongSauTru1) - parseInt(pHI_Nop);
-                PHI_ConNo.val(bxVinhFn.utils.convertNumberToMoney(pHI_ConNo));
-
-            });
 
             var chuyenTruyThu = bxVinhFn.utils.getNumberFormMoney(ChuyenTruyThu.val());
             var pHI_BenBai = bxVinhFn.utils.getNumberFormMoney(PHI_BenBai.val());
@@ -495,13 +484,67 @@ var bxVinhFn = {
             var pHI_ConNoAll = parseInt(tongSauTru) - parseInt(pHI_NopAll);
             PHI_ConNo.val(bxVinhFn.utils.convertNumberToMoney(pHI_ConNoAll));
             
+
+
             bxVinhFn.utils.formatTien(pnl.find('.money-input'));
+            
+
+            var thuPhiAllInputs = PhoiThuPhiPnl.find('.money-input');
+            thuPhiAllInputs.unbind('keyup').keyup(function () {
+                var giaVe = bxVinhFn.utils.getNumberFormMoney(GiaVe.val());
+                var hoaHongBanVe = bxVinhFn.utils.getNumberFormMoney(HoaHongBanVe.val());
+
+                var phiTrenMotVe = parseInt(giaVe) * parseInt(hoaHongBanVe) / 100;
+                PhiTrenMotVe.val(bxVinhFn.utils.convertNumberToMoney(phiTrenMotVe));
+
+                var isChiThuBenBai1 = PHI_ChiThuBenBai.is(':checked');
+
+                var ve = bxVinhFn.utils.getNumberFormMoney(Ve.val());
+                var pHiHoaHongBanVe = parseInt(ve) * parseInt(phiTrenMotVe);
+                PHI_HoaHongBanVe.val(bxVinhFn.utils.convertNumberToMoney(pHiHoaHongBanVe));
+
+                var chuyenTruyThu1 = bxVinhFn.utils.getNumberFormMoney(ChuyenTruyThu.val());
+                var pHI_BenBai1 = bxVinhFn.utils.getNumberFormMoney(PHI_BenBai.val());
+
+                var phiMotChuyen1 = 0;
+                $.each(phiMotChuyenInputs, function (i1, i2) {
+                    var thuPhiItem2 = $(i2);
+                    var phi2 = bxVinhFn.utils.getNumberFormMoney(thuPhiItem2.val());
+                    phiMotChuyen1 += parseInt(phi2);
+                });
+
+                var phiBiTruyThu1 = isChiThuBenBai1 ? pHI_BenBai1 : phiMotChuyen1;
+
+                var pHiChuyenTruyThu1 = parseInt(chuyenTruyThu1) * parseInt(phiBiTruyThu1);
+                PHI_ChuyenTruyThu.val(bxVinhFn.utils.convertNumberToMoney(pHiChuyenTruyThu1));
+
+
+                var khachTruyThu = bxVinhFn.utils.getNumberFormMoney(KhachTruyThu.val());
+                var pHiKhachTruyThu = parseInt(khachTruyThu) * parseInt(phiTrenMotVe);
+                PHI_KhachTruyThu.val(bxVinhFn.utils.convertNumberToMoney(pHiKhachTruyThu));
+
+                var tong1 = 0;
+                $.each(thuPhiInputs, function (i3, i4) {
+                    var thuPhiItem1 = $(i4);
+                    var phi1 = bxVinhFn.utils.getNumberFormMoney(thuPhiItem1.val());
+                    tong1 += parseInt(phi1);
+                });
+                var pHiTruyThuGiam1 = bxVinhFn.utils.getNumberFormMoney(PHI_TruyThuGiam.val());
+                var tongSauTru1 = parseInt(tong1) - parseInt(pHiTruyThuGiam1);
+
+                PHI_Tong.val(bxVinhFn.utils.convertNumberToMoney(tongSauTru1));
+
+                var pHiNop = bxVinhFn.utils.getNumberFormMoney(PHI_Nop.val());
+                var pHiConNo = parseInt(tongSauTru1) - parseInt(pHiNop);
+                PHI_ConNo.val(bxVinhFn.utils.convertNumberToMoney(pHiConNo));
+
+            });
         }
         , addPhoi:function () {
             var pnl = $('.Phoi-ThongTinXe-Pnl');
             if ($(pnl).length < 1) return;
-            var phoiId = pnl.attr('data-id');
-            if (phoiId == '' || phoiId == '0') {
+            var draff = pnl.attr('data-draff');
+            if (draff == 'true') {
                 bxVinhFn.normalFormFn.clearPhoiForm();
                 bxVinhFn.normalFormFn.addPhoiCurrent();
             }
@@ -512,6 +555,8 @@ var bxVinhFn = {
                 bxVinhFn.normalFormFn.addPhoiValidatorFn();
             }
             var PHI_ChiThuBenBai = pnl.find('.PHI_ChiThuBenBai');
+
+            var pnlTruyThuChamCongBodyPnl = pnl.find('.Phoi-TruyThuNgayChamCongPnl-Body');
 
             PHI_ChiThuBenBai.unbind('click').click(function() {
                 bxVinhFn.normalFormFn.phepTinh(pnl);
@@ -610,6 +655,7 @@ var bxVinhFn = {
                 data.push({ name: 'subAct', value: 'save' });
                 data.push({ name: 'hopLe', value: hopLeStr });
                 bxVinhFn.utils.loader('Đang lưu', true);
+                xeLenPhoiHolder = true;
                 $.ajax({
                     url: url
                     , type: 'POST'
@@ -633,6 +679,9 @@ var bxVinhFn = {
                            pnl.find('.panel-footer-insert').hide();
                            dangCapPhoi = false;
                        }
+                   }
+                   , complete: function () {
+                       xeLenPhoiHolder = false;
                    }
                 });
             });
@@ -676,6 +725,7 @@ var bxVinhFn = {
                 data.push({ name: 'subAct', value: 'save' });
                 data.push({ name: 'saveType', value: 'truyThu' });
                 bxVinhFn.utils.loader('Đang lưu', true);
+                xeLenPhoiHolder = true;
                 $.ajax({
                     url: url
                     , type: 'POST'
@@ -699,6 +749,9 @@ var bxVinhFn = {
                            pnl.find('.panel-footer-insert').hide();
                            dangCapPhoi = false;
                        }
+                   }
+                   , complete: function () {
+                       xeLenPhoiHolder = false;
                    }
                 });
             });
@@ -812,20 +865,118 @@ var bxVinhFn = {
             var chuyenTruyThu = phoiThuPhiPnl.find('.ChuyenTruyThu');
             $('.Phoi-TruyThuPnl-ChamCongPnl').on('click', '.ChamCongTd-Item-Clickable', function () {
                 var item = $(this);
-                var txt = item.find('input');
+                var ngay = item.attr('data-ngay');
+                var tangCuong = item.attr('data-tangCuong');
+                var phoiId = pnl.find('.ID').val();
+                var id = item.attr('data-id');
+                var data = [];
+                data.push({ name: 'Ngay', value: ngay });
+                data.push({ name: 'TangCuong', value: tangCuong });
+                data.push({ name: 'PhoiId', value: phoiId });
+                
                 if (item.hasClass('ChamCongTd-Item-Clickable-Active')) {
                     item.removeClass('ChamCongTd-Item-Clickable-Active');
-                    txt.removeAttr('name');
+                    data.push({ name: 'subAct', value: 'XoaChamCongDraff' });
+                    data.push({ name: 'ID', value: id });
+                    id = item.attr('data-id');
+                    $('.addPhoiTruyThuChamCong-Item[data-id="' + id +'"]').remove();
                 }
                 else {
                     item.addClass('ChamCongTd-Item-Clickable-Active');
-                    txt.attr('name', 'NgayChamCong');
+                    data.push({ name: 'subAct', value: 'LuuChamCongDraff' });
                 }
+                xeLenPhoiHolder = true;
+                $.ajax({
+                    url: bxVinhFn.url.chamCong,
+                    data: data ,
+                    success: function (rs) {
+                        var newItem = $(rs).appendTo(pnlTruyThuChamCongBodyPnl);
+                        var newId = newItem.attr('data-id');
+                        newItem.find('a').click(function() {
+                            $('td.ChamCongTd-Item-Clickable-Active[data-id="' + newId + '"]').click();
+                        });
+                        item.attr('data-id', newId);
+                        
+                        var totalChuyenTruyThu = truyThuChamCongPnl.find('.ChamCongTd-Item-Clickable-Active').length;
+                        var totalChuyenBiTruyThu = pnlTruyThuChamCongBodyPnl.find('.ChamCongTruyChuCkb:checked').length;
+                        
+                        chuyenTruyThu.val(totalChuyenBiTruyThu);
+                        var phoiTruyThuPnlId = $('#Phoi-TruyThuNgayChamCongPnl-Body');
+                        if (parseInt(totalChuyenTruyThu) > 0) {
+                            if (!phoiTruyThuPnlId.hasClass('in')) {
+                                phoiTruyThuPnlId.addClass('collapsing');
+                                setTimeout(function () {
+                                    $('#Phoi-TruyThuNgayChamCongPnl-Body').removeClass('collapsing');
+                                    $('#Phoi-TruyThuNgayChamCongPnl-Body').addClass('in');
+                                }, 500);
+                            }
+                        } else {
+                            $('#Phoi-TruyThuNgayChamCongPnl-Body').removeClass('in');
+                        }
+                        setTimeout(function () {
+                            bxVinhFn.normalFormFn.phepTinh(pnl);
+                        }, 100);
+                    },
+                    complete: function (rs) {
+                        xeLenPhoiHolder = false;
+                    }
+                });
+            });
+
+            $('.Phoi-TruyThuNgayChamCongPnl-Body').on('click', '.ChamCongTruyChuCkb', function () {
                 var totalChuyenTruyThu = truyThuChamCongPnl.find('.ChamCongTd-Item-Clickable-Active').length;
-                chuyenTruyThu.val(totalChuyenTruyThu);
-                setTimeout(function() {
+                var totalChuyenBiTruyThu = pnlTruyThuChamCongBodyPnl.find('.ChamCongTruyChuCkb:checked').length;
+
+                chuyenTruyThu.val(totalChuyenBiTruyThu);
+                var phoiTruyThuPnlId = $('#Phoi-TruyThuNgayChamCongPnl-Body');
+                if (parseInt(totalChuyenTruyThu) > 0) {
+                    if (!phoiTruyThuPnlId.hasClass('in')) {
+                        phoiTruyThuPnlId.addClass('collapsing');
+                        setTimeout(function () {
+                            $('#Phoi-TruyThuNgayChamCongPnl-Body').removeClass('collapsing');
+                            $('#Phoi-TruyThuNgayChamCongPnl-Body').addClass('in');
+                        }, 500);
+                    }
+                } else {
+                    $('#Phoi-TruyThuNgayChamCongPnl-Body').removeClass('in');
+                }
+                setTimeout(function () {
                     bxVinhFn.normalFormFn.phepTinh(pnl);
-                },500);
+                }, 100);
+            });
+
+            $('.Phoi-TruyThuNgayChamCongPnl-Body').on('blur', '.addPhoiTruyThuChamCong-Item-InputAjax', function () {
+                var item = $(this);
+                var pform = item.parent();
+                var id = $(item).attr('data-id');
+                var data = pform.find(':input').serializeArray();
+                data.push({ name: 'subAct', value: 'UpdateChamCongDraff' });
+                data.push({ name: 'ID', value: id });
+                xeLenPhoiHolder = true;
+                $.ajax({
+                    url: bxVinhFn.url.chamCong,
+                    data: data,
+                    complete: function (rs) {
+                        xeLenPhoiHolder = false;
+                    }
+                });
+            });
+
+            $('.Phoi-TruyThuNgayChamCongPnl-Body').on('blur', '.ChamCongTruyChuCkb', function () {
+                var item = $(this);
+                var pform = item.parent().parent().parent();
+                var id = $(item).attr('data-id');
+                var data = pform.find(':input').serializeArray();
+                data.push({ name: 'subAct', value: 'UpdateChamCongDraff' });
+                data.push({ name: 'ID', value: id });
+                xeLenPhoiHolder = true;
+                $.ajax({
+                    url: bxVinhFn.url.chamCong,
+                    data: data,
+                    complete: function (rs) {
+                        xeLenPhoiHolder = false;
+                    }
+                });
             });
 
             // Add shortcut
@@ -900,6 +1051,7 @@ var bxVinhFn = {
             var data = [];
             data.push({ name: 'subAct', value: 'getLatest' });
             bxVinhFn.utils.loader('Nạp dữ liệu', true);
+            xeLenPhoiHolder = true;
             $.ajax({
                 url: url
                 , type: 'POST'
@@ -907,14 +1059,20 @@ var bxVinhFn = {
                , success: function (rs) {
                    bxVinhFn.utils.loader('Nạp dữ liệu', false);
                    var dt = eval(rs);
+                   console.log(dt);
                    pnl.find('.STTBX').val(dt.STTBXStr);
                    pnl.find('.STTALL').val(dt.STTALLStr);
+                   pnl.find('.ID').val(dt.ID);
+               }
+               , complete: function () {
+                   xeLenPhoiHolder = false;
                }
             });
         }
         , addPhoiCurrent: function (fn) {
             var pnl = $('.Phoi-ThongTinXe-Pnl');
             var url = '/lib/ajax/XeVaoBen/Default.aspx';
+            xeLenPhoiHolder = true;
             $.ajax({
                 url: url,
                 data: {
@@ -932,6 +1090,9 @@ var bxVinhFn = {
                            fn();
                        }
                    }
+                },
+                complete: function (rs) {
+                    xeLenPhoiHolder = false;
                 }
             });
         }
@@ -947,8 +1108,8 @@ var bxVinhFn = {
                 pnl.find('.restoreBtn').hide();
                 pnl.find('.panel-footer').hide();
                 pnl.find('.help-block').hide();
-                pnl.attr('data-id', '');
-                pnl.find('.Id').val('');
+                //pnl.attr('data-id', '');
+                //pnl.find('.Id').val('');
                 pnl.find('.CQ_ID').val('');
                 pnl.find('.XVB_ID').val('');
                 pnl.find('.panel-footer-saved').show();
@@ -975,6 +1136,7 @@ var bxVinhFn = {
             var truyThuChamCongPnl = pnl.find('.Phoi-TruyThuPnl-ChamCongPnl');
             var phoiNghiepVuHanPnl = pnl.find('.Phoi-NghiepVu-HanPnl');
             var ngayXuatBen = pnl.find('.NgayXuatBen');
+            var pnlTruyThuChamCongBodyPnl = pnl.find('.Phoi-TruyThuNgayChamCongPnl-Body');
             itemEl.val(bx);
             xeId.val(id);
 
@@ -983,6 +1145,7 @@ var bxVinhFn = {
                  data.push({ name: 'Id', value: id });
                  data.push({ name: 'XVB_ID', value: xvbId });
                  data.push({ name: 'NgayXuatBen', value: ngayXuatBen.val() });
+                xeLenPhoiHolder = true;
                 $.ajax({
                     url: '/lib/ajax/Xe/Default.aspx'
                     , type: 'POST'
@@ -1116,23 +1279,31 @@ var bxVinhFn = {
                         bxVinhFn.normalFormFn.phepTinh(pnl);
                                
                     }
+                    , complete: function () {
+                        xeLenPhoiHolder = false;
+                    }
                 });
-
+                pnlTruyThuChamCongBodyPnl.html('');
+                truyThuChamCongPnl.html('Đang nạp...');
                 data = [];
                 data.push({ name: 'subAct', value: 'BangChamCongTheoXe' });
                 data.push({ name: 'XE_ID', value: id });
                 data.push({ name: 'NgayXuatBen', value: ngayXuatBen.val() });
+                xeLenPhoiHolder = true;
                 $.ajax({
                     url: '/lib/ajax/ChamCong/Default.aspx'
                     , type: 'POST'
                     , data: data
                     , success: function (rs) {
                         truyThuChamCongPnl.html(rs);
+                    },
+                    complete:function () {
+                        xeLenPhoiHolder = false;
                     }
                 });
         }
         , XeVaoBenTodayList: function () {
-            var url = '/lib/ajax/XeVaoBen/Default.aspx';
+            var url = bxVinhFn.url.xeVaoBen;
             var pnl = $('.XeRaVaoToDayList');
             if ($(pnl).length > 0) {
                 var timerXeVaoRaTodayList;
@@ -1181,7 +1352,15 @@ var bxVinhFn = {
                 
                 var timerYeuCauXuLyHangDoiList;
 
-                var ajaxYeuCauXuLyHangDoi = function() {
+                var ajaxYeuCauXuLyHangDoi = function () {
+                    if(xeLenPhoiHolder) {
+                        if (timerYeuCauXuLyHangDoiList) clearTimeout(timerYeuCauXuLyHangDoiList);
+                        timerYeuCauXuLyHangDoiList = setTimeout(function () {
+                            ajaxYeuCauXuLyHangDoi();
+                        }, globalTimeout);
+                        return;
+                    }
+                    xeLenPhoiHolder = true;
                     $.ajax({
                         url: url,
                         data: {
@@ -1190,6 +1369,9 @@ var bxVinhFn = {
                         success: function (rs) {
                             body.html('');
                             $(rs).prependTo(body);
+                        }
+                        , complete: function () {
+                            xeLenPhoiHolder = false;
                             if (timerYeuCauXuLyHangDoiList) clearTimeout(timerYeuCauXuLyHangDoiList);
                             timerYeuCauXuLyHangDoiList = setTimeout(function () {
                                 ajaxYeuCauXuLyHangDoi();
@@ -1199,8 +1381,24 @@ var bxVinhFn = {
                 };
                 ajaxYeuCauXuLyHangDoi();
 
+                $(phoiHangDoiPnl).on('click', 'button', function (e) {
+                    var item = $(this);
+                    var id = item.attr('data-xvbId');
+                    item.parent().parent().remove();
+                    $.ajax({
+                        url: url,
+                        data: {
+                            subAct: 'YeuCauXuatBen'
+                            , Id: id
+                        },
+                        success: function (rs) {
+                        }
+                    });
+                    e.stopPropagation();
+                });
 
-                $(phoiHangDoiPnl).on('click', '.list-group-item', function () {
+                $(phoiHangDoiPnl).on('click', '.list-group-item', function (e) {
+                    if (e.target !== this) return;
                     var item = $(this);
                     var id = item.attr('data-id');
                     var xvbId = item.attr('data-xvbId');
@@ -1213,6 +1411,14 @@ var bxVinhFn = {
                     bxVinhFn.normalFormFn.chonXeHandler(id, bx, xvbId);
                     $('.restoreBtn').show();
                 });
+                
+                $(phoiHangDoiPnl).on('mouseenter', function () {
+                    xeLenPhoiHolder = true;
+                });
+                $(phoiHangDoiPnl).on('mouseleave', function () {
+                    xeLenPhoiHolder = false;
+                });
+
             }
             
             var deNghiTruyThuPnl = $('.Phoi-DeNghiTruyThu-Pnl');
@@ -1222,6 +1428,15 @@ var bxVinhFn = {
                 var timerDeNghiTruyThu;
 
                 var ajaxDeNghiTruyThu = function () {
+                    
+                    if (xeLenPhoiHolder) {
+                        if (timerDeNghiTruyThu) clearTimeout(timerDeNghiTruyThu);
+                        timerDeNghiTruyThu = setTimeout(function () {
+                            ajaxDeNghiTruyThu();
+                        }, globalTimeout * 5);
+                        return;
+                    }
+                    xeLenPhoiHolder = true;
                     $.ajax({
                         url: url,
                         data: {
@@ -1235,6 +1450,10 @@ var bxVinhFn = {
                             }else {
                                 deNghiTruyThuPnl.show();
                             }
+                            
+                        }
+                        , complete: function () {
+                            xeLenPhoiHolder = false;
                             if (timerDeNghiTruyThu) clearTimeout(timerDeNghiTruyThu);
                             timerDeNghiTruyThu = setTimeout(function () {
                                 ajaxDeNghiTruyThu();
@@ -1254,6 +1473,15 @@ var bxVinhFn = {
                 var timerChoThanhToanList;
 
                 var ajaxUpdateChoThanhToanList = function () {
+                    
+                    if (xeLenPhoiHolder) {
+                        if (timerChoThanhToanList) clearTimeout(timerChoThanhToanList);
+                        timerChoThanhToanList = setTimeout(function () {
+                            ajaxUpdateChoThanhToanList();
+                        }, globalTimeout);
+                        return;
+                    }
+
                     $.ajax({
                         url: url,
                         data: {
@@ -1279,6 +1507,7 @@ var bxVinhFn = {
                 item.removeClass('btn-warning');
                 item.addClass('btn-default');
                 var id = item.attr('data-id');
+                xeLenPhoiHolder = true;
                 $.ajax({
                     url: url,
                     data: {
@@ -1286,6 +1515,9 @@ var bxVinhFn = {
                         , Id: id
                     },
                     success: function (rs) {
+                    },
+                    complete:function () {
+                        xeLenPhoiHolder = false;
                     }
                 });
             });
@@ -1295,8 +1527,15 @@ var bxVinhFn = {
                 var body = phoiHangDoiPnl.find('.ThuChi-HangDoi-XeYeuCauThanhToan-Body');
 
                 var timerYeuCauThanhToanHangDoiList;
-
                 var ajaxYeuCauThanhToanHangDoi = function () {
+                    if (xeLenPhoiHolder) {
+                        if (timerYeuCauThanhToanHangDoiList) clearTimeout(timerYeuCauThanhToanHangDoiList);
+                        timerYeuCauThanhToanHangDoiList = setTimeout(function () {
+                            ajaxYeuCauThanhToanHangDoi();
+                        }, globalTimeout);
+                        return;
+                    }
+                    xeLenPhoiHolder = true;
                     $.ajax({
                         url: url,
                         data: {
@@ -1305,6 +1544,9 @@ var bxVinhFn = {
                         success: function (rs) {
                             body.html('');
                             $(rs).prependTo(body);
+                        }
+                        ,complete:function() {
+                            xeLenPhoiHolder = false;
                             if (timerYeuCauThanhToanHangDoiList) clearTimeout(timerYeuCauThanhToanHangDoiList);
                             timerYeuCauThanhToanHangDoiList = setTimeout(function () {
                                 ajaxYeuCauThanhToanHangDoi();
@@ -1314,6 +1556,12 @@ var bxVinhFn = {
                 };
                 ajaxYeuCauThanhToanHangDoi();
 
+                $(phoiHangDoiPnl).on('mouseenter', function () {
+                    xeLenPhoiHolder = true;
+                });
+                $(phoiHangDoiPnl).on('mouseleave', function () {
+                    xeLenPhoiHolder = false;
+                });
 
                 $(phoiHangDoiPnl).on('click', '.list-group-item', function () {
                     var item = $(this);
@@ -1324,6 +1572,7 @@ var bxVinhFn = {
                     }, 1000);
                     $('.restoreBtn').show();
                     $('.XVB_ID').val(id);
+                    xeLenPhoiHolder = true;
                     $.ajax({
                         url: url,
                         data: {
@@ -1333,6 +1582,9 @@ var bxVinhFn = {
                         success: function (rs) {
                             var dt = eval(rs);
                             bxVinhFn.normalFormFn.ThuCapPhoiHanler(dt);
+                        }
+                        ,complete:function() {
+                            xeLenPhoiHolder = false;
                         }
                     });
                 });
@@ -1394,68 +1646,65 @@ var bxVinhFn = {
             xE_BienSo.val(dt.Phoi.Xe.BienSoStr);
             xE_ID.val(dt.Phoi.XE_ID);
             ngay.val(dt.Phoi.NgayXuatBenStr);
-            tien.val(bxVinhFn.utils.convertNumberToMoney(dt.Phoi.PHI_Tong));
+            tien.val(bxVinhFn.utils.convertNumberToMoney(dt.Phoi.PHI_Nop));
             pHOI_ID.val(dt.Phoi.ID);
             XVB_ID.val(dt.XeVaoBen.ID);
-        }
-        , ThuCapPhoiFn: function () {
-            var pnl = $('.ThuCapPhoi-Pnl-Add');
-            if ($(pnl).length > 0) {
-                bxVinhFn.normalFormFn.clearThuCapPhoiForm();
-                var autoCompletePhoiChonXe = pnl.find('.form-autocomplete-input-ThuChi-ChonXe');
-                $.each(autoCompletePhoiChonXe, function (i, j) {
-                    var itemEl = $(j);
-                    var parentEl = itemEl.parent();
-                    var btnAutocomplete = parentEl.find('.autocomplete-btn');
-                    var refId = itemEl.attr('data-refId');
-                    var refEl = parentEl.find('.' + refId);
-                    var src = itemEl.attr('data-src');
-                    btnAutocomplete.unbind('click').click(function () {
-                        itemEl.autocomplete('search', '');
-                    });
-                    itemEl.unbind('click').click(function () {
-                        itemEl.autocomplete('search', '');
-                    });
-                    bxVinhFn.utils.autoCompleteSearch(itemEl, src, refId
-                        , function (event, ui) {
-                            refEl.val(ui.item.id);
-                            //bxVinhFn.normalFormFn.chonXeHandler(ui.item.id, ui.item.label);
-
-                            //Phoi-TruyThuPnl-ChamCongPnl
-                        }
-                        , function (matcher, item) {
-                            if (matcher.test(item.Hint.toLowerCase()) || matcher.test(adm.normalizeStr(item.Hint.toLowerCase()))) {
-                                return {
-                                    label: item.Bien,
-                                    value: item.Bien,
-                                    id: item.ID,
-                                    hint: item.Hint
-                                };
-                            }
-                        }
-                    );
-
-                    itemEl.data('ui-autocomplete')._renderItem = function (ul, item) {
-                        return $("<li></li>")
-                            .data("item.autocomplete", item)
-                            .append("<a href=\"javascript:;\">" + item.label + "</a>")
-                            .appendTo(ul);
-                    };
-
-                });
-            }
         }
         , addThuCapPhoiFn:function () {
             var pnl = $('.ThuCapPhoi-Pnl-Add');
             if ($(pnl).length < 1) return;
-            var phoiId = pnl.attr('data-id');
-            if (phoiId == '' || phoiId == '0') {
+            var tcId = pnl.find('.ID').val();
+            if (tcId == '' || tcId == '0') {
                 bxVinhFn.normalFormFn.clearThuCapPhoiForm();
                 bxVinhFn.normalFormFn.addThuCapPhoiCurrent();
             }
             else {
                 pnl.find('.panel-footer').show();
+                pnl.find('.panel-footer-saved').show();
+                pnl.find('.panel-footer-insert').hide();
             }
+            
+            var autoCompletePhoiChonXe = pnl.find('.form-autocomplete-input-ThuChi-ChonXe');
+            $.each(autoCompletePhoiChonXe, function (i, j) {
+                var itemEl = $(j);
+                var parentEl = itemEl.parent();
+                var btnAutocomplete = parentEl.find('.autocomplete-btn');
+                var refId = itemEl.attr('data-refId');
+                var refEl = parentEl.find('.' + refId);
+                var src = itemEl.attr('data-src');
+                btnAutocomplete.unbind('click').click(function () {
+                    itemEl.autocomplete('search', '');
+                });
+                itemEl.unbind('click').click(function () {
+                    itemEl.autocomplete('search', '');
+                });
+                bxVinhFn.utils.autoCompleteSearch(itemEl, src, refId
+                    , function (event, ui) {
+                        refEl.val(ui.item.id);
+                        //bxVinhFn.normalFormFn.chonXeHandler(ui.item.id, ui.item.label);
+
+                        //Phoi-TruyThuPnl-ChamCongPnl
+                    }
+                    , function (matcher, item) {
+                        if (matcher.test(item.Hint.toLowerCase()) || matcher.test(adm.normalizeStr(item.Hint.toLowerCase()))) {
+                            return {
+                                label: item.Bien,
+                                value: item.Bien,
+                                id: item.ID,
+                                hint: item.Hint
+                            };
+                        }
+                    }
+                );
+
+                itemEl.data('ui-autocomplete')._renderItem = function (ul, item) {
+                    return $("<li></li>")
+                        .data("item.autocomplete", item)
+                        .append("<a href=\"javascript:;\">" + item.label + "</a>")
+                        .appendTo(ul);
+                };
+
+            });
             var alertErr = pnl.find('.alert-danger');
             var alertOk = pnl.find('.alert-success');
             
@@ -1543,13 +1792,21 @@ var bxVinhFn = {
                            alertOk.html('Lưu thành công');
                            setTimeout(function () {
                                alertOk.hide();
+                               pnl.find('.printBtn').click();
                            }, 1000);
+                           
+                           
+
                            bxVinhFn.utils.loader('Đang lưu', false);
                            pnl.find('.panel-footer-saved').show();
                            pnl.find('.panel-footer-saved').find('.btn').attr('data-id', rs);
                            printBtn.attr('href', printBtn.attr('data-url') + '?ID=' + rs);
                            editBtn.attr('href', editBtn.attr('data-url') + '?ID=' + rs);
                            pnl.find('.panel-footer-insert').hide();
+                           
+                           setTimeout(function () {
+                               printBtn.click();
+                           }, 1500);
                        }
                    }
                 });
@@ -1753,7 +2010,9 @@ var bxVinhFn = {
             var pnl = $('.KetQuaDuyetTruyThu-Pnl-Add');
             
             if ($(pnl).length < 1) return;
-            
+
+            bxVinhFn.normalFormFn.truyThuKetQuaViewPhepTinh();
+
             var url = pnl.attr('data-url');
             var chapNhanBtn = pnl.find('.chapNhanBtn');
             var kienNghiBtn = pnl.find('.kienNghiBtn');
@@ -1767,7 +2026,14 @@ var bxVinhFn = {
             chapNhanBtn.unbind('click').click(function () {
                 alertErr.hide();
                 alertOk.hide();
+                
+                var disabled = pnl.find(':input:disabled').removeAttr('disabled');
+
+                // serialize the form
                 var data = pnl.find(':input').serializeArray();
+
+                // re-disabled the set of inputs that you previously enabled
+                disabled.attr('disabled', 'disabled');
                 data.push({ name: 'subAct', value: 'nhaXeChapNhan' });
                 bxVinhFn.utils.loader('Đang lưu', true);
                 $.ajax({
@@ -1818,6 +2084,7 @@ var bxVinhFn = {
             });
 
             truyThuPnl.on('blur', '.TruyThu-KetQuaView-AjaxInput', function () {
+                bxVinhFn.normalFormFn.truyThuKetQuaViewPhepTinh();
                 var item = $(this);
                 var form = item.parent().parent();
                 var data = form.find(':input').serializeArray();
@@ -1834,7 +2101,40 @@ var bxVinhFn = {
                 });
             });
             
+            truyThuPnl.on('click', '.Loai', function () {
+                var item = $(this);
+                var ckb = item.is(':checked');
+
+                var soChuyenDuocDuyetValue = $('.SoChuyenDuocDuyet').html();
+                var soChuyenDuocDuyet = parseInt(soChuyenDuocDuyetValue);
+                var tongDuyetHienTai = $(truyThuPnl.find('.Loai:checked')).length;
+                                
+                if (tongDuyetHienTai >= soChuyenDuocDuyet) {
+                    bxVinhFn.normalFormFn.truyThuKetQuaViewPhepTinh();
+                    var form = item.parent().parent();
+                    var data = form.find(':input').serializeArray();
+                    data.push({ name: 'subAct', value: 'updateAjaxTruyThuDuyetKetQua' });
+                    $.ajax({
+                        url: urlChamCong
+                        , type: 'POST'
+                        , data: data
+                       , success: function (rs) {
+                           if (rs == '0') {
+                           } else {
+                           }
+                       }
+                    });
+                }
+                else { // redo check
+                    alert('Cần truy thu đủ ' + soChuyenDuocDuyetValue + ' chuyến');
+                    if(!ckb) {
+                        item.click();
+                    }
+                }
+            });
+
             truyThuPnl.on('click', '.TrangThaiNo', function () {
+                bxVinhFn.normalFormFn.truyThuKetQuaViewPhepTinh();
                 var item = $(this);
                 var form = item.parent().parent();
                 var data = form.find(':input').serializeArray();
@@ -1850,6 +2150,44 @@ var bxVinhFn = {
                    }
                 });
             });
+        }
+        , truyThuKetQuaViewPhepTinh:function () {
+            var pnl = $('.TruyThu-KetQuaView-List');
+            if ($(pnl).length < 0) return;
+
+            var phiTruocTruyThuEl = pnl.find('.PhiTruocTruyThu');
+            var tongTruyThu = pnl.find('.TongTruyThu');
+            var no = pnl.find('.No');
+            var tong = pnl.find('.Tong');
+
+            var phiTruocTruyThu = bxVinhFn.utils.getNumberFormMoney(phiTruocTruyThuEl.val());
+
+            var truyThu = 0;
+            pnl.find('.Loai:checked').each(function(i,j) {
+                var item = $(j);
+                var p = item.parent().parent();
+                var tienEl = p.find('.CHAMCONG_Tien');
+                var tien = bxVinhFn.utils.getNumberFormMoney(tienEl.val());
+                truyThu += tien;
+            });
+            tongTruyThu.val(bxVinhFn.utils.convertNumberToMoney(truyThu));
+            
+            var tongNo = 0;
+            pnl.find('.TrangThaiNo:checked').each(function (i, j) {
+                var item = $(j);
+                var p = item.parent().parent();
+                var tienEl = p.find('.CHAMCONG_Tien');
+                var trangThaiTruyThu = p.find('.Loai').is(':checked');
+                if (trangThaiTruyThu) {
+                    var tien = bxVinhFn.utils.getNumberFormMoney(tienEl.val());
+                    tongNo += tien;
+                }
+            });
+            no.val(bxVinhFn.utils.convertNumberToMoney(tongNo));
+            
+            var tongTien = phiTruocTruyThu + truyThu - tongNo;
+            tong.val(bxVinhFn.utils.convertNumberToMoney(tongTien));
+
         }
         , addThuNoFn:function () {
             var pnl = $('.ThuNo-Pnl-Add');

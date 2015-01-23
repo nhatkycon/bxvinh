@@ -10,11 +10,10 @@
                         <i class="glyphicon glyphicon-remove"></i>
                     </a>    
                 </span>
-                Xe chờ
+                Xe chờ thanh toán
             </div>    
             <div id="ThuChi-HangDoi-XeYeuCauThanhToan-Body" class="list-group ThuChi-HangDoi-XeYeuCauThanhToan-Body collapse in">
-                        
-            </div>    
+            </div>
         </div>
     </div>
     <div class="col-md-10">
@@ -26,7 +25,7 @@
             >
             <div class="panel-body">
                 <div class="form-horizontal" role="form">
-                    <input id="Id" style="display: none;" value="<%=Item.ID == 0 ? string.Empty  : Item.ID.ToString() %>" name="Id" type="text" />
+                    <input class="ID" id="Id" style="display: none;" value="<%=Item.ID == 0 ? string.Empty  : Item.ID.ToString() %>" name="Id" type="text" />
                     <input id="PHOI_ID" class="PHOI_ID" style="display: none;" value="<%=Item.PHOI_ID == 0 ? string.Empty  : Item.PHOI_ID.ToString() %>" name="PHOI_ID" type="text" />
                     <input id="XVB_ID" class="XVB_ID" style="display: none;" value="<%=Item.XVB_ID == 0 ? string.Empty : Item.XVB_ID.ToString() %>" name="XVB_ID" type="text" />
                     <div class="form-group">
@@ -63,7 +62,7 @@
                        
                         <label for="Tien" class="col-sm-1 control-label">Phải thu:</label>
                         <div class="col-sm-3">
-                            <input type="text" name="Tien" id="Tien" value="<%=Item.Tien.TienVietNam() %>" class="form-control input-lg Tien money-input"/>
+                            <input type="text" name="Tien" id="Tien" value="<%=Item.Tien %>" class="form-control input-lg Tien money-input"/>
                         </div>                      
                     </div>
                     <%if (!string.IsNullOrEmpty(Id)){ %>
@@ -117,10 +116,3 @@
         
     </div>
 </div>
-<%if(!string.IsNullOrEmpty(Id))
-    {%>
-    <script>
-        $(function () {
-        });
-    </script>    
-<%  } %>

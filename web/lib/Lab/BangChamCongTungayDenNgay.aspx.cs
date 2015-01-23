@@ -23,7 +23,8 @@ public partial class lib_Lab_BangChamCongTungayDenNgay : System.Web.UI.Page
             ChamCongCalendar_View.ListChamCongCurrent = chamCongListCurrent;
             ChamCongCalendar_View.LoaiBieuDo = LoaiBieuDo;
             ChamCongCalendar_View.Visible = true;
-
+            ChamCongCalendar_View.TuNgay = tuNgay;
+            ChamCongCalendar_View.DenNgay = DateTime.Now;
             BieuDo = LoaiBieuDo;
         }
     }

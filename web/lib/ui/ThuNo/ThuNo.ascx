@@ -8,21 +8,6 @@
     data-success="/lib/pages/ThuNo/Add.aspx?ID="
     data-list="/lib/pages/ThuNo/"
     >
-    <div class="panel-heading">
-        <a href="/lib/pages/ThuNo/" class="btn btn-default"><i class="glyphicon glyphicon-chevron-left"></i></a>
-        <%if (!string.IsNullOrEmpty(Id))
-            {%>
-            <a href="javascript:;" data-ret="<%=Ret %>" class="btn btn-primary savebtn">Lưu</a>
-            <a href="/lib/pages/ThuNo/Add.aspx" class="btn btn-success">Thêm</a>
-            <%if(Item.NguoiTao == Security.Username){ %>
-                <a href="javascript:;" data-id="<%=Item.ID %>" class="btn btn-warning xoaBtn">Xóa</a>
-            <%} %>
-        <%}
-        else
-        {%>
-            <a href="javascript:;" data-ret="<%=Ret %>" class="btn btn-primary savebtn">Lưu</a>
-        <%} %>                  
-    </div>
     <div class="panel-body">
         <div class="form-horizontal" role="form">
             <input id="Id" style="display: none;" value="<%=Item.ID == 0 ? string.Empty  : Item.ID.ToString() %>" name="Id" type="text" />

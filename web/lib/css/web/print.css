@@ -1,11 +1,11 @@
 ﻿body {
-    padding: 0px;
-    margin: 0px;
+    padding: 5px;
+    margin: 5px;
 }
 
 * {
     line-height: 100%;
-    font-size: 12px;
+    font-size: 10px;
 }
 h1 {
     font-size: 22px;
@@ -19,9 +19,16 @@ table {
     clear: both;
     width: 100%;
 }
+table.print-border {
+    border: solid #000 !important;
+    border-width: 1px !important;
+}
+table.print-border td, table.print-border th {
+    border: solid #000 !important;
+    border-width: 1px !important;
+}
 table
 {
-    border: none;
     border-collapse: collapse;
     margin-bottom: 10px;
 }
@@ -35,24 +42,6 @@ table th
 {
     text-align: center;
 }
-table.border td, table.border th
-{
-    border: 1px solid #aaa;
-}
-.ChonAnh-PrintItem {
-    border: solid 1px #aaa;
-    display: inline-block;
-    margin-right: 2px;
-}
-.ChonAnh-PrintItem-Stt {
-    display: inline-block;
-    border-right: solid 1px #aaa;
-    padding: 2px 2px;
-    font-weight: bold;
-}
-.ChonAnh-PrintItem-Ten {
-    padding: 2px 2px;
-}
 .print-frame-a5 {
     clear: both;
     float: left;
@@ -63,4 +52,15 @@ table.border td, table.border th
     position: absolute;
     -webkit-transform: rotate(-90deg); -moz-transform:rotate(-90deg);
      filter:progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+}
+@media print {
+    * {
+        font-size: 10px;
+    }   
+    table td, table th
+    {
+        padding: 4px 3px;
+        text-align: center;
+        vertical-align: top;
+    }
 }

@@ -1,9 +1,13 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="ChamCongCalendar_TuNgayDenNgay.ascx.cs" Inherits="lib_ui_Phoi_ChamCongCalendar_TuNgayDenNgay" %>
 <%@ Import Namespace="linh.common" %>
 <p>
+    <span class="pull-right">
+        <a class="btn btn-link" href="/lib/pages/ChamCong/Xe_ChamCongTuNgayDenNgay.aspx?XE_ID=<%=Item.XE_ID %>">
+            <i class="glyphicon glyphicon-calendar"></i>
+        </a>
+    </span>
     <strong class="BIEUDO_Ten">
-        <%=LoaiBieuDo.Ten %> 
-        
+        <%=LoaiBieuDo.Ten %> (<span data-toggle="tooltip" class="Xe_SoChuyenChapThuan" title="Xe này được chấp thuận <%=Item.Xe.ChapThuanTuyen_SoChuyen %> chuyến/ tháng" ><%=Item.Xe.ChapThuanTuyen_SoChuyen %></span>)
         <%=SoChuyenNo==0 ? "" : string.Format(": Còn nợ <a href=\"/lib/pages/ThuNo/Add.aspx?XE_ID={1}\">{0}</a> chuyến",SoChuyenNo, Item.XE_ID) %>
     </strong>
 </p>
@@ -25,31 +29,29 @@
                 Σ
             </th>
         </thead>
-        <tr>
-            <td rowspan="2">
+        <tr data-id="<%= listThang.Ngay.Count() %>">
+            <td rowspan="2" height="60" style="vertical-align: middle;">
                 <strong>
                     T<%=listThang.Thang %>                    
-                </strong><br/><br/><br/><br/>
+                </strong>
             </td>
             <%foreach (var d in listThang.Ngay)
               { %>
-                <td class="<%=d.KieuChamCongClass %><%=d.Clickable ? " ChamCongTd-Item-Clickable" : "" %><%=d.Clickactive ? " ChamCongTd-Item-Clickable-Active" : "" %>" title="<%= d.KieuChamCongStr%>">
-                    <%=string.IsNullOrEmpty(d.GhiChu) ?  d.SoChuyen.ChamCongHienThiStr() : d.GhiChu %>
-                    <input style="display: none;" name="<%=d.Clickactive ? "NgayChamCong" : "" %>" type="text" value="<%=d.Day.ToString("dd/MM/yyyy") %>"/>
+                <td  data-id="<%=d.Item.ID==0 ? "" : d.Item.ID.ToString() %>" data-ngay="<%=d.Day.ToString("dd/MM/yyyy") %>" data-tangCuong="false" class="ChamCongTd-Item-UnClickable <%=d.KieuChamCongClass %><%=d.Clickable ? " ChamCongTd-Item-Clickable" : "" %><%=d.Clickactive ? " ChamCongTd-Item-Clickable-Active" : "" %>" title="<%= d.KieuChamCongStr%>">
+                    <%=d.Txt %>
                 </td>
             <%} %>
-            <td rowspan="2">
+            <td rowspan="2"   style="vertical-align: middle;">
                 <strong>
                     <%=listThang.Tong %>/ <%=listThang.TongBieuDo %>                    
                 </strong>
             </td>
         </tr>
-        <tr>
-            <%foreach (var d in listThang.Ngay)
+        <tr data-id="<%= listThang.NgayTangCuong.Count() %>">
+            <%foreach (var d in listThang.NgayTangCuong)
               { %>
-                <td class="<%=d.KieuChamCongClass %><%=d.Clickable ? " ChamCongTd-Item-Clickable" : "" %><%=d.Clickactive ? " ChamCongTd-Item-Clickable-Active" : "" %>" title="<%= d.KieuChamCongStr%>">
-                    <%=string.IsNullOrEmpty(d.GhiChu) ?  d.SoChuyen.ChamCongHienThiStr() : d.GhiChu %>
-                    <input style="display: none;" name="<%=d.Clickactive ? "NgayChamCong" : "" %>" type="text" value="<%=d.Day.ToString("dd/MM/yyyy") %>"/>
+                <td data-id="<%=d.Item.ID==0 ? "" : d.Item.ID.ToString() %>" data-ngay="<%=d.Day.ToString("dd/MM/yyyy") %>" data-tangCuong="true" class="ChamCongTd-Item-UnClickable <%=d.KieuChamCongClass %><%=d.Clickable ? " ChamCongTd-Item-Clickable" : "" %><%=d.Clickactive ? " ChamCongTd-Item-Clickable-Active" : "" %>" title="<%= d.KieuChamCongStr%>">
+                    <%=d.Txt %>
                 </td>
             <%} %>
         </tr>

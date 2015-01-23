@@ -59,7 +59,7 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "web", "web\", "{CC439979-ED
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
-		VWDPort = "42905"
+		VWDPort = "55713"
 		VWDDynamicPort = "true"
 		VWDVirtualPath = "/"
 	EndProjectSection

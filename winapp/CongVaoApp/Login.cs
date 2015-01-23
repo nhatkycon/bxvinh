@@ -54,7 +54,8 @@ namespace CongVaoApp
             }
             catch(Exception ex)
             {
-                MessageBox.Show("Dịch vụ đang tạm lỗi, vui lòng kiểm tra máy chủ");
+                ///MessageBox.Show("Dịch vụ đang tạm lỗi, vui lòng kiểm tra máy chủ");
+                MessageBox.Show(ex.Message);
             }
         }
 

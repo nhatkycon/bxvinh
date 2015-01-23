@@ -16,13 +16,15 @@ public partial class lib_pages_TruyThu_KetQuaDuyet : System.Web.UI.Page
             var Xe = XeDal.SelectById(con, Item.XE_ID);
             var Tuyen = TuyenDal.SelectById(con, Xe.TUYEN_ID);
             var LaiXe = LaiXeDal.SelectById(con, phoi.LAIXE_ID);
-            var chamCong = ChamCongDal.SelectByTruyThuId(con, Item.ID).OrderBy(x => x.Ngay).ToList();
+            var chamCong = ChamCongDal.SelectByTruyThuId(con, Item.ID).Where(x => x.Loai!= 1 && x.Loai!= 2) 
+                .OrderBy(x => x.Ngay).ToList();
             Xe.Tuyen = Tuyen;
             phoi.Xe = Xe;
             phoi.LaiXe = LaiXe;
             Item.Phoi = phoi;
             Add.Item = Item;
             Add.List = chamCong;
+            Add.Phoi = phoi;
         }
     }
 }

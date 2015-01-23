@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Services;
@@ -143,5 +144,45 @@ public class WebService : System.Web.Services.WebService {
         mem.GiaoCa = GiaoCaDal.SelectByCqIdUsername(mem.CQ_ID, username);
         return mem;
     }
+    #endregion
+
+
+    #region Upload anh
+    [WebMethod]
+    public bool LuuBienSo(Byte[] docbinaryarray, string docname)
+    {
+        //141201_1142-30P 6688-16-in
+        var firtsIndex = docname.IndexOf("-", System.StringComparison.Ordinal);
+        var d = docname.Substring(0, firtsIndex);
+        var y = d.Substring(0, 2);
+        var m = d.Substring(2, 2);
+        var day = d.Substring(4, 2);
+        var file = docname.Substring(firtsIndex + 1);
+        var folderPath = Server.MapPath(string.Format(@"~/lib/up/bienso/{0}/{1}/{2}/", y, m, day));
+        if(!Directory.Exists(folderPath))
+        {
+            Directory.CreateDirectory(folderPath);
+        }
+        var strdocPath = string.Format(@"{0}{1}", folderPath, file);
+        var objfilestream = new FileStream(strdocPath, FileMode.Create, FileAccess.ReadWrite);
+        objfilestream.Write(docbinaryarray, 0, docbinaryarray.Length);
+        objfilestream.Close();
+        objfilestream.Dispose();
+        return true;
+    }
+
+    [WebMethod]
+    public Byte[] GetBienSoAnh(string docname)
+    {
+        var strdocPath = Server.MapPath(string.Format(@"~/lib/up/bienso/{0}", docname));
+
+        var objfilestream = new FileStream(strdocPath, FileMode.Open, FileAccess.Read);
+        var len = (int)objfilestream.Length;
+        var documentcontents = new Byte[len];
+        objfilestream.Read(documentcontents, 0, len);
+        objfilestream.Close();
+        objfilestream.Dispose();
+        return documentcontents;
+    } 
     #endregion
 }

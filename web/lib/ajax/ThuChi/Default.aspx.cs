@@ -36,11 +36,13 @@ public partial class lib_ajax_ThuChi_Default : basePage
                     {
                         Item.Tien = Convert.ToDouble(Tien);                        
                     }
-                    Item.XE_ID = Convert.ToInt32(XE_ID);
                     Item.CQ_ID = Security.CqId;
                     if (!string.IsNullOrEmpty(PHOI_ID))
                     {
-                        Item.PHOI_ID = Convert.ToInt64(PHOI_ID);                        
+                        Item.PHOI_ID = Convert.ToInt64(PHOI_ID);
+                        var phoi = PhoiDal.SelectById(Item.PHOI_ID);
+                        Item.XE_ID = Convert.ToInt32(phoi.XE_ID);
+                        
                     }
                     if (!string.IsNullOrEmpty(Ngay))
                     {
@@ -62,21 +64,27 @@ public partial class lib_ajax_ThuChi_Default : basePage
                         GiaoCaDal.Update(giaoCa);
                     }
                     Item.NgayCapNhat = DateTime.Now;
+                    Item.XVB_ID = Convert.ToInt64(XVB_ID);
                     Item = Inserted ? ThuChiDal.Insert(Item) : ThuChiDal.Update(Item);
 
                     if(Inserted)
                     {
                         if (!string.IsNullOrEmpty(XVB_ID))
                         {
-                            Item.XVB_ID = Convert.ToInt64(XVB_ID);
                             var xvb = XeVaoBenDal.SelectById(Convert.ToInt64(XVB_ID));
                             xvb.TC_ID = Item.ID;
                             xvb.TrangThai = 800;
                             xvb.NguoiXuLyThanhToan = Security.Username;
                             xvb.NgayThanhToanXong = xvb.NgayCapNhat = DateTime.Now;
-                            xvb = XeVaoBenDal.Update(xvb);
+                            XeVaoBenDal.Update(xvb);
                         }
-
+                        var chamCongByPhoiId = ChamCongDal.SelectByPhoiId(Item.PHOI_ID);
+                        foreach (var item in chamCongByPhoiId)
+                        {
+                            item.NgayCapNhat = DateTime.Now;
+                            item.Draff = false;
+                            ChamCongDal.Update(item);
+                        }
                     }
 
                     rendertext(Item.ID.ToString());

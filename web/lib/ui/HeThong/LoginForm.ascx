@@ -1,37 +1,47 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="LoginForm.ascx.cs" Inherits="lib_ui_HeThong_LoginForm" %>
 <style type="text/css">
     body {
-    padding-top: 40px;
-    padding-bottom: 40px;
-    background-color: #f5f5f5;
+      padding-top: 40px;
+      padding-bottom: 40px;
+      background-color: #eee;
     }
 
     .form-signin {
-    max-width: 280px;
-    padding: 19px 29px 29px;
-    margin: 0 auto 20px;
-    background-color: #fff;
-    border: 1px solid #e5e5e5;
-    -webkit-border-radius: 5px;
-        -moz-border-radius: 5px;
-            border-radius: 5px;
-    -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05);
-        -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
-            box-shadow: 0 1px 2px rgba(0,0,0,.05);
+      max-width: 330px;
+      padding: 15px;
+      margin: 0 auto;
     }
     .form-signin .form-signin-heading,
     .form-signin .checkbox {
-    margin-bottom: 10px;
+      margin-bottom: 10px;
     }
-    .form-signin input[type="text"],
+    .form-signin .checkbox {
+      font-weight: normal;
+    }
+    .form-signin .form-control {
+      position: relative;
+      height: auto;
+      -webkit-box-sizing: border-box;
+         -moz-box-sizing: border-box;
+              box-sizing: border-box;
+      padding: 10px;
+      font-size: 16px;
+    }
+    .form-signin .form-control:focus {
+      z-index: 2;
+    }
+    .form-signin input[type="email"] {
+      margin-bottom: -1px;
+      border-bottom-right-radius: 0;
+      border-bottom-left-radius: 0;
+    }
     .form-signin input[type="password"] {
-    font-size: 16px;
-    height: auto;
-    margin-bottom: 15px;
-    padding: 7px 9px;
+      margin-bottom: 10px;
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
     }
 
-</style>
+    </style>
 
     <div class="form-signin">
     <h2 class="form-signin-heading">Đăng nhập</h2>
@@ -44,5 +54,18 @@
         <div id="msg" runat="server" Visible="False" class="alert alert-warning">
         Username và mật khẩu không hợp lệ                    
     </div>
-    <asp:LinkButton ID="btnLogin" CssClass="btn btn-large btn-primary" runat="server" OnClick="btnLogin_Click">Đăng nhập</asp:LinkButton>
+    <asp:Button ID="btnLogin" ClientIDMode="Static" CssClass="btn btn-lg btn-block btn-primary" runat="server" OnClick="btnLogin_Click" Text="Đăng nhập" />
     </div>
+<script src="/lib/js/jQueryLib/jquery-1.10.2.min.js"></script>
+<script src="/lib/js/jQueryLib/jquery.hotkeys.js"></script>
+<script>
+    $(document).ready(function () {
+        var btn = $('#btnLogin');
+        
+        $(document).keypress(function (e) {
+            if (e.which == 13) {
+                btn.click();
+            }
+        });
+    });
+</script>

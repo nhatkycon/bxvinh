@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using docsoft;
 using docsoft.entities;
 using linh.core.dal;
 
@@ -20,8 +17,10 @@ public partial class lib_pages_Phoi_In_Phoi_NgoaiTinh : System.Web.UI.Page
             var LoaiBieuDo = LoaiBieuDoDal.SelectById(con, Xe.BIEUDO_ID);
             var Tuyen = TuyenDal.SelectById(con, Xe.TUYEN_ID);
             var TruyThuItem = TruyThuDal.SelectByPhoiId(con, Convert.ToInt64(Item.ID));
+            var XeVaoBen = XeVaoBenDal.SelectByPhoiId(con, Item.ID);
 
             Item.TruyThuItem = TruyThuItem;
+            Item.XeVaoBen = XeVaoBen;
             Xe.LaiXe = LaiXe;
             Item.LaiXe = LaiXe;
             Xe.LoaiBieuDo = LoaiBieuDo;
