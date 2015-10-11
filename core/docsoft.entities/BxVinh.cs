@@ -4256,7 +4256,29 @@ namespace docsoft.entities
             }
             return List;
         }
+        public static XeCollection ListByTuyen(SqlConnection con, Int32 cqId, int TuyenId, int Size)
+        {
+            var list = new XeCollection();
+            var obj = new SqlParameter[3];
+            if (TuyenId > 0)
+            {
+                obj[0] = new SqlParameter("TuyenId", TuyenId);
+            }
+            else
+            {
+                obj[0] = new SqlParameter("TuyenId", DBNull.Value);
+            }
 
+
+            using (IDataReader rd = SqlHelper.ExecuteReader(con, CommandType.StoredProcedure, "sp_tblBx_Xe_Select_ListByTuyen_linhnx", obj))
+            {
+                while (rd.Read())
+                {
+                    list.Add(getFromReader(rd));
+                }
+            }
+            return list;
+        }
         public static XeCollection ListByTuyen(SqlConnection con,int TuyenId)
         {
             var list = new XeCollection();
@@ -4419,7 +4441,7 @@ namespace docsoft.entities
 
                 var gioXuatBen = new DateTime(d.Year, d.Month, d.Day, Convert.ToInt32(arrays[0]),
                                               Convert.ToInt32(arrays[1]), 0);
-                //return Math.Floor(Convert.ToDecimal((d - gioXuatBen).TotalMinutes));
+                return Convert.ToInt32(Math.Floor(Convert.ToDecimal((d - gioXuatBen).TotalMinutes)));
             }
         }
         #endregion

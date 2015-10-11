@@ -339,39 +339,7 @@ namespace linh.httpModule
                     context.Response.WriteFile(context.Server.MapPath("~/lib/up/d/") + item.ThuMuc + "/" + item.Path + item.MimeType);
                 }
                 break;
-            case "uploadvideo":
-                if (Security.IsAuthenticated())
-                {
-                    if (context.Request.Files[0] != null)
-                    {
-                        string imgten = Guid.NewGuid().ToString();
-                        string strVideoRender = "";
-                        context.Request.Files[0].SaveAs(context.Server.MapPath("~/lib/up/v/") + imgten + Path.GetExtension(context.Request.Files[0].FileName));
-                        string _hinhanh = "";
-                        string fWmv = "";
-                        if (Path.GetExtension(context.Request.Files[0].FileName).ToLower() == ".flv")
-                        {
-                            fWmv = WMV_encode(context, imgten + Path.GetExtension(context.Request.Files[0].FileName), "320", "240", "64", "44100");
-                            context.Request.Files[0].SaveAs(context.Server.MapPath("~/lib/up/v/") + fWmv);
-                            _hinhanh = CreatImg(context, fWmv, imgten + Path.GetExtension(context.Request.Files[0].FileName));
-                            System.IO.File.Delete(context.Server.MapPath("~/lib/up/v/") + fWmv);
-                        }
-                        else
-                        {
-                            fWmv = FLV_encode(context, imgten + Path.GetExtension(context.Request.Files[0].FileName), "320", "240", "64", "44100");
-
-                            fWmv = context.Request.Files[0].FileName;
-                            _hinhanh = CreatImg(context, imgten + Path.GetExtension(context.Request.Files[0].FileName), imgten + Path.GetExtension(context.Request.Files[0].FileName));
-                        }
-                        rendertext(_hinhanh + ";" + imgten + Path.GetExtension(context.Request.Files[0].FileName));
-                    }
-                }
-
-                break;
-            case "DelOldFlash":
-                System.IO.File.Delete(context.Server.MapPath("~/lib/up/v/") + Path.GetExtension(context.Request.Files[0].FileName));
-                System.IO.File.Delete(context.Server.MapPath("~/lib/up/i/") + Path.GetExtension(context.Request.Files[0].FileName));
-                break;
+           
 
             case "MultiuploadImg":
                 #region UploadAnh
@@ -460,105 +428,6 @@ namespace linh.httpModule
             c.Response.ContentType = "text/html";
             c.Response.Write(txt);
             c.Response.End();
-        }
-        private string CreatImg(HttpContext context, string _mediaName, string strname)
-        {
-            string ret = "";
-            //   string filenameIMG = _mediaName;
-            MediaHandler _mediahandler = new MediaHandler();
-
-            string rootpath = context.Server.MapPath(context.Request.ApplicationPath);
-            string inputpath = context.Server.MapPath("~/lib/up/v/");
-            string outputpath = context.Server.MapPath("~/lib/up/v/"); // +"\\up\\v";
-            string _ffmpegpath = HttpContext.Current.Server.MapPath("~\\lib\\ffmpeg\\ffmpeg.dll");
-            string filenameIMG = Guid.NewGuid().ToString().Substring(0, 10) + ".jpg";
-
-            _mediahandler.FFMPEGPath = _ffmpegpath;
-            _mediahandler.InputPath = inputpath;
-            _mediahandler.OutputPath = outputpath;
-            _mediahandler.Width = 180;
-            _mediahandler.Height = 130;
-            _mediahandler.Frame_Time = "3";
-            _mediahandler.Image_Format = "jpg";
-            _mediahandler.FileName = _mediaName;
-            _mediahandler.ImageName = filenameIMG;
-            VideoInfo info = _mediahandler.Grab_Thumb();
-
-
-            if (info.ErrorCode > 0 && info.ErrorCode != 121)
-            {
-                return "";
-            }
-            ret = filenameIMG;
-            return filenameIMG;
-        }
-
-        public string WMV_encode(HttpContext context, string filename, string width, string height, string bitrate, string samplingrate)
-        {
-            try
-            {
-                string rootpath = context.Server.MapPath(context.Request.ApplicationPath);
-                rootpath = rootpath + "\\lib\\up\\v\\";
-                string outfile = "";
-                string size = width + "*" + height;
-                outfile = System.IO.Path.GetFileNameWithoutExtension(rootpath + filename);
-                //  outfile = outfile + ".flv";
-                outfile = Guid.NewGuid().ToString() + ".wmv";
-
-                string ffmpegargs = " -i " + rootpath + filename + " -vcodec wmv2 -acodec wmav2 -ab 64k -b 300k -s " + size + " " + rootpath + outfile;
-                System.Diagnostics.Process pProcess = new System.Diagnostics.Process();
-                pProcess.StartInfo.FileName = HttpContext.Current.Server.MapPath("~\\lib\\ffmpeg\\ffmpeg.dll");
-                pProcess.StartInfo.UseShellExecute = false;
-                pProcess.StartInfo.RedirectStandardOutput = true;
-                pProcess.StartInfo.CreateNoWindow = true;
-                pProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                pProcess.StartInfo.Arguments = ffmpegargs;
-                pProcess.EnableRaisingEvents = true;
-                pProcess.Start();
-                pProcess.WaitForExit();
-                pProcess.Close();
-                pProcess.Dispose();
-                return outfile;
-            }
-            catch (Exception err)
-            {
-                return "KO";
-            }
-        }
-        public string FLV_encode(HttpContext context, string filename, string width, string height, string bitrate, string samplingrate)
-        {
-            try
-            {
-                string rootpath = context.Server.MapPath(context.Request.ApplicationPath);
-                string inputpath = rootpath + "\\lib\\up\\v";
-                string outputpath = rootpath + "\\lib\\up\\v";
-                string _ffmpegpath = HttpContext.Current.Server.MapPath("~\\lib\\ffmpeg\\ffmpeg.dll");
-
-                string outfile = "";
-                string size = width + "*" + height;
-                outfile = System.IO.Path.GetFileNameWithoutExtension(inputpath + filename);
-                //outfile = outfile + ".flv";
-                outfile = Guid.NewGuid().ToString() + ".flv";
-
-                string ffmpegarg = " -i " + inputpath + filename + " -acodec libmp3lame -ar " + samplingrate + " -ab " + bitrate + " -f flv -s " + size + " " + inputpath + outfile;
-                System.Diagnostics.Process pProcess = new System.Diagnostics.Process();
-                pProcess.StartInfo.FileName = _ffmpegpath;
-                pProcess.StartInfo.UseShellExecute = false;
-                pProcess.StartInfo.RedirectStandardOutput = true;
-                pProcess.StartInfo.CreateNoWindow = true;
-                pProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                pProcess.StartInfo.Arguments = ffmpegarg;
-                pProcess.EnableRaisingEvents = true;
-                pProcess.Start();
-                pProcess.WaitForExit();
-                pProcess.Close();
-                pProcess.Dispose();
-                return outfile;
-            }
-            catch (Exception err)
-            {
-                return "KO";
-            }
         }
 
     }
